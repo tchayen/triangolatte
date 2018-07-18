@@ -11,7 +11,7 @@ type Triangle struct {
 	A, B, C Point
 }
 
-func Cyclic(i, n int) int {
+func cyclic(i, n int) int {
 	return (i%n + n) % n
 }
 
@@ -29,12 +29,12 @@ func IsInsideTriangle(t Triangle, p Point) bool {
 		SameSide(p, t.C, t.A, t.B)
 }
 
-func SplitConvexAndReflex(points []Point) (convex, reflex Set) {
+func splitConvexAndReflex(points []Point) (convex, reflex Set) {
 	n := len(points)
 	convex, reflex = make(Set, len(points)), make(Set, len(points))
 
 	for i := 0; i < n; i++ {
-		if IsReflex(points[Cyclic(i-1, n)], points[i], points[Cyclic(i+1, n)]) {
+		if IsReflex(points[cyclic(i-1, n)], points[i], points[cyclic(i+1, n)]) {
 			reflex[i] = true
 		} else {
 			convex[i] = true
@@ -43,7 +43,7 @@ func SplitConvexAndReflex(points []Point) (convex, reflex Set) {
 	return convex, reflex
 }
 
-func DetectEars(points []Point, reflex Set) (ears Set) {
+func detectEars(points []Point, reflex Set) (ears Set) {
 	n := len(points)
 	ears = make(Set, len(points))
 
@@ -56,15 +56,15 @@ func DetectEars(points []Point, reflex Set) (ears Set) {
 		for j := 0; j < n; j++ {
 			// It is ok to skip reflex vertices and the ones that actually belong to
 			// the triangle.
-			if reflex[j] || j == Cyclic(i-1, n) || j == i || j == Cyclic(i+1, n) {
+			if reflex[j] || j == cyclic(i-1, n) || j == i || j == cyclic(i+1, n) {
 				continue
 			}
 
 			// If triangle contains points[j], points[i] cannot be an ear tip.
 			if IsInsideTriangle(Triangle{
-				points[Cyclic(i-1, n)],
+				points[cyclic(i-1, n)],
 				points[i],
-				points[Cyclic(i+1, n)],
+				points[cyclic(i+1, n)],
 			}, points[j]) {
 				isEar = false
 			}
@@ -76,7 +76,7 @@ func DetectEars(points []Point, reflex Set) (ears Set) {
 	return ears
 }
 
-func CombinePolygons(outer, inner []Point) (result []Point) {
+func combinePolygons(outer, inner []Point) (result []Point) {
 	xMax := 0.0
 	mIndex := 0
 	for i := 0; i < len(inner); i++ {
@@ -166,7 +166,7 @@ func CombinePolygons(outer, inner []Point) (result []Point) {
 		n := len(outer)
 		for i := 0; i < n; i++ {
 			notInside := !IsInsideTriangle(Triangle{m, k, outer[pIndex]}, outer[i])
-			notReflex := !IsReflex(outer[Cyclic(i-1, n)], outer[i], outer[Cyclic(i+1, n)])
+			notReflex := !IsReflex(outer[cyclic(i-1, n)], outer[i], outer[cyclic(i+1, n)])
 			if notInside || notReflex {
 				continue
 			}
@@ -184,7 +184,7 @@ func CombinePolygons(outer, inner []Point) (result []Point) {
 	result = make([]Point, 0, len(outer)+len(inner)+2)
 	result = append(result, outer[:visibleIndex+1]...)
 	for i := 0; i < n; i++ {
-		result = append(result, inner[Cyclic(mIndex+i, n)])
+		result = append(result, inner[cyclic(mIndex+i, n)])
 	}
 	result = append(result, inner[mIndex], outer[visibleIndex])
 	result = append(result, outer[visibleIndex+1:]...)
@@ -219,13 +219,13 @@ func (polygons byMaxX) Less(i, j int) bool {
 	return true
 }
 
-func EliminateHoles(outer []Point, inners [][]Point) []Point {
+func eliminateHoles(outer []Point, inners [][]Point) []Point {
 	sort.Sort(byMaxX(inners))
 
 	var inner []Point
 	for len(inners) > 0 {
 		inner, inners = inners[0], inners[1:]
-		outer = CombinePolygons(outer, inner)
+		outer = combinePolygons(outer, inner)
 	}
 	return outer
 }
@@ -236,8 +236,8 @@ func EarCut(points []Point) (triangles []float64) {
 		panic("Cannot triangulate less than three points")
 	}
 
-	var _, reflex Set = SplitConvexAndReflex(points)
-	var ears Set = DetectEars(points, reflex)
+	var _, reflex Set = splitConvexAndReflex(points)
+	var ears Set = detectEars(points, reflex)
 
 	triangles = make([]float64, 0, (n-1)/2)
 	for len(points) > 3 {
@@ -246,16 +246,16 @@ func EarCut(points []Point) (triangles []float64) {
 			i = k
 		}
 
-		v1, v2 := points[Cyclic(i-1, n)].Pair()
+		v1, v2 := points[cyclic(i-1, n)].Pair()
 		v3, v4 := points[i].Pair()
-		v5, v6 := points[Cyclic(i+1, n)].Pair()
+		v5, v6 := points[cyclic(i+1, n)].Pair()
 
 		triangles = append(triangles, v1, v2, v3, v4, v5, v6)
 		points = append(points[:i], points[i+1:]...)
 		n = n - 1
 
-		_, reflex = SplitConvexAndReflex(points)
-		ears = DetectEars(points, reflex)
+		_, reflex = splitConvexAndReflex(points)
+		ears = detectEars(points, reflex)
 	}
 	return triangles
 }

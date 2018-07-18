@@ -8,8 +8,8 @@ import (
 var vertices = []Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
 
 func TestCyclic(t *testing.T) {
-	if Cyclic(1, 5) != 1 || Cyclic(4, 5) != 4 || Cyclic(6, 5) != 1 || Cyclic(-1, 5) != 4 || Cyclic(-5, 5) != 0 || Cyclic(-6, 5) != 4 {
-		t.Error("Cyclic is broken")
+	if cyclic(1, 5) != 1 || cyclic(4, 5) != 4 || cyclic(6, 5) != 1 || cyclic(-1, 5) != 4 || cyclic(-5, 5) != 0 || cyclic(-6, 5) != 4 {
+		t.Error("cyclic is broken")
 	}
 }
 
@@ -32,12 +32,12 @@ func TestIsInsideTriangle(t *testing.T) {
 }
 
 func TestSplitConvexAndReflex(t *testing.T) {
-	convex, reflex := SplitConvexAndReflex([]Point{{0, 0}, {2, 3}, {4, 2}, {0, 7}})
+	convex, reflex := splitConvexAndReflex([]Point{{0, 0}, {2, 3}, {4, 2}, {0, 7}})
 	t.Log(convex)
 	t.Log(reflex)
 
 	if !(convex[0] && convex[2] && convex[3] && !convex[1] && reflex[1] && !reflex[2]) {
-		t.Error("SplitConvexAndReflex is broken")
+		t.Error("splitConvexAndReflex is broken")
 	}
 }
 
@@ -60,12 +60,12 @@ func TestEliminateHoles(t *testing.T) {
 	// 	{50, 40}, {90, 40}, {30, 70},
 	// }
 
-	t.Log(EliminateHoles(polygon, holes))
+	t.Log(eliminateHoles(polygon, holes))
 
 	// var withoutHoles []Point
 	// copy(polygonWithEliminatedHoles, withoutHoles)
 	//
-	// EliminateHoles(polygon, holes)
+	// eliminateHoles(polygon, holes)
 	// for i := 0; i < len(polygonWithEliminatedHoles); i++ {
 	// 	if polygonWithEliminatedHoles[i] != withoutHoles[i] {
 	// 		t.Error("Incorrect hole elimination")
