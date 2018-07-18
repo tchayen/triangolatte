@@ -138,12 +138,21 @@ func CombinePolygons(outer, inner []Point) (result []Point) {
 
 	// Check with all vertices of the outer polygon to be outside of the
 	// triangle `[M, K, P]`. If it is true, `M` and `P` are mutually visible.
-	anyInside := false
+	allOutside := true
 	for i := 0; i < len(outer); i++ {
-		anyInside = anyInside && (outer[i] == outer[pIndex] || !IsInsideTriangle(Triangle{m, k, outer[pIndex]}, outer[i]))
+		// We have to skip M, K and P vertices. Since M is from the inner
+		// polygon and K was proved to not match any vertex, the only one to
+		// check is pIndex
+		if i == pIndex {
+			continue
+		}
+
+		if IsInsideTriangle(Triangle{m, k, outer[pIndex]}, outer[i]) {
+			allOutside = false
+		}
 	}
 
-	if visibleIndex < 0 && anyInside {
+	if visibleIndex < 0 && allOutside {
 		visibleIndex = pIndex
 	}
 
@@ -156,7 +165,9 @@ func CombinePolygons(outer, inner []Point) (result []Point) {
 		var reflex []int
 		n := len(outer)
 		for i := 0; i < n; i++ {
-			if !IsInsideTriangle(Triangle{m, k, outer[pIndex]}, outer[i]) || !IsReflex(outer[Cyclic(i-1, n)], outer[i], outer[Cyclic(i+1, n)]) {
+			notInside := !IsInsideTriangle(Triangle{m, k, outer[pIndex]}, outer[i])
+			notReflex := !IsReflex(outer[Cyclic(i-1, n)], outer[i], outer[Cyclic(i+1, n)])
+			if notInside || notReflex {
 				continue
 			}
 			reflex = append(reflex, i)
@@ -169,11 +180,14 @@ func CombinePolygons(outer, inner []Point) (result []Point) {
 		panic("Could not find visible vertex")
 	}
 
+	n := len(inner)
 	result = make([]Point, 0, len(outer)+len(inner)+2)
-	result = append(outer[:visibleIndex])
-	result = append(inner[:])
+	result = append(result, outer[:visibleIndex+1]...)
+	for i := 0; i < n; i++ {
+		result = append(result, inner[Cyclic(mIndex+i, n)])
+	}
 	result = append(result, inner[mIndex], outer[visibleIndex])
-	result = append(outer[visibleIndex:])
+	result = append(result, outer[visibleIndex+1:]...)
 
 	return result
 }
@@ -199,13 +213,13 @@ func (polygons byMaxX) Less(i, j int) bool {
 
 	for k := 0; k < len(polygons[j]); k++ {
 		if polygons[j][k].X > xMax {
-			return true
+			return false
 		}
 	}
-	return false
+	return true
 }
 
-func EliminateHoles(outer []Point, inners [][]Point) {
+func EliminateHoles(outer []Point, inners [][]Point) []Point {
 	sort.Sort(byMaxX(inners))
 
 	var inner []Point
@@ -213,6 +227,7 @@ func EliminateHoles(outer []Point, inners [][]Point) {
 		inner, inners = inners[0], inners[1:]
 		outer = CombinePolygons(outer, inner)
 	}
+	return outer
 }
 
 func EarCut(points []Point) (triangles []float64) {
