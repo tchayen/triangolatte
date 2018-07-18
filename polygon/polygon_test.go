@@ -5,7 +5,7 @@ import (
 	. "triangolate/point"
 )
 
-var vertices = []Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, Point{395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
+var vertices = []Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
 
 func TestCyclic(t *testing.T) {
 	if Cyclic(1, 5) != 1 || Cyclic(4, 5) != 4 || Cyclic(6, 5) != 1 || Cyclic(-1, 5) != 4 || Cyclic(-5, 5) != 0 || Cyclic(-6, 5) != 4 {
@@ -53,7 +53,7 @@ func TestEliminateHoles(t *testing.T) {
 	}
 
 	var polygonWithEliminatedHoles = []Point{
-		{0, 30}, {20,  0}, {80,  0},
+		{0, 30}, {20, 0}, {80, 0},
 		{90, 40}, {70, 20}, {50, 10},
 		{60, 30}, {70, 20}, {90, 40},
 		{50, 40}, {20, 10}, {20, 40},

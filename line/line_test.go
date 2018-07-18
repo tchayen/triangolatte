@@ -1,8 +1,8 @@
 package line
 
 import (
-	"testing"
 	"math"
+	"testing"
 	. "triangolate/point"
 )
 
@@ -12,7 +12,7 @@ func checkArray(t *testing.T, result, expected []float64) {
 	}
 
 	for i := 0; i < len(result); i++ {
-		if math.Abs(result[i] - expected[i]) > 0.001 {
+		if math.Abs(result[i]-expected[i]) > 0.001 {
 			t.Error("Value error beyond floating point precision")
 		}
 	}

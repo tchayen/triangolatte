@@ -1,8 +1,8 @@
 package polygon
 
 import (
-	. "triangolate/point"
 	"sort"
+	. "triangolate/point"
 )
 
 type Set map[int]bool
@@ -12,7 +12,7 @@ type Triangle struct {
 }
 
 func Cyclic(i, n int) int {
-	return (i % n + n) % n
+	return (i%n + n) % n
 }
 
 func IsReflex(a, b, c Point) bool {
@@ -20,7 +20,7 @@ func IsReflex(a, b, c Point) bool {
 }
 
 func SameSide(p1, p2, a, b Point) bool {
-	return b.Sub(a).Cross(p1.Sub(a)) * b.Sub(a).Cross(p2.Sub(a)) >= 0
+	return b.Sub(a).Cross(p1.Sub(a))*b.Sub(a).Cross(p2.Sub(a)) >= 0
 }
 
 func IsInsideTriangle(t Triangle, p Point) bool {
@@ -34,7 +34,7 @@ func SplitConvexAndReflex(points []Point) (convex, reflex Set) {
 	convex, reflex = make(Set, len(points)), make(Set, len(points))
 
 	for i := 0; i < n; i++ {
-		if IsReflex(points[Cyclic(i - 1, n)], points[i], points[Cyclic(i + 1, n)]) {
+		if IsReflex(points[Cyclic(i-1, n)], points[i], points[Cyclic(i+1, n)]) {
 			reflex[i] = true
 		} else {
 			convex[i] = true
@@ -56,15 +56,15 @@ func DetectEars(points []Point, reflex Set) (ears Set) {
 		for j := 0; j < n; j++ {
 			// It is ok to skip reflex vertices and the ones that actually belong to
 			// the triangle.
-			if reflex[j] || j == Cyclic(i - 1, n) || j == i || j == Cyclic(i + 1, n) {
+			if reflex[j] || j == Cyclic(i-1, n) || j == i || j == Cyclic(i+1, n) {
 				continue
 			}
 
 			// If triangle contains points[j], points[i] cannot be an ear tip.
 			if IsInsideTriangle(Triangle{
-				points[Cyclic(i - 1, n)],
+				points[Cyclic(i-1, n)],
 				points[i],
-				points[Cyclic(i + 1, n)],
+				points[Cyclic(i+1, n)],
 			}, points[j]) {
 				isEar = false
 			}
@@ -93,7 +93,7 @@ func CombinePolygons(outer, inner []Point) (result []Point) {
 	var k Point
 	foundK := false
 	var k1, k2 int
-	for i, j := len(outer) - 1, 0; j < len(outer); i, j = j, j + 1 {
+	for i, j := len(outer)-1, 0; j < len(outer); i, j = j, j+1 {
 		// Skip edges that does not have their first point below `M` and the second
 		// one above.
 		if outer[i].Y > m.Y || outer[j].Y < m.Y {
@@ -109,14 +109,14 @@ func CombinePolygons(outer, inner []Point) (result []Point) {
 
 		if t1 >= 0.0 && t2 >= 0.0 && t2 <= 1.0 {
 			// If there is no current `k` candidate or this one is closer.
-			if !foundK || t1 - m.X < k.X {
-			k = Point{X: t1 + m.X, Y: m.Y}
-			k1, k2 = i, j
-			foundK = true
+			if !foundK || t1-m.X < k.X {
+				k = Point{X: t1 + m.X, Y: m.Y}
+				k1, k2 = i, j
+				foundK = true
 			}
 		} else {
 			panic("Cannot calculate intersection, problematic data")
-    	}
+		}
 	}
 
 	var visibleIndex, pIndex int = -1, -1
@@ -156,7 +156,7 @@ func CombinePolygons(outer, inner []Point) (result []Point) {
 		var reflex []int
 		n := len(outer)
 		for i := 0; i < n; i++ {
-			if !IsInsideTriangle(Triangle{m, k, outer[pIndex]}, outer[i]) || !IsReflex(outer[Cyclic(i - 1, n)], outer[i], outer[Cyclic(i + 1, n)]) {
+			if !IsInsideTriangle(Triangle{m, k, outer[pIndex]}, outer[i]) || !IsReflex(outer[Cyclic(i-1, n)], outer[i], outer[Cyclic(i+1, n)]) {
 				continue
 			}
 			reflex = append(reflex, i)
@@ -169,7 +169,7 @@ func CombinePolygons(outer, inner []Point) (result []Point) {
 		panic("Could not find visible vertex")
 	}
 
-	result = make([]Point, 0, len(outer) + len(inner) + 2)
+	result = make([]Point, 0, len(outer)+len(inner)+2)
 	result = append(outer[:visibleIndex])
 	result = append(inner[:])
 	result = append(result, inner[mIndex], outer[visibleIndex])
@@ -179,6 +179,7 @@ func CombinePolygons(outer, inner []Point) (result []Point) {
 }
 
 type byMaxX [][]Point
+
 func (polygons byMaxX) Len() int {
 	return len(polygons)
 }
@@ -223,17 +224,19 @@ func EarCut(points []Point) (triangles []float64) {
 	var _, reflex Set = SplitConvexAndReflex(points)
 	var ears Set = DetectEars(points, reflex)
 
-	triangles = make([]float64, 0, (n - 1) / 2)
+	triangles = make([]float64, 0, (n-1)/2)
 	for len(points) > 3 {
 		i := 0
-		for k := range ears { i = k }
+		for k := range ears {
+			i = k
+		}
 
-		v1, v2 := points[Cyclic(i - 1, n)].Pair()
+		v1, v2 := points[Cyclic(i-1, n)].Pair()
 		v3, v4 := points[i].Pair()
-		v5, v6 := points[Cyclic(i + 1, n)].Pair()
+		v5, v6 := points[Cyclic(i+1, n)].Pair()
 
 		triangles = append(triangles, v1, v2, v3, v4, v5, v6)
-		points = append(points[:i], points[i + 1:]...)
+		points = append(points[:i], points[i+1:]...)
 		n = n - 1
 
 		_, reflex = SplitConvexAndReflex(points)
