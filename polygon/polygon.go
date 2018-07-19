@@ -34,7 +34,11 @@ func splitConvexAndReflex(points []Point, indexMap []int) (convex, reflex Set) {
 	convex, reflex = make(Set, len(points)), make(Set, len(points))
 
 	for i := 0; i < n; i++ {
-		if IsReflex(points[indexMap[cyclic(i-1, n)]], points[indexMap[i]], points[indexMap[cyclic(i+1, n)]]) {
+		a := points[indexMap[cyclic(i-1, n)]]
+		b := points[indexMap[i]]
+		c := points[indexMap[cyclic(i+1, n)]]
+
+		if IsReflex(a, b, c) {
 			reflex[i] = true
 		} else {
 			convex[i] = true
@@ -230,19 +234,23 @@ func eliminateHoles(outer []Point, inners [][]Point) []Point {
 	return outer
 }
 
-func EarCut(points []Point) (triangles []float64) {
+func EarCut(points []Point, holes [][]Point) (triangles []float64) {
 	n := len(points)
 	if n < 3 {
 		panic("Cannot triangulate less than three points")
 	}
 
-	var indexMap []int = make([]int, 0, n)
+	if len(holes) > 0 {
+		points = eliminateHoles(points, holes)
+	}
+
+	var indexMap = make([]int, 0, n)
 	for i := 0; i < n; i++ {
 		indexMap = append(indexMap, i)
 	}
 
 	var _, reflex Set = splitConvexAndReflex(points, indexMap)
-	var ears Set = detectEars(points, reflex, indexMap)
+	var ears = detectEars(points, reflex, indexMap)
 
 	triangles = make([]float64, 0, (n-1)/2)
 	for len(indexMap) > 3 {
