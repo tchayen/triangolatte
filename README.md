@@ -1,4 +1,4 @@
-# triangolate
+# triangolatte
 
 > **NOTE:** _The library is in its very early stage. Near future will bring real package class API, tests and optimizations._
 
