@@ -9,6 +9,24 @@ import (
 
 var vertices = []Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
 
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
+// func TestMain(m *testing.M) {
+// 	data, err := ioutil.ReadFile("../assets/agh_a0")
+// 	check(err)
+//
+// 	// TODO read JSON array
+// 	fmt.Println(string(data))
+//
+// 	var polygons [][]Point
+// 	json.Unmarshal([]byte(data), &polygons)
+// 	fmt.Printf(": %+v", polygons)
+// }
+
 func checkIntArray(t *testing.T, result, expected []int) {
 	if len(result) != len(expected) {
 		t.Error("Array sizes don't match")
