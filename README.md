@@ -27,7 +27,7 @@ go get github.com/Tchayen/triangolatte
 ```go
 vertices := []Point{{10, 20}, {30, 40}, {50, 60}}
 holes := [][]Point{}
-triangolate.EarCut(vertices, holes)
+triangolatte.EarCut(vertices, holes)
 ```
 
 ## Features
