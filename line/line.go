@@ -1,6 +1,6 @@
 package line
 
-import . "triangolate/point"
+import . "triangolatte/point"
 
 func Normal(points []Point, width int) (triangles []float64) {
 	width /= 2.0

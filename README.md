@@ -16,7 +16,7 @@ One of the core plans for this library's development is creating, as soon as it 
 
 Nothing surprising
 ```bash
-go get github.com/Tchayen/triangolate
+go get github.com/Tchayen/triangolatte
 ```
 
 ## Usage

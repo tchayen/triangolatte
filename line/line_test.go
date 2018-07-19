@@ -3,7 +3,7 @@ package line
 import (
 	"math"
 	"testing"
-	. "triangolate/point"
+	. "triangolatte/point"
 )
 
 func checkArray(t *testing.T, result, expected []float64) {
