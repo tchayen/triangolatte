@@ -33,7 +33,6 @@ func checkFloat64Array(t *testing.T, result, expected []float64) {
 	}
 }
 
-
 // TODO: generalise function above
 func checkPointArray(t *testing.T, result, expected []Point) {
 	if len(result) != len(expected) {
@@ -131,7 +130,6 @@ func TestEliminateHolesWithNoPossibleVisibleVertex(t *testing.T) {
 func TestEarCut(t *testing.T) {
 	result := EarCut(vertices)
 	expected := []float64{240, 115, 320, 65, 395, 170, 240, 115, 395, 170, 305, 160, 240, 115, 305, 160, 265, 240, 240, 115, 265, 240, 190, 100, 150, 30, 240, 115, 190, 100, 50, 110, 150, 30, 190, 100, 50, 110, 190, 100, 95, 125, 50, 110, 95, 125, 100, 215}
-
 
 	t.Log(result)
 	t.Log(expected)
