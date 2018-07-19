@@ -9,17 +9,30 @@ import (
 
 var vertices = []Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
 
-func checkArray(t *testing.T, result, expected []int) {
+func checkIntArray(t *testing.T, result, expected []int) {
 	if len(result) != len(expected) {
 		t.Error("Array sizes don't match")
 	}
 
 	for i := 0; i < len(result); i++ {
 		if math.Abs(float64(result[i]-expected[i])) > 0.001 {
-			t.Error("Value error beyond floating point precision")
+			t.Error("Value error beyond floating point precision problem")
 		}
 	}
 }
+
+func checkFloat64Array(t *testing.T, result, expected []float64) {
+	if len(result) != len(expected) {
+		t.Error("Array sizes don't match")
+	}
+
+	for i := 0; i < len(result); i++ {
+		if math.Abs(result[i]-expected[i]) > 0.001 {
+			t.Error("Value error beyond floating point precision problem")
+		}
+	}
+}
+
 
 // TODO: generalise function above
 func checkPointArray(t *testing.T, result, expected []Point) {
@@ -29,7 +42,7 @@ func checkPointArray(t *testing.T, result, expected []Point) {
 
 	for i := 0; i < len(result); i++ {
 		if math.Abs(result[i].X-expected[i].X) > 0.001 && math.Abs(result[i].Y-expected[i].Y) > 0.001 {
-			t.Error("Value error beyond floating point precision")
+			t.Error("Value error beyond floating point precision problem")
 		}
 	}
 }
@@ -59,7 +72,9 @@ func TestIsInsideTriangle(t *testing.T) {
 }
 
 func TestSplitConvexAndReflex(t *testing.T) {
-	convex, reflex := splitConvexAndReflex([]Point{{0, 0}, {2, 3}, {4, 2}, {0, 7}})
+	indexMap := []int{0, 1, 2, 3}
+
+	convex, reflex := splitConvexAndReflex([]Point{{0, 0}, {2, 3}, {4, 2}, {0, 7}}, indexMap)
 	t.Log(convex)
 	t.Log(reflex)
 
@@ -69,20 +84,21 @@ func TestSplitConvexAndReflex(t *testing.T) {
 }
 
 func TestDetectEars(t *testing.T) {
-	_, reflex := splitConvexAndReflex(vertices)
-	earsMap := detectEars(vertices, reflex)
+	var indexMap []int = []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+
+	_, reflex := splitConvexAndReflex(vertices, indexMap)
+	earsMap := detectEars(vertices, reflex, indexMap)
 	ears := make([]int, 0, len(earsMap))
-	for _, v := range ears {
-		ears = append(ears, v)
+	for k, _ := range earsMap {
+		ears = append(ears, k)
 	}
 	sort.Ints(ears)
 
 	expectedEars := []int{3, 4, 6, 9}
 
-	t.Log(earsMap)
+	t.Log(ears)
 	t.Log(expectedEars)
-	checkArray(t, ears, expectedEars)
-
+	checkIntArray(t, ears, expectedEars)
 }
 
 func TestEliminateHoles(t *testing.T) {
@@ -105,5 +121,12 @@ func TestEliminateHoles(t *testing.T) {
 }
 
 func TestEarCut(t *testing.T) {
+	result := EarCut(vertices)
+	expected := []float64{240, 115, 320, 65, 395, 170, 240, 115, 395, 170, 305, 160, 240, 115, 305, 160, 265, 240, 240, 115, 265, 240, 190, 100, 150, 30, 240, 115, 190, 100, 50, 110, 150, 30, 190, 100, 50, 110, 190, 100, 95, 125, 50, 110, 95, 125, 100, 215}
 
+
+	t.Log(result)
+	t.Log(expected)
+
+	checkFloat64Array(t, result, expected)
 }

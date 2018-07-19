@@ -29,12 +29,12 @@ func IsInsideTriangle(t Triangle, p Point) bool {
 		SameSide(p, t.C, t.A, t.B)
 }
 
-func splitConvexAndReflex(points []Point) (convex, reflex Set) {
-	n := len(points)
+func splitConvexAndReflex(points []Point, indexMap []int) (convex, reflex Set) {
+	n := len(indexMap)
 	convex, reflex = make(Set, len(points)), make(Set, len(points))
 
 	for i := 0; i < n; i++ {
-		if IsReflex(points[cyclic(i-1, n)], points[i], points[cyclic(i+1, n)]) {
+		if IsReflex(points[indexMap[cyclic(i-1, n)]], points[indexMap[i]], points[indexMap[cyclic(i+1, n)]]) {
 			reflex[i] = true
 		} else {
 			convex[i] = true
@@ -43,8 +43,8 @@ func splitConvexAndReflex(points []Point) (convex, reflex Set) {
 	return convex, reflex
 }
 
-func detectEars(points []Point, reflex Set) (ears Set) {
-	n := len(points)
+func detectEars(points []Point, reflex Set, indexMap []int) (ears Set) {
+	n := len(indexMap)
 	ears = make(Set, len(points))
 
 	for i := 0; i < n; i++ {
@@ -56,16 +56,16 @@ func detectEars(points []Point, reflex Set) (ears Set) {
 		for j := 0; j < n; j++ {
 			// It is ok to skip reflex vertices and the ones that actually belong to
 			// the triangle.
-			if reflex[j] || j == cyclic(i-1, n) || j == i || j == cyclic(i+1, n) {
+			if !reflex[j] || j == cyclic(i-1, n) || j == i || j == cyclic(i+1, n) {
 				continue
 			}
 
 			// If triangle contains points[j], points[i] cannot be an ear tip.
 			if IsInsideTriangle(Triangle{
-				points[cyclic(i-1, n)],
-				points[i],
-				points[cyclic(i+1, n)],
-			}, points[j]) {
+				points[indexMap[cyclic(i-1, n)]],
+				points[indexMap[i]],
+				points[indexMap[cyclic(i+1, n)]],
+			}, points[indexMap[j]]) {
 				isEar = false
 			}
 		}
@@ -236,26 +236,38 @@ func EarCut(points []Point) (triangles []float64) {
 		panic("Cannot triangulate less than three points")
 	}
 
-	var _, reflex Set = splitConvexAndReflex(points)
-	var ears Set = detectEars(points, reflex)
+	var indexMap []int = make([]int, 0, n)
+	for i := 0; i < n; i++ {
+		indexMap = append(indexMap, i)
+	}
+
+	var _, reflex Set = splitConvexAndReflex(points, indexMap)
+	var ears Set = detectEars(points, reflex, indexMap)
 
 	triangles = make([]float64, 0, (n-1)/2)
-	for len(points) > 3 {
-		i := 0
+	for len(indexMap) > 3 {
+		e := make([]int, 0, len(ears))
 		for k := range ears {
-			i = k
+			e = append(e, k)
 		}
+		sort.Ints(e)
+		i := e[0]
 
-		v1, v2 := points[cyclic(i-1, n)].Pair()
-		v3, v4 := points[i].Pair()
-		v5, v6 := points[cyclic(i+1, n)].Pair()
+		v1, v2 := points[indexMap[cyclic(i-1, n)]].Pair()
+		v3, v4 := points[indexMap[i]].Pair()
+		v5, v6 := points[indexMap[cyclic(i+1, n)]].Pair()
 
 		triangles = append(triangles, v1, v2, v3, v4, v5, v6)
-		points = append(points[:i], points[i+1:]...)
+		indexMap = append(indexMap[:i], indexMap[i+1:]...) // Skip `points[indexMap[i]]`.
 		n = n - 1
 
-		_, reflex = splitConvexAndReflex(points)
-		ears = detectEars(points, reflex)
+		_, reflex = splitConvexAndReflex(points, indexMap)
+		ears = detectEars(points, reflex, indexMap)
 	}
+	v1, v2 := points[indexMap[0]].Pair()
+	v3, v4 := points[indexMap[1]].Pair()
+	v5, v6 := points[indexMap[2]].Pair()
+
+	triangles = append(triangles, v1, v2, v3, v4, v5, v6)
 	return triangles
 }
