@@ -2,7 +2,7 @@
 
 > **NOTE:** _The library is in its very early stage. Near future will bring real package class API, tests and optimizations._
 
-> **NOTE:** I have been writing Go for ~6 hours now, not everything will be perfect. _Also: proper usage examples will come later._
+> **NOTE:** _I have been writing Go for ~6 hours now, not everything will be perfect. Also: proper usage examples will come later._
 
 Triangulation library. Allows translating lines and polygons to the language of GPUs.
 
