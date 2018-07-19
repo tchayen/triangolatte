@@ -29,7 +29,7 @@ triangolate.EarCut(vertices, holes)
 
 ## Features
 
-> **NOTE**: _this library is developed mostly in map data triangulation and it will be its main performance target once it reaches benchmarking phase_
+> **NOTE**: _this library is developed mostly with map data triangulation in mind and it will be its main performance target once it reaches benchmarking phase_
 
 #### `line.Normal(points []Point, width int)`
 Normal triangulation. Produces joints that are ugly in zoom, but fast to compute and sometimes acceptable.
