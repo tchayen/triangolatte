@@ -1,6 +1,9 @@
 package polygon
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"math"
 	"sort"
 	"testing"
@@ -15,17 +18,17 @@ func check(e error) {
 	}
 }
 
-// func TestMain(m *testing.M) {
-// 	data, err := ioutil.ReadFile("../assets/agh_a0")
-// 	check(err)
-//
-// 	// TODO read JSON array
-// 	fmt.Println(string(data))
-//
-// 	var polygons [][]Point
-// 	json.Unmarshal([]byte(data), &polygons)
-// 	fmt.Printf(": %+v", polygons)
-// }
+func TestMain(m *testing.M) {
+	data, err := ioutil.ReadFile("../assets/agh_a0")
+	check(err)
+
+	// TODO read JSON array
+	fmt.Println(string(data))
+
+	polygons := make([][][]float64, 0)
+	json.Unmarshal([]byte(data), &polygons)
+	fmt.Printf(": %#v", polygons)
+}
 
 func checkIntArray(t *testing.T, result, expected []int) {
 	if len(result) != len(expected) {
