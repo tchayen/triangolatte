@@ -1,11 +1,38 @@
 package polygon
 
 import (
+	"math"
+	"sort"
 	"testing"
 	. "triangolatte/point"
 )
 
 var vertices = []Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
+
+func checkArray(t *testing.T, result, expected []int) {
+	if len(result) != len(expected) {
+		t.Error("Array sizes don't match")
+	}
+
+	for i := 0; i < len(result); i++ {
+		if math.Abs(float64(result[i]-expected[i])) > 0.001 {
+			t.Error("Value error beyond floating point precision")
+		}
+	}
+}
+
+// TODO: generalise function above
+func checkPointArray(t *testing.T, result, expected []Point) {
+	if len(result) != len(expected) {
+		t.Error("Array sizes don't match")
+	}
+
+	for i := 0; i < len(result); i++ {
+		if math.Abs(result[i].X-expected[i].X) > 0.001 && math.Abs(result[i].Y-expected[i].Y) > 0.001 {
+			t.Error("Value error beyond floating point precision")
+		}
+	}
+}
 
 func TestCyclic(t *testing.T) {
 	if cyclic(1, 5) != 1 || cyclic(4, 5) != 4 || cyclic(6, 5) != 1 || cyclic(-1, 5) != 4 || cyclic(-5, 5) != 0 || cyclic(-6, 5) != 4 {
@@ -42,35 +69,39 @@ func TestSplitConvexAndReflex(t *testing.T) {
 }
 
 func TestDetectEars(t *testing.T) {
-	// TODO
+	_, reflex := splitConvexAndReflex(vertices)
+	earsMap := detectEars(vertices, reflex)
+	ears := make([]int, 0, len(earsMap))
+	for _, v := range ears {
+		ears = append(ears, v)
+	}
+	sort.Ints(ears)
+
+	expectedEars := []int{3, 4, 6, 9}
+
+	t.Log(earsMap)
+	t.Log(expectedEars)
+	checkArray(t, ears, expectedEars)
+
 }
 
 func TestEliminateHoles(t *testing.T) {
-	var polygon = []Point{{0, 30}, {20, 0}, {80, 0}, {90, 40}, {30, 70}}
-	var holes = [][]Point{
+	polygon := []Point{{0, 30}, {20, 0}, {80, 0}, {90, 40}, {30, 70}}
+	holes := [][]Point{
 		{{20, 10}, {20, 40}, {50, 40}},
 		{{60, 30}, {70, 20}, {50, 10}},
 	}
 
-	// var polygonWithEliminatedHoles = []Point{
-	// 	{0, 30}, {20, 0}, {80, 0},
-	// 	{90, 40}, {70, 20}, {50, 10},
-	// 	{60, 30}, {70, 20}, {90, 40},
-	// 	{50, 40}, {20, 10}, {20, 40},
-	// 	{50, 40}, {90, 40}, {30, 70},
-	// }
+	polygonWithEliminatedHoles := []Point{
+		{0, 30}, {20, 0}, {80, 0},
+		{90, 40}, {70, 20}, {50, 10},
+		{60, 30}, {70, 20}, {90, 40},
+		{50, 40}, {20, 10}, {20, 40},
+		{50, 40}, {90, 40}, {30, 70},
+	}
 
-	t.Log(eliminateHoles(polygon, holes))
-
-	// var withoutHoles []Point
-	// copy(polygonWithEliminatedHoles, withoutHoles)
-	//
-	// eliminateHoles(polygon, holes)
-	// for i := 0; i < len(polygonWithEliminatedHoles); i++ {
-	// 	if polygonWithEliminatedHoles[i] != withoutHoles[i] {
-	// 		t.Error("Incorrect hole elimination")
-	// 	}
-	// }
+	eliminated := eliminateHoles(polygon, holes)
+	checkPointArray(t, eliminated, polygonWithEliminatedHoles)
 }
 
 func TestEarCut(t *testing.T) {
