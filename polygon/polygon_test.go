@@ -120,6 +120,14 @@ func TestEliminateHoles(t *testing.T) {
 	checkPointArray(t, eliminated, polygonWithEliminatedHoles)
 }
 
+func TestEliminateHolesWithNoDirectlyVisible(t *testing.T) {
+	// TODO
+}
+
+func TestEliminateHolesWithNoPossibleVisibleVertex(t *testing.T) {
+	// TODO
+}
+
 func TestEarCut(t *testing.T) {
 	result := EarCut(vertices)
 	expected := []float64{240, 115, 320, 65, 395, 170, 240, 115, 395, 170, 305, 160, 240, 115, 305, 160, 265, 240, 240, 115, 265, 240, 190, 100, 150, 30, 240, 115, 190, 100, 50, 110, 150, 30, 190, 100, 50, 110, 190, 100, 95, 125, 50, 110, 95, 125, 100, 215}
@@ -129,4 +137,21 @@ func TestEarCut(t *testing.T) {
 	t.Log(expected)
 
 	checkFloat64Array(t, result, expected)
+}
+
+func TestIncorrectEarCut(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("The code did not panic")
+		}
+	}()
+	EarCut([]Point{{0, 0}})
+}
+
+func TestSortingByXMax(t *testing.T) {
+	inners := [][]Point{
+		[]Point{{1, 2}},
+		[]Point{{0, 0}},
+	}
+	sort.Sort(byMaxX(inners))
 }
