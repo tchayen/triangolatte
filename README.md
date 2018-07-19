@@ -55,31 +55,31 @@ Biggest place for impromevent. Ranging from more effective data structures for v
 
 Some helpers for polygon-related operations.
 
-`polygon.IsInsideTriangle(t Triangle, p Point) bool` – checks whether `point` lies in the `triangle` or not.
+**`polygon.IsInsideTriangle(t Triangle, p Point) bool`** – checks whether `point` lies in the `triangle` or not.
 
-`polygon.IsReflex(a, b, c Point) bool` - checks if given point `b` is reflex with respect to neighbor vertices `a` and `c`.
+**`polygon.IsReflex(a, b, c Point) bool`** - checks if given point `b` is reflex with respect to neighbor vertices `a` and `c`.
 
-`polygon.SameSide(p1, p2, a, b Point) bool` – checks if `p1` lies on the same side of segment `a<->b` as `p2`.
+**`polygon.SameSide(p1, p2, a, b Point) bool`** – checks if `p1` lies on the same side of segment `a<->b` as `p2`.
 
 ### Point
 
 Api of the `point` package used for calculating maths.
 
-`(p Point) Add(r Point) Point` – add some point to the current one i.e. `p.Add(Point{0, 1})`.
+**`(p Point) Add(r Point) Point`** – add some point to the current one i.e. `p.Add(Point{0, 1})`.
 
-`(p Point) Sub(r Point) Point` – subtract point.
+**`(p Point) Sub(r Point) Point`** – subtract point.
 
-`(p Point) Scale(f float64) Point` – scale point **to** given length.
+**`(p Point) Scale(f float64) Point`** – scale point **to** given length.
 
-`(p Point) Normalize() Point` – normalize point (make length equal to `1`).
+**`(p Point) Normalize() Point`** – normalize point (make length equal to `1`).
 
-`(p Point) Dot(r Point) float64` – calculate dot product of two vectors.
+**`(p Point) Dot(r Point) float64`** – calculate dot product of two vectors.
 
-`(p Point) Cross(r Point) float64` – calculate 2D cross product (like in 3D but taking only non-zero coordinate as result)
+**`(p Point) Cross(r Point) float64`** – calculate 2D cross product (like in 3D but taking only non-zero coordinate as result)
 
-`(p Point) Distance2(r Point) float64` – squared distance to given point. _Useful for comparisons._
+**`(p Point) Distance2(r Point) float64`** – squared distance to given point. _Useful for comparisons._
 
-`(p Point) Pair() (x, y float64)` – split point into pair of floats.
+**`(p Point) Pair() (x, y float64)`** – split point into pair of floats.
 
 ### Types
 
