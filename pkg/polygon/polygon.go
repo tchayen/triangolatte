@@ -267,6 +267,9 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 		for k := range ears {
 			e = append(e, k)
 		}
+		if len(e) == 0 {
+			return nil, errors.New("could not detect any ear tip in a non-empty polygon")
+		}
 		sort.Ints(e)
 		i := e[0]
 

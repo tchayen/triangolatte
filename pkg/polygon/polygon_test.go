@@ -6,7 +6,6 @@ import (
 	"testing"
 	. "triangolatte/pkg/point"
 	"io/ioutil"
-	"fmt"
 	"encoding/json"
 )
 
@@ -162,13 +161,36 @@ func TestSortingByXMax(t *testing.T) {
 	sort.Sort(byMaxX(inners))
 }
 
-func TestAghA0(t *testing.T) {
-	data, err := ioutil.ReadFile("../../assets/agh_a0")
-	check(err)
-
-	fmt.Println(string(data))
+func loadPointsFromFile(fileName string) ([][]Point, error) {
+	data, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		return nil, err
+	}
 
 	polygons := make([][][]float64, 0)
 	json.Unmarshal([]byte(data), &polygons)
-	fmt.Printf(": %#v", polygons)
+
+	points := make([][]Point, len(polygons))
+	for i := range polygons {
+		points[i] = make([]Point, len(polygons[i]))
+		for j := range polygons[i] {
+			points[i][j] = Point{polygons[i][j][0], polygons[i][j][1]}
+		}
+	}
+	return points, nil
+}
+
+func TestAghA0(t *testing.T) {
+	agh, _ := loadPointsFromFile("../../assets/agh_a0")
+	result, err := EarCut(agh[0], agh[1:])
+
+	t.Log(err)
+	t.Log(result)
+}
+
+func TestLakeSuperior(t *testing.T) {
+	lakeSuperior, _ := loadPointsFromFile("../../assets/lake_superior")
+	result, _ := EarCut(lakeSuperior[0], lakeSuperior[1:])
+
+	print(result)
 }

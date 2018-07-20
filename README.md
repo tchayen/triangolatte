@@ -147,7 +147,6 @@ You are welcome to create an issue or pull request. I will be glad to help.
 ## Roadmap
 
 - use real life data for tests
-- rename/move directories to match Go's conventions
 - provide proper, tested installation and usage info
 - complete usage example
 - try to break something – more solid error handling
