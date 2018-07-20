@@ -180,17 +180,22 @@ func loadPointsFromFile(fileName string) ([][]Point, error) {
 	return points, nil
 }
 
+func TestSingleTriangleTriangulation(t *testing.T) {
+	result, _ := EarCut([]Point{{0, 0}, {0, 1}, {1, 1}}, [][]Point{})
+	t.Log(result)
+}
+
 func TestAghA0(t *testing.T) {
 	agh, _ := loadPointsFromFile("../../assets/agh_a0")
-	result, err := EarCut(agh[0], agh[1:])
+	result, err := EarCut(agh[0], [][]Point{}) // agh[1:]
 
 	t.Log(err)
 	t.Log(result)
 }
 
 func TestLakeSuperior(t *testing.T) {
-	lakeSuperior, _ := loadPointsFromFile("../../assets/lake_superior")
-	result, _ := EarCut(lakeSuperior[0], lakeSuperior[1:])
+	//lakeSuperior, _ := loadPointsFromFile("../../assets/lake_superior")
+	//result, _ := EarCut(lakeSuperior[0], [][]Point{}) // lakeSuperior[1:]
 
-	print(result)
+	//print(result)
 }

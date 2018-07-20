@@ -137,7 +137,11 @@ type Triangle struct {
 ## Tests
 
 ```bash
-go test
+# line package
+go test pkg/line/line.go pkg/line/line_test.go
+
+# polygon package
+go test pkg/polygon/polygon.go pkg/polygon/polygon_test.go
 ```
 
 ## Contributing
@@ -146,7 +150,7 @@ You are welcome to create an issue or pull request. I will be glad to help.
 
 ## Roadmap
 
-- use real life data for tests
+- fix bug with incorrect hole elimination in AGH A0 example
 - provide proper, tested installation and usage info
 - complete usage example
 - try to break something – more solid error handling
