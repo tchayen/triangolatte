@@ -169,7 +169,7 @@ func combinePolygons(outer, inner []Point) ([]Point, error) {
 	// mutually visible. If there are multiple such vertices, pick the one closest
 	// to `M`.
 	if visibleIndex < 0 {
-		var reflex []int
+		reflex := list.New()
 		n := len(outer)
 		for i := 0; i < n; i++ {
 			notInside := !IsInsideTriangle(Triangle{m, k, outer[pIndex]}, outer[i])
@@ -177,10 +177,20 @@ func combinePolygons(outer, inner []Point) ([]Point, error) {
 			if notInside || notReflex {
 				continue
 			}
-			reflex = append(reflex, i)
+			reflex.PushBack(i)
 		}
-		sort.Ints(reflex)
-		visibleIndex = reflex[0]
+		var closest int
+		var maxDist float64
+
+		for r := reflex.Front(); r != nil; r = r.Next() {
+			i := r.Value.(int)
+			dist := outer[i].Distance2(outer[closest])
+			if dist > maxDist {
+				closest = i
+				maxDist = dist
+			}
+		}
+		visibleIndex = closest
 	}
 
 	if visibleIndex < 0 {
