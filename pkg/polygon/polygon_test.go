@@ -7,7 +7,7 @@ import (
 	"math"
 	"sort"
 	"testing"
-	. "triangolatte/point"
+	. "triangolatte/pkg/point"
 )
 
 var vertices = []Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}

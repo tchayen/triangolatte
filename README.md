@@ -24,10 +24,29 @@ go get github.com/Tchayen/triangolatte
 
 ## Usage
 
+#### Basic example
 ```go
 vertices := []Point{{10, 20}, {30, 40}, {50, 60}}
 holes := [][]Point{}
-triangolatte.EarCut(vertices, holes)
+var triangulated []float64 = triangolatte.EarCut(vertices, holes)
+```
+
+#### Reading from OpenStreetMap XML
+
+```go
+// TODO
+```
+
+#### Reading from GeoJSON file
+
+```go
+// TODO
+```
+
+#### Rendering triangles
+
+```go
+// TODO
 ```
 
 ## Features

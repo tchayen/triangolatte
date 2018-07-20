@@ -2,7 +2,7 @@ package polygon
 
 import (
 	"sort"
-	. "triangolatte/point"
+	. "triangolatte/pkg/point"
 )
 
 type Set map[int]bool
