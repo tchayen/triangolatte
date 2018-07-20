@@ -1,13 +1,13 @@
 package polygon
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"math"
 	"sort"
 	"testing"
 	. "triangolatte/pkg/point"
+	"io/ioutil"
+	"fmt"
+	"encoding/json"
 )
 
 var vertices = []Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
@@ -18,25 +18,13 @@ func check(e error) {
 	}
 }
 
-func TestMain(m *testing.M) {
-	data, err := ioutil.ReadFile("../assets/agh_a0")
-	check(err)
-
-	// TODO read JSON array
-	fmt.Println(string(data))
-
-	polygons := make([][][]float64, 0)
-	json.Unmarshal([]byte(data), &polygons)
-	fmt.Printf(": %#v", polygons)
-}
-
 func checkIntArray(t *testing.T, result, expected []int) {
 	if len(result) != len(expected) {
 		t.Error("Array sizes don't match")
 	}
 
-	for i := 0; i < len(result); i++ {
-		if math.Abs(float64(result[i]-expected[i])) > 0.001 {
+	for i, r := range result {
+		if math.Abs(float64(r-expected[i])) > 0.001 {
 			t.Error("Value error beyond floating point precision problem")
 		}
 	}
@@ -47,8 +35,8 @@ func checkFloat64Array(t *testing.T, result, expected []float64) {
 		t.Error("Array sizes don't match")
 	}
 
-	for i := 0; i < len(result); i++ {
-		if math.Abs(result[i]-expected[i]) > 0.001 {
+	for i, r := range result {
+		if math.Abs(r-expected[i]) > 0.001 {
 			t.Error("Value error beyond floating point precision problem")
 		}
 	}
@@ -60,8 +48,8 @@ func checkPointArray(t *testing.T, result, expected []Point) {
 		t.Error("Array sizes don't match")
 	}
 
-	for i := 0; i < len(result); i++ {
-		if math.Abs(result[i].X-expected[i].X) > 0.001 && math.Abs(result[i].Y-expected[i].Y) > 0.001 {
+	for i, r := range result {
+		if math.Abs(r.X-expected[i].X) > 0.001 && math.Abs(result[i].Y-expected[i].Y) > 0.001 {
 			t.Error("Value error beyond floating point precision problem")
 		}
 	}
@@ -109,7 +97,7 @@ func TestDetectEars(t *testing.T) {
 	_, reflex := splitConvexAndReflex(vertices, indexMap)
 	earsMap := detectEars(vertices, reflex, indexMap)
 	ears := make([]int, 0, len(earsMap))
-	for k, _ := range earsMap {
+	for k := range earsMap {
 		ears = append(ears, k)
 	}
 	sort.Ints(ears)
@@ -136,7 +124,7 @@ func TestEliminateHoles(t *testing.T) {
 		{50, 40}, {90, 40}, {30, 70},
 	}
 
-	eliminated := eliminateHoles(polygon, holes)
+	eliminated, _ := eliminateHoles(polygon, holes)
 	checkPointArray(t, eliminated, polygonWithEliminatedHoles)
 }
 
@@ -149,7 +137,7 @@ func TestEliminateHolesWithNoPossibleVisibleVertex(t *testing.T) {
 }
 
 func TestEarCut(t *testing.T) {
-	result := EarCut(vertices, [][]Point{})
+	result, _ := EarCut(vertices, [][]Point{})
 	expected := []float64{240, 115, 320, 65, 395, 170, 240, 115, 395, 170, 305, 160, 240, 115, 305, 160, 265, 240, 240, 115, 265, 240, 190, 100, 150, 30, 240, 115, 190, 100, 50, 110, 150, 30, 190, 100, 50, 110, 190, 100, 95, 125, 50, 110, 95, 125, 100, 215}
 
 	t.Log(result)
@@ -159,12 +147,11 @@ func TestEarCut(t *testing.T) {
 }
 
 func TestIncorrectEarCut(t *testing.T) {
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("The code did not panic")
-		}
-	}()
-	EarCut([]Point{{0, 0}}, [][]Point{})
+	var err error
+	_, err = EarCut([]Point{{0, 0}}, [][]Point{})
+	if err == nil {
+		t.Errorf("The code did not return error on incorrect input")
+	}
 }
 
 func TestSortingByXMax(t *testing.T) {
@@ -173,4 +160,15 @@ func TestSortingByXMax(t *testing.T) {
 		[]Point{{0, 0}},
 	}
 	sort.Sort(byMaxX(inners))
+}
+
+func TestAghA0(t *testing.T) {
+	data, err := ioutil.ReadFile("../../assets/agh_a0")
+	check(err)
+
+	fmt.Println(string(data))
+
+	polygons := make([][][]float64, 0)
+	json.Unmarshal([]byte(data), &polygons)
+	fmt.Printf(": %#v", polygons)
 }

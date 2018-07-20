@@ -3,6 +3,7 @@ package polygon
 import (
 	"sort"
 	. "triangolatte/pkg/point"
+	"errors"
 )
 
 type Set map[int]bool
@@ -80,7 +81,7 @@ func detectEars(points []Point, reflex Set, indexMap []int) (ears Set) {
 	return ears
 }
 
-func combinePolygons(outer, inner []Point) (result []Point) {
+func combinePolygons(outer, inner []Point) ([]Point, error) {
 	xMax := 0.0
 	mIndex := 0
 	for i := 0; i < len(inner); i++ {
@@ -119,7 +120,7 @@ func combinePolygons(outer, inner []Point) (result []Point) {
 				foundK = true
 			}
 		} else {
-			panic("Cannot calculate intersection, problematic data")
+			return nil, errors.New("cannot calculate intersection, problematic data")
 		}
 	}
 
@@ -143,7 +144,7 @@ func combinePolygons(outer, inner []Point) (result []Point) {
 	// Check with all vertices of the outer polygon to be outside of the
 	// triangle `[M, K, P]`. If it is true, `M` and `P` are mutually visible.
 	allOutside := true
-	for i := 0; i < len(outer); i++ {
+	for i := range outer {
 		// We have to skip M, K and P vertices. Since M is from the inner
 		// polygon and K was proved to not match any vertex, the only one to
 		// check is pIndex
@@ -181,11 +182,11 @@ func combinePolygons(outer, inner []Point) (result []Point) {
 	}
 
 	if visibleIndex < 0 {
-		panic("Could not find visible vertex")
+		return nil, errors.New("could not find visible vertex")
 	}
 
 	n := len(inner)
-	result = make([]Point, 0, len(outer)+len(inner)+2)
+	result := make([]Point, 0, len(outer)+len(inner)+2)
 	result = append(result, outer[:visibleIndex+1]...)
 	for i := 0; i < n; i++ {
 		result = append(result, inner[cyclic(mIndex+i, n)])
@@ -193,7 +194,7 @@ func combinePolygons(outer, inner []Point) (result []Point) {
 	result = append(result, inner[mIndex], outer[visibleIndex])
 	result = append(result, outer[visibleIndex+1:]...)
 
-	return result
+	return result, nil
 }
 
 type byMaxX [][]Point
@@ -223,36 +224,44 @@ func (polygons byMaxX) Less(i, j int) bool {
 	return true
 }
 
-func eliminateHoles(outer []Point, inners [][]Point) []Point {
+func eliminateHoles(outer []Point, inners [][]Point) ([]Point, error) {
 	sort.Sort(byMaxX(inners))
 
 	var inner []Point
 	for len(inners) > 0 {
 		inner, inners = inners[0], inners[1:]
-		outer = combinePolygons(outer, inner)
+		var err error
+		outer, err = combinePolygons(outer, inner)
+		if err != nil {
+			return nil, err
+		}
 	}
-	return outer
+	return outer, nil
 }
 
-func EarCut(points []Point, holes [][]Point) (triangles []float64) {
+func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 	n := len(points)
 	if n < 3 {
-		panic("Cannot triangulate less than three points")
+		return nil, errors.New("cannot triangulate less than three points")
 	}
 
 	if len(holes) > 0 {
-		points = eliminateHoles(points, holes)
+		var err error
+		points, err = eliminateHoles(points, holes)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	var indexMap = make([]int, 0, n)
-	for i := 0; i < n; i++ {
-		indexMap = append(indexMap, i)
+	var indexMap = make([]int, n)
+	for i := range indexMap {
+		indexMap[i] = i
 	}
 
 	var _, reflex Set = splitConvexAndReflex(points, indexMap)
 	var ears = detectEars(points, reflex, indexMap)
 
-	triangles = make([]float64, 0, (n-1)/2)
+	triangles := make([]float64, 0, (n-1)/2)
 	for len(indexMap) > 3 {
 		e := make([]int, 0, len(ears))
 		for k := range ears {
@@ -277,5 +286,5 @@ func EarCut(points []Point, holes [][]Point) (triangles []float64) {
 	v5, v6 := points[indexMap[2]].Pair()
 
 	triangles = append(triangles, v1, v2, v3, v4, v5, v6)
-	return triangles
+	return triangles, nil
 }

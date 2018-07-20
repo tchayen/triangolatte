@@ -28,7 +28,7 @@ go get github.com/Tchayen/triangolatte
 ```go
 vertices := []Point{{10, 20}, {30, 40}, {50, 60}}
 holes := [][]Point{}
-var triangulated []float64 = triangolatte.EarCut(vertices, holes)
+t, err = triangolatte.EarCut(vertices, holes)
 ```
 
 #### Reading from OpenStreetMap XML
@@ -71,7 +71,7 @@ angles can potentially explode to infinity.
 Refer to this [forum post](https://forum.libcinder.org/topic/smooth-thick-lines-using-geometry-shader)
 for sketches, code examples and ideas.
 
-#### `polygon.EarCut(points []Point) (triangles []float64)`
+#### `polygon.EarCut(points []Point, holes [][]Point) ([]float64, error)`
 
 Based on the following [paper](https://www.geometrictools.com/Documentation/TriangulationByEarClipping.pdf).
 
