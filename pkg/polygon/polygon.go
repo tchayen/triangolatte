@@ -281,15 +281,15 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 			return nil, errors.New("could not detect any ear tip in a non-empty polygon")
 		}
 
-		i := ears.Remove(ears.Front()).(int)
+		e := ears.Remove(ears.Front()).(int)
 
-		t[i+0], t[i+1] = points[indexMap[cyclic(i-1, n)]].Pair()
-		t[i+2], t[i+3] = points[indexMap[i]].Pair()
-		t[i+4], t[i+5] = points[indexMap[cyclic(i+1, n)]].Pair()
+		t[i+0], t[i+1] = points[indexMap[cyclic(e-1, n)]].Pair()
+		t[i+2], t[i+3] = points[indexMap[e]].Pair()
+		t[i+4], t[i+5] = points[indexMap[cyclic(e+1, n)]].Pair()
 		i += 6
 
 		// Skip `points[indexMap[i]]`.
-		indexMap = append(indexMap[:i], indexMap[i+1:]...)
+		indexMap = append(indexMap[:e], indexMap[e+1:]...)
 
 		_, reflex = splitConvexAndReflex(points, indexMap)
 		ears = detectEars(points, reflex, indexMap)
