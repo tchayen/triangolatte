@@ -94,18 +94,31 @@ func TestDetectEars(t *testing.T) {
 	var indexMap []int = []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 
 	_, reflex := splitConvexAndReflex(vertices, indexMap)
-	earsMap := detectEars(vertices, reflex, indexMap)
-	ears := make([]int, 0, len(earsMap))
-	for k := range earsMap {
-		ears = append(ears, k)
+
+	earList := detectEars(vertices, reflex, indexMap)
+
+	ears := make([]int, earList.Len())
+	i, e := 0, earList.Front()
+
+	for e != nil {
+		ears[i] = e.Value.(int)
+		i, e = i + 1, e.Next()
 	}
-	sort.Ints(ears)
 
 	expectedEars := []int{3, 4, 6, 9}
 
 	t.Log(ears)
 	t.Log(expectedEars)
 	checkIntArray(t, ears, expectedEars)
+}
+
+func BenchmarkDetectEars(b *testing.B) {
+	var indexMap []int = []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+	_, reflex := splitConvexAndReflex(vertices, indexMap)
+
+	for i := 0; i < b.N; i++ {
+		detectEars(vertices, reflex, indexMap)
+	}
 }
 
 func TestEliminateHoles(t *testing.T) {

@@ -4,6 +4,7 @@ import (
 	"sort"
 	. "triangolatte/pkg/point"
 	"errors"
+	"container/list"
 )
 
 type Set map[int]bool
@@ -48,9 +49,9 @@ func splitConvexAndReflex(points []Point, indexMap []int) (convex, reflex Set) {
 	return convex, reflex
 }
 
-func detectEars(points []Point, reflex Set, indexMap []int) (ears Set) {
+func detectEars(points []Point, reflex Set, indexMap []int) *list.List {
 	n := len(indexMap)
-	ears = make(Set, len(points))
+	ears := list.New()
 
 	for i := 0; i < n; i++ {
 		if reflex[i] {
@@ -74,8 +75,9 @@ func detectEars(points []Point, reflex Set, indexMap []int) (ears Set) {
 				isEar = false
 			}
 		}
+
 		if isEar {
-			ears[i] = true
+			ears.PushBack(i)
 		}
 	}
 	return ears
@@ -261,33 +263,30 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 	var _, reflex Set = splitConvexAndReflex(points, indexMap)
 	var ears = detectEars(points, reflex, indexMap)
 
-	triangles := make([]float64, 0, (n-1)/2)
+	// Any triangulation of simple polygon has `n-2` triangles.
+	t, triangles := 0, make([]float64, (n-2) * 6)
 	for len(indexMap) > 3 {
-		e := make([]int, 0, len(ears))
-		for k := range ears {
-			e = append(e, k)
-		}
-		if len(e) == 0 {
+
+		if ears.Len() == 0 {
 			return nil, errors.New("could not detect any ear tip in a non-empty polygon")
 		}
-		sort.Ints(e)
-		i := e[0]
+		i := ears.Remove(ears.Front()).(int)
 
-		v1, v2 := points[indexMap[cyclic(i-1, n)]].Pair()
-		v3, v4 := points[indexMap[i]].Pair()
-		v5, v6 := points[indexMap[cyclic(i+1, n)]].Pair()
+		triangles[t], triangles[t+1] = points[indexMap[cyclic(i-1, n)]].Pair()
+		triangles[t+2], triangles[t+3] = points[indexMap[i]].Pair()
+		triangles[t+4], triangles[t+5] = points[indexMap[cyclic(i+1, n)]].Pair()
+		t += 6
 
-		triangles = append(triangles, v1, v2, v3, v4, v5, v6)
 		indexMap = append(indexMap[:i], indexMap[i+1:]...) // Skip `points[indexMap[i]]`.
 		n = n - 1
 
 		_, reflex = splitConvexAndReflex(points, indexMap)
 		ears = detectEars(points, reflex, indexMap)
 	}
-	v1, v2 := points[indexMap[0]].Pair()
-	v3, v4 := points[indexMap[1]].Pair()
-	v5, v6 := points[indexMap[2]].Pair()
 
-	triangles = append(triangles, v1, v2, v3, v4, v5, v6)
+	triangles[t], triangles[t+1] = points[indexMap[0]].Pair()
+	triangles[t+2], triangles[t+3] = points[indexMap[1]].Pair()
+	triangles[t+4], triangles[t+5] = points[indexMap[2]].Pair()
+
 	return triangles, nil
 }
