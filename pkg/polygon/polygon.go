@@ -67,11 +67,12 @@ func detectEars(points []Point, reflex Set, indexMap []int) *list.List {
 			}
 
 			// If triangle contains points[j], points[i] cannot be an ear tip.
-			if IsInsideTriangle(Triangle{
+			t := Triangle{
 				points[indexMap[cyclic(i-1, n)]],
 				points[indexMap[i]],
 				points[indexMap[cyclic(i+1, n)]],
-			}, points[indexMap[j]]) {
+			}
+			if IsInsideTriangle(t, points[indexMap[j]]) {
 				isEar = false
 			}
 		}
@@ -274,29 +275,31 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 	var ears = detectEars(points, reflex, indexMap)
 
 	// Any triangulation of simple polygon has `n-2` triangles.
-	t, triangles := 0, make([]float64, (n-2) * 6)
+	i, t := 0, make([]float64, (n-2) * 6)
 	for len(indexMap) > 3 {
-
 		if ears.Len() == 0 {
 			return nil, errors.New("could not detect any ear tip in a non-empty polygon")
 		}
+
 		i := ears.Remove(ears.Front()).(int)
 
-		triangles[t], triangles[t+1] = points[indexMap[cyclic(i-1, n)]].Pair()
-		triangles[t+2], triangles[t+3] = points[indexMap[i]].Pair()
-		triangles[t+4], triangles[t+5] = points[indexMap[cyclic(i+1, n)]].Pair()
-		t += 6
+		t[i+0], t[i+1] = points[indexMap[cyclic(i-1, n)]].Pair()
+		t[i+2], t[i+3] = points[indexMap[i]].Pair()
+		t[i+4], t[i+5] = points[indexMap[cyclic(i+1, n)]].Pair()
+		i += 6
 
-		indexMap = append(indexMap[:i], indexMap[i+1:]...) // Skip `points[indexMap[i]]`.
-		n = n - 1
+		// Skip `points[indexMap[i]]`.
+		indexMap = append(indexMap[:i], indexMap[i+1:]...)
 
 		_, reflex = splitConvexAndReflex(points, indexMap)
 		ears = detectEars(points, reflex, indexMap)
+
+		n = n - 1
 	}
 
-	triangles[t], triangles[t+1] = points[indexMap[0]].Pair()
-	triangles[t+2], triangles[t+3] = points[indexMap[1]].Pair()
-	triangles[t+4], triangles[t+5] = points[indexMap[2]].Pair()
+	t[i+0], t[i+1] = points[indexMap[0]].Pair()
+	t[i+2], t[i+3] = points[indexMap[1]].Pair()
+	t[i+4], t[i+5] = points[indexMap[2]].Pair()
 
-	return triangles, nil
+	return t, nil
 }
