@@ -19,7 +19,10 @@
 
 package cyclicList
 
-import . "triangolatte/pkg/point"
+import (
+    . "triangolatte/pkg/point"
+    "container/list"
+)
 
 type CyclicList struct {
     root Element
@@ -38,6 +41,7 @@ type Element struct {
 
     // Its properties.
     Reflex bool
+    Ear *list.Element
 }
 
 func (c *CyclicList) Init() *CyclicList {

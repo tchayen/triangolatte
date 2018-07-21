@@ -246,6 +246,33 @@ func eliminateHoles(outer []Point, inners [][]Point) ([]Point, error) {
 	return outer, nil
 }
 
+// If an adjacent vertex is convex, it remains convex.
+// If an adjacent vertex is an ear, it does not necessarily remain an ear.
+// If an adjacent vertex is reflex, it is possible that it becomes
+// convex and, possibly, an ear.
+func checkVertex(element *cyclicList.Element, ears *list.List) {
+	triangle := Triangle{
+		element.Prev().Point,
+		element.Point,
+		element.Next().Point,
+	}
+
+	if element.Reflex {
+		if !IsReflex(triangle.A, triangle.B, triangle.C) {
+			element.Reflex = false
+
+			if isEar(element, triangle) {
+				element.Ear = ears.PushBack(element)
+			}
+		}
+	} else {
+		if element.Ear != nil && !isEar(element, triangle) {
+			ears.Remove(element.Ear)
+			element.Ear = nil
+		}
+	}
+}
+
 func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 	n := len(points)
 	if n < 3 {
@@ -254,13 +281,13 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 
 	c := cyclicList.NewFromArray(points)
 
-	if len(holes) > 0 {
-		var err error
-		points, err = eliminateHoles(points, holes)
-		if err != nil {
-			return nil, err
-		}
-	}
+	// if len(holes) > 0 {
+	// 	var err error
+	// 	points, err = eliminateHoles(points, holes)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// }
 
 	setReflex(c)
 	var ears = detectEars(c)
@@ -269,75 +296,39 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 	i, t := 0, make([]float64, (n-2) * 6)
 	for c.Len() > 3 {
 
-		// //// DEBUG ////
-		// indexOf := func (value *cyclicList.Element) int {
-		// 	for i, p := range points {
-		// 		if value.Point == p {
-		// 			return i
-		// 		}
-		// 	}
-		// 	return -1
-		// }
+		//// DEBUG ////
         //
 		// __e := make([]int, ears.Len())
 		// for _i, e := 0, ears.Front(); e != nil; _i, e = _i + 1, e.Next() {
 		// 	__e[_i] = indexOf(e.Value.(*cyclicList.Element))
 		// }
-		// //// ////
+		////       ////
 
 		if ears.Len() == 0 {
 			return nil, errors.New("could not detect any ear tip in a non-empty polygon")
 		}
 
 		ear := ears.Remove(ears.Front()).(*cyclicList.Element)
+		ear.Ear = nil
+
+		_ind[_i] = []int{indexOf(ear.Prev()), indexOf(ear), indexOf(ear.Next())}
+		_i += 1
 
 		t[i+0], t[i+1] = ear.Prev().Point.Pair()
 		t[i+2], t[i+3] = ear.Point.Pair()
 		t[i+4], t[i+5] = ear.Next().Point.Pair()
 		i += 6
 
-		// Skip `points[indexMap[i]]`.
+		prev := ear.Prev()
+		next := ear.Next()
 		c.Remove(ear)
 		n = n - 1
 
-		// // If an adjacent vertex is convex, it remains convex.
-		// // If an adjacent vertex is an ear, it does not necessarily remain an ear.
-		// // If the adjacent vertex is reflex, it is possible that it becomes
-		// // convex and, possibly, an ear.
-		// check := func(index int) {
-		// 	triangle := Triangle{
-		// 		points[indexMap[cyclic(index-1, n)]],
-		// 		points[indexMap[index]],
-		// 		points[indexMap[cyclic(index+1, n)]],
-		// 	}
-        //
-		// 	if reflex[index] {
-		// 		if !IsReflex(triangle.A, triangle.B, triangle.C) {
-		// 			delete(reflex, index)
-        //
-		// 			if isEar(index, triangle, points, reflex, indexMap) {
-		// 				for e := ears.Front(); e != nil; e = e.Next() {
-		// 					if e.Value.(int) < index && e.Next().Value.(int) > index {
-		// 						ears.InsertAfter(index, e)
-		// 					}
-		// 				}
-		// 			}
-		// 		}
-		// 	} else {
-		// 		for e := ears.Front(); e != nil; e = e.Next() {
-		// 			if e.Value.(int) == index {
-		// 				if !isEar(index, triangle, points, reflex, indexMap) {
-		// 					ears.Remove(e)
-		// 				}
-		// 			}
-		// 		}
-		// 	}
-		// }
-		// check(ear - 1)
-		// check(ear)
+		checkVertex(prev, ears)
+		checkVertex(next, ears)
 
-		setReflex(c)
-		ears = detectEars(c)
+		// setReflex(c)
+		// ears = detectEars(c)
 	}
 
 	p := c.Front()
