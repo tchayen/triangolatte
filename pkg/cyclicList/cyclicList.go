@@ -28,7 +28,7 @@ type CyclicList struct {
 
 type Element struct {
     // The list to which this element belongs.
-    list *CyclicList
+    List *CyclicList
 
     // Next and previous elements.
     prev, next *Element
@@ -44,7 +44,7 @@ type Element struct {
 func (c *CyclicList) Init() *CyclicList {
     c.root.next = &c.root
     c.root.prev = &c.root
-    c.root.list = c
+    c.root.List = c
     c.len = 0
     return c
 }
@@ -78,7 +78,7 @@ func (c *CyclicList) Front() *Element {
 }
 
 func (c *CyclicList) InsertAfter(p Point, e *Element) *Element {
-    new := Element{Point: p, prev: e, next: e.next, list: e.list}
+    new := Element{Point: p, prev: e, next: e.next, List: e.List}
     e.next.prev = &new
     e.next = &new
     c.len++
@@ -99,7 +99,7 @@ func (c *CyclicList) Remove(e *Element) *Element {
     // Avoid memory leaks.
     e.next = nil
     e.prev = nil
-    e.list = nil
+    e.List = nil
 
     c.len--
 
@@ -107,24 +107,24 @@ func (c *CyclicList) Remove(e *Element) *Element {
 }
 
 func (e *Element) Next() *Element {
-    if e.list == nil {
+    if e.List == nil {
         return nil
     }
 
-    if e.next == &e.list.root {
-        return e.list.root.next
+    if e.next == &e.List.root {
+        return e.List.root.next
     }
 
     return e.next
 }
 
 func (e *Element) Prev() *Element {
-    if e.list == nil {
+    if e.List == nil {
         return nil
     }
 
-    if e.prev == &e.list.root {
-        return e.list.root.prev
+    if e.prev == &e.List.root {
+        return e.List.root.prev
     }
 
     return e.prev

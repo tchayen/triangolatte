@@ -7,6 +7,7 @@ import (
 	. "triangolatte/pkg/point"
 	"io/ioutil"
 	"encoding/json"
+	"triangolatte/pkg/cyclicList"
 )
 
 var vertices = []Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
@@ -79,43 +80,45 @@ func TestIsInsideTriangle(t *testing.T) {
 }
 
 func TestSplitConvexAndReflex(t *testing.T) {
-	indexMap := []int{0, 1, 2, 3}
+	c := cyclicList.NewFromArray([]Point{{0, 0}, {2, 3}, {4, 2}, {0, 7}})
+	setReflex(c)
 
-	reflex := filterReflex([]Point{{0, 0}, {2, 3}, {4, 2}, {0, 7}}, indexMap)
-	t.Log(reflex)
-
-	if !(reflex[1] && !reflex[2]) {
+	if !(c.Front().Next().Reflex && !c.Front().Next().Next().Reflex) {
 		t.Error("splitConvexAndReflex is broken")
 	}
 }
 
 func TestDetectEars(t *testing.T) {
-	var indexMap []int = []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+	c := cyclicList.NewFromArray(vertices)
+	setReflex(c)
+	earList := detectEars(c)
 
-	reflex := filterReflex(vertices, indexMap)
-	earList := detectEars(vertices, reflex, indexMap)
-
-	ears := make([]int, earList.Len())
+	ears := make([]Point, earList.Len())
 	i, e := 0, earList.Front()
 
 	for e != nil {
-		ears[i] = e.Value.(int)
+		ears[i] = e.Value.(*cyclicList.Element).Point
 		i, e = i + 1, e.Next()
 	}
 
-	expectedEars := []int{3, 4, 6, 9}
+	third := c.Front().Next().Next().Next()
+	sixth := third.Next().Next().Next()
+	ninth := sixth.Next().Next().Next()
+	expectedEars := []Point{third.Point, third.Next().Point, sixth.Point, ninth.Point}
 
 	t.Log(ears)
 	t.Log(expectedEars)
-	checkIntArray(t, ears, expectedEars)
+	checkPointArray(t, ears, expectedEars)
 }
 
 func BenchmarkDetectEars(b *testing.B) {
-	var indexMap []int = []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
-	reflex := filterReflex(vertices, indexMap)
+	b.StopTimer()
+	c := cyclicList.NewFromArray(vertices)
+	setReflex(c)
+	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		detectEars(vertices, reflex, indexMap)
+		detectEars(c)
 	}
 }
 

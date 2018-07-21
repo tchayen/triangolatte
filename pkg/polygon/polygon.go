@@ -3,6 +3,7 @@ package polygon
 import (
 	"sort"
 	. "triangolatte/pkg/point"
+	"triangolatte/pkg/cyclicList"
 	"errors"
 	"container/list"
 )
@@ -31,56 +32,45 @@ func IsInsideTriangle(t Triangle, p Point) bool {
 		SameSide(p, t.C, t.A, t.B)
 }
 
-func filterReflex(points []Point, indexMap []int) Set {
-	n := len(indexMap)
-	reflex := make(Set, len(points))
+func setReflex(points *cyclicList.CyclicList) {
+	n := points.Len()
 
-	for i := 0; i < n; i++ {
-		a := points[indexMap[cyclic(i-1, n)]]
-		b := points[indexMap[i]]
-		c := points[indexMap[cyclic(i+1, n)]]
-
-		if IsReflex(a, b, c) {
-			reflex[i] = true
+	for i, p := 0, points.Front(); i < n; i, p = i + 1, p.Next() {
+		if IsReflex(p.Prev().Point, p.Point, p.Next().Point) {
+			p.Reflex = true
 		}
 	}
-	return reflex
 }
 
-
-func isEar(i int, t Triangle, points []Point, reflex Set, indexMap []int) bool {
-	n := len(indexMap)
-	for j := 0; j < n; j++ {
+func isEar(p *cyclicList.Element, t Triangle) bool {
+	n := p.List.Len()
+	for i, r := 0, p.List.Front(); i < n; i, r = i + 1, r.Next() {
 		// It is ok to skip reflex vertices and the ones that actually belong to
 		// the triangle.
-		if !reflex[j] || j == cyclic(i-1, n) || j == i || j == cyclic(i+1, n) {
+		if p.Reflex || r == p.Prev() || r == p || r == p.Next() {
 			continue
 		}
 
 		// If triangle contains points[j], points[i] cannot be an ear tip.
-		if IsInsideTriangle(t, points[indexMap[j]]) {
+		if IsInsideTriangle(t, r.Point) {
 			return false
 		}
 	}
 	return true
 }
 
-func detectEars(points []Point, reflex Set, indexMap []int) *list.List {
-	n := len(indexMap)
+func detectEars(points *cyclicList.CyclicList) *list.List {
 	ears := list.New()
 
-	for i := 0; i < n; i++ {
-		if reflex[i] {
+	n := points.Len()
+	for i, p := 0, points.Front(); i < n; i, p = i + 1, p.Next() {
+		if p.Reflex {
 			continue
 		}
 
-		t := Triangle{
-			points[indexMap[cyclic(i-1, n)]],
-			points[indexMap[i]],
-			points[indexMap[cyclic(i+1, n)]],
-		}
-		if isEar(i, t, points, reflex, indexMap) {
-			ears.PushBack(i)
+		t := Triangle{p.Prev().Point, p.Point, p.Next().Point}
+		if isEar(p, t) {
+			ears.PushBack(p)
 		}
 	}
 	return ears
@@ -260,6 +250,8 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 		return nil, errors.New("cannot triangulate less than three points")
 	}
 
+	c := cyclicList.NewFromArray(points)
+
 	if len(holes) > 0 {
 		var err error
 		points, err = eliminateHoles(points, holes)
@@ -268,30 +260,25 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 		}
 	}
 
-	var indexMap = make([]int, n)
-	for i := range indexMap {
-		indexMap[i] = i
-	}
-
-	reflex := filterReflex(points, indexMap)
-	var ears = detectEars(points, reflex, indexMap)
+	setReflex(c)
+	var ears = detectEars(c)
 
 	// Any triangulation of simple polygon has `n-2` triangles.
 	i, t := 0, make([]float64, (n-2) * 6)
-	for len(indexMap) > 3 {
+	for c.Len() > 3 {
 		if ears.Len() == 0 {
 			return nil, errors.New("could not detect any ear tip in a non-empty polygon")
 		}
 
-		ear := ears.Remove(ears.Front()).(int)
+		ear := ears.Remove(ears.Front()).(*cyclicList.Element)
 
-		t[i+0], t[i+1] = points[indexMap[cyclic(ear-1, n)]].Pair()
-		t[i+2], t[i+3] = points[indexMap[ear]].Pair()
-		t[i+4], t[i+5] = points[indexMap[cyclic(ear+1, n)]].Pair()
+		t[i+0], t[i+1] = ear.Prev().Point.Pair()
+		t[i+2], t[i+3] = ear.Point.Pair()
+		t[i+4], t[i+5] = ear.Next().Point.Pair()
 		i += 6
 
 		// Skip `points[indexMap[i]]`.
-		indexMap = append(indexMap[:ear], indexMap[ear+1:]...)
+		c.Remove(ear)
 		n = n - 1
 
 		// // If an adjacent vertex is convex, it remains convex.
@@ -330,13 +317,14 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 		// check(ear - 1)
 		// check(ear)
 
-		reflex = filterReflex(points, indexMap)
-		ears = detectEars(points, reflex, indexMap)
+		setReflex(c)
+		ears = detectEars(c)
 	}
 
-	t[i+0], t[i+1] = points[indexMap[0]].Pair()
-	t[i+2], t[i+3] = points[indexMap[1]].Pair()
-	t[i+4], t[i+5] = points[indexMap[2]].Pair()
+	p := c.Front()
+	t[i+0], t[i+1] = p.Point.Pair(); p = p.Next()
+	t[i+2], t[i+3] = p.Point.Pair(); p = p.Next()
+	t[i+4], t[i+5] = p.Point.Pair(); p = p.Next()
 
 	return t, nil
 }
