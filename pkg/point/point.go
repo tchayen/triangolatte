@@ -34,7 +34,3 @@ func (p Point) Cross(r Point) float64 {
 func (p Point) Distance2(r Point) float64 {
 	return (p.X-r.X)*(p.X-r.X) + (p.Y-r.Y)*(p.Y-r.Y)
 }
-
-func (p Point) Pair() (x, y float64) {
-	return p.X, p.Y
-}

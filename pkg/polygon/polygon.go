@@ -289,9 +289,9 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 		ear := ears.Remove(ears.Front()).(*cyclicList.Element)
 		ear.Ear = nil
 
-		t[i+0], t[i+1] = ear.Prev().Point.Pair()
-		t[i+2], t[i+3] = ear.Point.Pair()
-		t[i+4], t[i+5] = ear.Next().Point.Pair()
+		t[i+0], t[i+1] = ear.Prev().Point.X, ear.Prev().Point.Y
+		t[i+2], t[i+3] = ear.Point.X, ear.Point.Y
+		t[i+4], t[i+5] = ear.Next().Point.X, ear.Next().Point.Y
 		i += 6
 
 		prev := ear.Prev()
@@ -304,9 +304,11 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 	}
 
 	p := c.Front()
-	t[i+0], t[i+1] = p.Point.Pair(); p = p.Next()
-	t[i+2], t[i+3] = p.Point.Pair(); p = p.Next()
-	t[i+4], t[i+5] = p.Point.Pair();
+	t[i+0], t[i+1] = p.Point.X, p.Point.Y
+	p = p.Next()
+	t[i+2], t[i+3] = p.Point.X, p.Point.Y
+	p = p.Next()
+	t[i+4], t[i+5] = p.Point.X, p.Point.Y
 	
 	return t, nil
 }

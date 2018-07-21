@@ -67,6 +67,12 @@ func TestIsReflex(t *testing.T) {
 	}
 }
 
+func BenchmarkIsReflex(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		IsReflex(Point{0, 0}, Point{1, 1}, Point{2, 0})
+	}
+}
+
 func TestIsInsideTriangle(t *testing.T) {
 	case1 := IsInsideTriangle(vertices[0].X, vertices[0].Y, vertices[8].X, vertices[8].Y, vertices[9].X, vertices[9].Y, vertices[7].X, vertices[7].Y)
 	case2 := IsInsideTriangle(vertices[0].X, vertices[0].Y, vertices[1].X, vertices[1].Y, vertices[5].X, vertices[5].Y, vertices[7].X, vertices[7].Y)
@@ -217,8 +223,8 @@ func TestAghA0(t *testing.T) {
 // **WARNING**
 // Runs much longer than others (several orders of magnitude longer, can last minutes)
 func TestLakeSuperior(t *testing.T) {
-	t.Log("Skipping long test")
-	return
+	// t.Log("Skipping long test")
+	// return
 
 	lakeSuperior, _ := loadPointsFromFile("../../assets/lake_superior")
 	result, _ := EarCut(lakeSuperior[0], [][]Point{}) // lakeSuperior[1:]
