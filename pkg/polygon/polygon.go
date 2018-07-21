@@ -1,11 +1,11 @@
 package polygon
 
 import (
-	"sort"
-	. "triangolatte/pkg/point"
-	"triangolatte/pkg/cyclicList"
-	"errors"
 	"container/list"
+	"errors"
+	"sort"
+	"triangolatte/pkg/cyclicList"
+	. "triangolatte/pkg/point"
 )
 
 type Set map[int]bool
@@ -35,7 +35,7 @@ func IsInsideTriangle(t Triangle, p Point) bool {
 func setReflex(points *cyclicList.CyclicList) {
 	n := points.Len()
 
-	for i, p := 0, points.Front(); i < n; i, p = i + 1, p.Next() {
+	for i, p := 0, points.Front(); i < n; i, p = i+1, p.Next() {
 		if IsReflex(p.Prev().Point, p.Point, p.Next().Point) {
 			p.Reflex = true
 		} else {
@@ -46,7 +46,7 @@ func setReflex(points *cyclicList.CyclicList) {
 
 func isEar(p *cyclicList.Element, t Triangle) bool {
 	n := p.List.Len()
-	for i, r := 0, p.List.Front(); i < n; i, r = i + 1, r.Next() {
+	for i, r := 0, p.List.Front(); i < n; i, r = i+1, r.Next() {
 		// It is ok to skip reflex vertices and the ones that actually belong to
 		// the triangle.
 		if p.Reflex || r == p.Prev() || r == p || r == p.Next() {
@@ -65,7 +65,7 @@ func detectEars(points *cyclicList.CyclicList) *list.List {
 	ears := list.New()
 
 	n := points.Len()
-	for i, p := 0, points.Front(); i < n; i, p = i + 1, p.Next() {
+	for i, p := 0, points.Front(); i < n; i, p = i+1, p.Next() {
 		if p.Reflex {
 			continue
 		}

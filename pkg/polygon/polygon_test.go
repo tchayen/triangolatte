@@ -1,13 +1,13 @@
 package polygon
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"math"
 	"sort"
 	"testing"
-	. "triangolatte/pkg/point"
-	"io/ioutil"
-	"encoding/json"
 	"triangolatte/pkg/cyclicList"
+	. "triangolatte/pkg/point"
 )
 
 var vertices = []Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
@@ -98,7 +98,7 @@ func TestDetectEars(t *testing.T) {
 
 	for e != nil {
 		ears[i] = e.Value.(*cyclicList.Element).Point
-		i, e = i + 1, e.Next()
+		i, e = i+1, e.Next()
 	}
 
 	third := c.Front().Next().Next().Next()
