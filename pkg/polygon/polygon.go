@@ -295,24 +295,12 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 	// Any triangulation of simple polygon has `n-2` triangles.
 	i, t := 0, make([]float64, (n-2) * 6)
 	for c.Len() > 3 {
-
-		//// DEBUG ////
-        //
-		// __e := make([]int, ears.Len())
-		// for _i, e := 0, ears.Front(); e != nil; _i, e = _i + 1, e.Next() {
-		// 	__e[_i] = indexOf(e.Value.(*cyclicList.Element))
-		// }
-		////       ////
-
 		if ears.Len() == 0 {
 			return nil, errors.New("could not detect any ear tip in a non-empty polygon")
 		}
 
 		ear := ears.Remove(ears.Front()).(*cyclicList.Element)
 		ear.Ear = nil
-
-		_ind[_i] = []int{indexOf(ear.Prev()), indexOf(ear), indexOf(ear.Next())}
-		_i += 1
 
 		t[i+0], t[i+1] = ear.Prev().Point.Pair()
 		t[i+2], t[i+3] = ear.Point.Pair()
@@ -326,15 +314,12 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 
 		checkVertex(prev, ears)
 		checkVertex(next, ears)
-
-		// setReflex(c)
-		// ears = detectEars(c)
 	}
 
 	p := c.Front()
 	t[i+0], t[i+1] = p.Point.Pair(); p = p.Next()
 	t[i+2], t[i+3] = p.Point.Pair(); p = p.Next()
-	t[i+4], t[i+5] = p.Point.Pair(); p = p.Next()
-
+	t[i+4], t[i+5] = p.Point.Pair();
+	
 	return t, nil
 }
