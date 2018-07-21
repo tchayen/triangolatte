@@ -31,9 +31,9 @@ func IsInsideTriangle(t Triangle, p Point) bool {
 		SameSide(p, t.C, t.A, t.B)
 }
 
-func splitConvexAndReflex(points []Point, indexMap []int) (convex, reflex Set) {
+func filterReflex(points []Point, indexMap []int) Set {
 	n := len(indexMap)
-	convex, reflex = make(Set, len(points)), make(Set, len(points))
+	reflex := make(Set, len(points))
 
 	for i := 0; i < n; i++ {
 		a := points[indexMap[cyclic(i-1, n)]]
@@ -42,11 +42,9 @@ func splitConvexAndReflex(points []Point, indexMap []int) (convex, reflex Set) {
 
 		if IsReflex(a, b, c) {
 			reflex[i] = true
-		} else {
-			convex[i] = true
 		}
 	}
-	return convex, reflex
+	return reflex
 }
 
 
@@ -275,7 +273,7 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 		indexMap[i] = i
 	}
 
-	var _, reflex Set = splitConvexAndReflex(points, indexMap)
+	reflex := filterReflex(points, indexMap)
 	var ears = detectEars(points, reflex, indexMap)
 
 	// Any triangulation of simple polygon has `n-2` triangles.

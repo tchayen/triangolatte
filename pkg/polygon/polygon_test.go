@@ -81,11 +81,10 @@ func TestIsInsideTriangle(t *testing.T) {
 func TestSplitConvexAndReflex(t *testing.T) {
 	indexMap := []int{0, 1, 2, 3}
 
-	convex, reflex := splitConvexAndReflex([]Point{{0, 0}, {2, 3}, {4, 2}, {0, 7}}, indexMap)
-	t.Log(convex)
+	reflex := filterReflex([]Point{{0, 0}, {2, 3}, {4, 2}, {0, 7}}, indexMap)
 	t.Log(reflex)
 
-	if !(convex[0] && convex[2] && convex[3] && !convex[1] && reflex[1] && !reflex[2]) {
+	if !(reflex[1] && !reflex[2]) {
 		t.Error("splitConvexAndReflex is broken")
 	}
 }
@@ -93,8 +92,7 @@ func TestSplitConvexAndReflex(t *testing.T) {
 func TestDetectEars(t *testing.T) {
 	var indexMap []int = []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 
-	_, reflex := splitConvexAndReflex(vertices, indexMap)
-
+	reflex := filterReflex(vertices, indexMap)
 	earList := detectEars(vertices, reflex, indexMap)
 
 	ears := make([]int, earList.Len())
@@ -114,7 +112,7 @@ func TestDetectEars(t *testing.T) {
 
 func BenchmarkDetectEars(b *testing.B) {
 	var indexMap []int = []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
-	_, reflex := splitConvexAndReflex(vertices, indexMap)
+	reflex := filterReflex(vertices, indexMap)
 
 	for i := 0; i < b.N; i++ {
 		detectEars(vertices, reflex, indexMap)
