@@ -150,9 +150,10 @@ func TestEliminateHolesWithNoPossibleVisibleVertex(t *testing.T) {
 }
 
 func TestEarCut(t *testing.T) {
-	result, _ := EarCut(vertices, [][]Point{})
+	result, err := EarCut(vertices, [][]Point{})
 	expected := []float64{240, 115, 320, 65, 395, 170, 240, 115, 395, 170, 305, 160, 240, 115, 305, 160, 265, 240, 240, 115, 265, 240, 190, 100, 150, 30, 240, 115, 190, 100, 50, 110, 150, 30, 190, 100, 50, 110, 190, 100, 95, 125, 50, 110, 95, 125, 100, 215}
 
+	t.Log(err)
 	t.Log(result)
 	t.Log(expected)
 
@@ -196,7 +197,11 @@ func loadPointsFromFile(fileName string) ([][]Point, error) {
 
 func TestSingleTriangleTriangulation(t *testing.T) {
 	result, _ := EarCut([]Point{{0, 0}, {0, 1}, {1, 1}}, [][]Point{})
+	expected := []float64{0, 0, 0, 1, 1, 1}
+
 	t.Log(result)
+
+	checkFloat64Array(t, result, expected)
 }
 
 func TestAghA0(t *testing.T) {

@@ -38,7 +38,6 @@ type Element struct {
 
     // Its properties.
     Reflex bool
-    Ear bool
 }
 
 func (c *CyclicList) Init() *CyclicList {
