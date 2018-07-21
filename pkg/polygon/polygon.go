@@ -38,6 +38,8 @@ func setReflex(points *cyclicList.CyclicList) {
 	for i, p := 0, points.Front(); i < n; i, p = i + 1, p.Next() {
 		if IsReflex(p.Prev().Point, p.Point, p.Next().Point) {
 			p.Reflex = true
+		} else {
+			p.Reflex = false
 		}
 	}
 }
@@ -266,6 +268,23 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 	// Any triangulation of simple polygon has `n-2` triangles.
 	i, t := 0, make([]float64, (n-2) * 6)
 	for c.Len() > 3 {
+
+		// //// DEBUG ////
+		// indexOf := func (value *cyclicList.Element) int {
+		// 	for i, p := range points {
+		// 		if value.Point == p {
+		// 			return i
+		// 		}
+		// 	}
+		// 	return -1
+		// }
+        //
+		// __e := make([]int, ears.Len())
+		// for _i, e := 0, ears.Front(); e != nil; _i, e = _i + 1, e.Next() {
+		// 	__e[_i] = indexOf(e.Value.(*cyclicList.Element))
+		// }
+		// //// ////
+
 		if ears.Len() == 0 {
 			return nil, errors.New("could not detect any ear tip in a non-empty polygon")
 		}
