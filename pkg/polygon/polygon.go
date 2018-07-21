@@ -49,6 +49,24 @@ func splitConvexAndReflex(points []Point, indexMap []int) (convex, reflex Set) {
 	return convex, reflex
 }
 
+
+func isEar(i int, t Triangle, points []Point, reflex Set, indexMap []int) bool {
+	n := len(indexMap)
+	for j := 0; j < n; j++ {
+		// It is ok to skip reflex vertices and the ones that actually belong to
+		// the triangle.
+		if !reflex[j] || j == cyclic(i-1, n) || j == i || j == cyclic(i+1, n) {
+			continue
+		}
+
+		// If triangle contains points[j], points[i] cannot be an ear tip.
+		if IsInsideTriangle(t, points[indexMap[j]]) {
+			return false
+		}
+	}
+	return true
+}
+
 func detectEars(points []Point, reflex Set, indexMap []int) *list.List {
 	n := len(indexMap)
 	ears := list.New()
@@ -58,26 +76,12 @@ func detectEars(points []Point, reflex Set, indexMap []int) *list.List {
 			continue
 		}
 
-		isEar := true
-		for j := 0; j < n; j++ {
-			// It is ok to skip reflex vertices and the ones that actually belong to
-			// the triangle.
-			if !reflex[j] || j == cyclic(i-1, n) || j == i || j == cyclic(i+1, n) {
-				continue
-			}
-
-			// If triangle contains points[j], points[i] cannot be an ear tip.
-			t := Triangle{
-				points[indexMap[cyclic(i-1, n)]],
-				points[indexMap[i]],
-				points[indexMap[cyclic(i+1, n)]],
-			}
-			if IsInsideTriangle(t, points[indexMap[j]]) {
-				isEar = false
-			}
+		t := Triangle{
+			points[indexMap[cyclic(i-1, n)]],
+			points[indexMap[i]],
+			points[indexMap[cyclic(i+1, n)]],
 		}
-
-		if isEar {
+		if isEar(i, t, points, reflex, indexMap) {
 			ears.PushBack(i)
 		}
 	}
