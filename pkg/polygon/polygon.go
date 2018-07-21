@@ -10,10 +10,6 @@ import (
 
 type Set map[int]bool
 
-type Triangle struct {
-	A, B, C Point
-}
-
 func cyclic(i, n int) int {
 	return (i%n + n) % n
 }
@@ -22,14 +18,10 @@ func IsReflex(a, b, c Point) bool {
 	return b.Sub(a).Cross(c.Sub(b)) < 0.0
 }
 
-func SameSide(p1, p2, a, b Point) bool {
-	return b.Sub(a).Cross(p1.Sub(a))*b.Sub(a).Cross(p2.Sub(a)) >= 0
-}
-
-func IsInsideTriangle(t Triangle, p Point) bool {
-	return SameSide(p, t.A, t.B, t.C) &&
-		SameSide(p, t.B, t.A, t.C) &&
-		SameSide(p, t.C, t.A, t.B)
+func IsInsideTriangle(ax, ay, bx, by, cx, cy, px, py float64) bool {
+	return (cx-px)*(ay-py)-(ax-px)*(cy-py) >= 0 &&
+		(ax-px)*(by-py)-(bx-px)*(ay-py) >= 0 &&
+		(bx-px)*(cy-py)-(cx-px)*(by-py) >= 0
 }
 
 func setReflex(points *cyclicList.CyclicList) {
@@ -44,7 +36,7 @@ func setReflex(points *cyclicList.CyclicList) {
 	}
 }
 
-func isEar(p *cyclicList.Element, t Triangle) bool {
+func isEar(p *cyclicList.Element, a, b, c Point) bool {
 	n := p.List.Len()
 	for i, r := 0, p.List.Front(); i < n; i, r = i+1, r.Next() {
 		// It is ok to skip reflex vertices and the ones that actually belong to
@@ -54,7 +46,7 @@ func isEar(p *cyclicList.Element, t Triangle) bool {
 		}
 
 		// If triangle contains points[j], points[i] cannot be an ear tip.
-		if IsInsideTriangle(t, r.Point) {
+		if IsInsideTriangle(a.X, a.Y, b.X, b.Y, c.X, c.Y, r.Point.X, r.Point.Y) {
 			return false
 		}
 	}
@@ -70,8 +62,7 @@ func detectEars(points *cyclicList.CyclicList) *list.List {
 			continue
 		}
 
-		t := Triangle{p.Prev().Point, p.Point, p.Next().Point}
-		if isEar(p, t) {
+		if isEar(p, p.Prev().Point, p.Point, p.Next().Point) {
 			ears.PushBack(p)
 		}
 	}
@@ -149,7 +140,7 @@ func combinePolygons(outer, inner []Point) ([]Point, error) {
 			continue
 		}
 
-		if IsInsideTriangle(Triangle{m, k, outer[pIndex]}, outer[i]) {
+		if IsInsideTriangle(m.X, m.Y, k.X, k.Y, outer[pIndex].X, outer[pIndex].Y, outer[i].X, outer[i].Y) {
 			allOutside = false
 		}
 	}
@@ -167,7 +158,7 @@ func combinePolygons(outer, inner []Point) ([]Point, error) {
 		reflex := list.New()
 		n := len(outer)
 		for i := 0; i < n; i++ {
-			notInside := !IsInsideTriangle(Triangle{m, k, outer[pIndex]}, outer[i])
+			notInside := !IsInsideTriangle(m.X, m.Y, k.X, k.Y, outer[pIndex].X, outer[pIndex].Y, outer[i].X, outer[i].Y)
 			notReflex := !IsReflex(outer[cyclic(i-1, n)], outer[i], outer[cyclic(i+1, n)])
 			if notInside || notReflex {
 				continue
@@ -251,22 +242,18 @@ func eliminateHoles(outer []Point, inners [][]Point) ([]Point, error) {
 // If an adjacent vertex is reflex, it is possible that it becomes
 // convex and, possibly, an ear.
 func checkVertex(element *cyclicList.Element, ears *list.List) {
-	triangle := Triangle{
-		element.Prev().Point,
-		element.Point,
-		element.Next().Point,
-	}
+	a, b, c := element.Prev().Point, element.Point, element.Next().Point
 
 	if element.Reflex {
-		if !IsReflex(triangle.A, triangle.B, triangle.C) {
+		if !IsReflex(a, b, c) {
 			element.Reflex = false
 
-			if isEar(element, triangle) {
+			if isEar(element, a, b, c) {
 				element.Ear = ears.PushBack(element)
 			}
 		}
 	} else {
-		if element.Ear != nil && !isEar(element, triangle) {
+		if element.Ear != nil && !isEar(element, a, b, c) {
 			ears.Remove(element.Ear)
 			element.Ear = nil
 		}

@@ -67,15 +67,17 @@ func TestIsReflex(t *testing.T) {
 	}
 }
 
-func TestSameSide(t *testing.T) {
-	if SameSide(Point{3, 1}, Point{4, 2}, Point{0, 0}, Point{5, 3}) != true {
-		t.Error("SameSide is broken")
+func TestIsInsideTriangle(t *testing.T) {
+	case1 := IsInsideTriangle(vertices[0].X, vertices[0].Y, vertices[8].X, vertices[8].Y, vertices[9].X, vertices[9].Y, vertices[7].X, vertices[7].Y)
+	case2 := IsInsideTriangle(vertices[0].X, vertices[0].Y, vertices[1].X, vertices[1].Y, vertices[5].X, vertices[5].Y, vertices[7].X, vertices[7].Y)
+	if case1 == true || case2 == false {
+		t.Error("IsInsideTriangle is broken")
 	}
 }
 
-func TestIsInsideTriangle(t *testing.T) {
-	if IsInsideTriangle(Triangle{vertices[0], vertices[1], vertices[2]}, vertices[7]) != true || IsInsideTriangle(Triangle{vertices[0], vertices[1], vertices[2]}, vertices[5]) != false {
-		t.Error("IsInsideTriangle is broken")
+func BenchmarkIsInsideTriangle(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		IsInsideTriangle(vertices[0].X, vertices[0].Y, vertices[1].X, vertices[1].Y, vertices[2].X, vertices[2].Y, vertices[3].X, vertices[3].Y)
 	}
 }
 
@@ -212,9 +214,14 @@ func TestAghA0(t *testing.T) {
 	t.Log(result)
 }
 
+// **WARNING**
+// Runs much longer than others (several orders of magnitude longer, can last minutes)
 func TestLakeSuperior(t *testing.T) {
-	//lakeSuperior, _ := loadPointsFromFile("../../assets/lake_superior")
-	//result, _ := EarCut(lakeSuperior[0], [][]Point{}) // lakeSuperior[1:]
+	t.Log("Skipping long test")
+	return
 
-	//print(result)
+	lakeSuperior, _ := loadPointsFromFile("../../assets/lake_superior")
+	result, _ := EarCut(lakeSuperior[0], [][]Point{}) // lakeSuperior[1:]
+
+	t.Log(result)
 }
