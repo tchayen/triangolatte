@@ -74,8 +74,8 @@ func BenchmarkIsReflex(b *testing.B) {
 }
 
 func TestIsInsideTriangle(t *testing.T) {
-	case1 := IsInsideTriangle(vertices[0].X, vertices[0].Y, vertices[8].X, vertices[8].Y, vertices[9].X, vertices[9].Y, vertices[7].X, vertices[7].Y)
-	case2 := IsInsideTriangle(vertices[0].X, vertices[0].Y, vertices[1].X, vertices[1].Y, vertices[5].X, vertices[5].Y, vertices[7].X, vertices[7].Y)
+	case1 := IsInsideTriangle(vertices[0], vertices[8], vertices[9], vertices[7])
+	case2 := IsInsideTriangle(vertices[0], vertices[1], vertices[5], vertices[7])
 	if case1 == true || case2 == false {
 		t.Error("IsInsideTriangle is broken")
 	}
@@ -83,7 +83,7 @@ func TestIsInsideTriangle(t *testing.T) {
 
 func BenchmarkIsInsideTriangle(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		IsInsideTriangle(vertices[0].X, vertices[0].Y, vertices[1].X, vertices[1].Y, vertices[2].X, vertices[2].Y, vertices[3].X, vertices[3].Y)
+		IsInsideTriangle(vertices[0], vertices[1], vertices[2], vertices[3])
 	}
 }
 

@@ -18,10 +18,10 @@ func IsReflex(a, b, c Point) bool {
 	return b.Sub(a).Cross(c.Sub(b)) < 0.0
 }
 
-func IsInsideTriangle(ax, ay, bx, by, cx, cy, px, py float64) bool {
-	return (cx-px)*(ay-py)-(ax-px)*(cy-py) >= 0 &&
-		(ax-px)*(by-py)-(bx-px)*(ay-py) >= 0 &&
-		(bx-px)*(cy-py)-(cx-px)*(by-py) >= 0
+func IsInsideTriangle(a, b, c, p Point) bool {
+	return (c.X-p.X)*(a.Y-p.Y)-(a.X-p.X)*(c.Y-p.Y) >= 0 &&
+		(a.X-p.X)*(b.Y-p.Y)-(b.X-p.X)*(a.Y-p.Y) >= 0 &&
+		(b.X-p.X)*(c.Y-p.Y)-(c.X-p.X)*(b.Y-p.Y) >= 0
 }
 
 func setReflex(points *cyclicList.CyclicList) {
@@ -46,7 +46,7 @@ func isEar(p *cyclicList.Element, a, b, c Point) bool {
 		}
 
 		// If triangle contains points[j], points[i] cannot be an ear tip.
-		if IsInsideTriangle(a.X, a.Y, b.X, b.Y, c.X, c.Y, r.Point.X, r.Point.Y) {
+		if IsInsideTriangle(a, b, c, r.Point) {
 			return false
 		}
 	}
@@ -140,7 +140,7 @@ func combinePolygons(outer, inner []Point) ([]Point, error) {
 			continue
 		}
 
-		if IsInsideTriangle(m.X, m.Y, k.X, k.Y, outer[pIndex].X, outer[pIndex].Y, outer[i].X, outer[i].Y) {
+		if IsInsideTriangle(m, k, outer[pIndex], outer[i]) {
 			allOutside = false
 		}
 	}
@@ -158,7 +158,7 @@ func combinePolygons(outer, inner []Point) ([]Point, error) {
 		reflex := list.New()
 		n := len(outer)
 		for i := 0; i < n; i++ {
-			notInside := !IsInsideTriangle(m.X, m.Y, k.X, k.Y, outer[pIndex].X, outer[pIndex].Y, outer[i].X, outer[i].Y)
+			notInside := !IsInsideTriangle(m, k, outer[pIndex], outer[i])
 			notReflex := !IsReflex(outer[cyclic(i-1, n)], outer[i], outer[cyclic(i+1, n)])
 			if notInside || notReflex {
 				continue
