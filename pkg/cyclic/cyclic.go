@@ -2,6 +2,12 @@
 //
 // **NOTE:** _in one element list `e == e.next`_
 //
+// Parameters
+// - find O(n)
+// - removal O(1)
+// - addition O(1)
+// - length O(1)
+//
 // Initialize using
 //      c := cyclic.New()
 //
@@ -38,6 +44,7 @@ type Element struct {
 func (c *Cyclic) Init() *Cyclic {
     c.root.next = &c.root
     c.root.prev = &c.root
+    c.root.list = c
     c.len = 0
     return c
 }
@@ -70,9 +77,24 @@ func (c *Cyclic) InsertAfter(p Point, e *Element) *Element {
 }
 
 func (c *Cyclic) Push(points ...Point) {
+    after := c.root.prev
     for _, p := range points {
-        c.InsertAfter(p, c.root.prev)
+        after = c.InsertAfter(p, after)
     }
+}
+
+func (c *Cyclic) Remove(e *Element) *Element {
+    e.prev.next = e.next
+    e.next.prev = e.prev
+
+    // Avoid memory leaks.
+    e.next = nil
+    e.prev = nil
+    e.list = nil
+
+    c.len--
+
+    return e
 }
 
 func (e *Element) Next() *Element {
