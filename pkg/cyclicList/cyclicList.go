@@ -17,18 +17,18 @@
 //      }
 //
 
-package cyclic
+package cyclicList
 
 import . "triangolatte/pkg/point"
 
-type Cyclic struct {
+type CyclicList struct {
     root Element
     len int
 }
 
 type Element struct {
     // The list to which this element belongs.
-    list *Cyclic
+    list *CyclicList
 
     // Next and previous elements.
     prev, next *Element
@@ -41,7 +41,7 @@ type Element struct {
     Ear bool
 }
 
-func (c *Cyclic) Init() *Cyclic {
+func (c *CyclicList) Init() *CyclicList {
     c.root.next = &c.root
     c.root.prev = &c.root
     c.root.list = c
@@ -49,26 +49,35 @@ func (c *Cyclic) Init() *Cyclic {
     return c
 }
 
-func New() *Cyclic {
-    return new(Cyclic).Init()
+func New() *CyclicList {
+    return new(CyclicList).Init()
 }
 
-func (c *Cyclic) First() *Element {
+func NewFromArray(points []Point) *CyclicList {
+    c := New()
+    after := &c.root
+    for _, p := range points {
+        after = c.InsertAfter(p, after)
+    }
+    return c
+}
+
+func (c *CyclicList) First() *Element {
     return &c.root
 }
 
-func (c *Cyclic) Len() int {
+func (c *CyclicList) Len() int {
     return c.len
 }
 
-func (c *Cyclic) Front() *Element {
+func (c *CyclicList) Front() *Element {
     if c.len == 0 {
         return nil
     }
     return c.root.next
 }
 
-func (c *Cyclic) InsertAfter(p Point, e *Element) *Element {
+func (c *CyclicList) InsertAfter(p Point, e *Element) *Element {
     new := Element{Point: p, prev: e, next: e.next, list: e.list}
     e.next.prev = &new
     e.next = &new
@@ -76,14 +85,14 @@ func (c *Cyclic) InsertAfter(p Point, e *Element) *Element {
     return &new
 }
 
-func (c *Cyclic) Push(points ...Point) {
+func (c *CyclicList) Push(points ...Point) {
     after := c.root.prev
     for _, p := range points {
         after = c.InsertAfter(p, after)
     }
 }
 
-func (c *Cyclic) Remove(e *Element) *Element {
+func (c *CyclicList) Remove(e *Element) *Element {
     e.prev.next = e.next
     e.next.prev = e.prev
 

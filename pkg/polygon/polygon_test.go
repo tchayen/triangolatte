@@ -56,7 +56,7 @@ func checkPointArray(t *testing.T, result, expected []Point) {
 
 func TestCyclic(t *testing.T) {
 	if cyclic(1, 5) != 1 || cyclic(4, 5) != 4 || cyclic(6, 5) != 1 || cyclic(-1, 5) != 4 || cyclic(-5, 5) != 0 || cyclic(-6, 5) != 4 {
-		t.Error("cyclic is broken")
+		t.Error("cyclicList is broken")
 	}
 }
 

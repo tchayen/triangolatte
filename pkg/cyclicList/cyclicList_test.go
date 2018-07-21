@@ -1,11 +1,21 @@
-package cyclic
+package cyclicList
 
 import (
     "testing"
     . "triangolatte/pkg/point"
 )
 
-func TestCyclic_PushOne(t *testing.T) {
+func TestCyclicList_NewFromArray(t *testing.T) {
+    points := []Point{{0, 1}, {1, 1}, {2, 0}}
+    c := NewFromArray(points)
+
+    for i, e := 0, c.Front(); i < c.Len(); i, e = i + 1, e.Next() {
+        if points[i] != e.Point {
+            t.Error("Initialization from array does not work as intended")
+        }
+    }
+}
+func TestCyclicList_PushOne(t *testing.T) {
     c, p := New(), Point{1, 1}
     c.Push(p)
 
@@ -14,13 +24,13 @@ func TestCyclic_PushOne(t *testing.T) {
     }
 }
 
-func TestCyclic_Push(t *testing.T) {
+func TestCyclicList_Push(t *testing.T) {
     c := New()
     p1, p2, p3 := Point{0, 0}, Point{1, 0}, Point{2, 0}
     c.Push(p1, p2, p3)
 }
 
-func TestCyclic_Remove(t *testing.T) {
+func TestCyclicList_Remove(t *testing.T) {
     c := New()
     p1, p2, p3 := Point{0, 0}, Point{1, 0}, Point{2, 0}
     c.Push(p1, p2, p3)
@@ -32,7 +42,7 @@ func TestCyclic_Remove(t *testing.T) {
     }
 }
 
-func TestCyclic_Len(t *testing.T) {
+func TestCyclicList_Len(t *testing.T) {
     c := New()
     p1, p2, p3 := Point{0, 0}, Point{1, 0}, Point{2, 0}
     c.Push(p1, p2, p3)
