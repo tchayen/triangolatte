@@ -1,5 +1,9 @@
 package triangolatte
 
+// Normal triangulates given array of points with no joint correction, according
+// to provided width in O(n) time.
+//
+// Returns array of two-coordinate CCW triangles one after another.
 func Normal(points []Point, width int) (triangles []float64) {
 	width /= 2.0
 	triangles = make([]float64, 0, len(points)*12)
@@ -29,6 +33,11 @@ func calculateNormals(x, y float64) [2]Point {
 	}
 }
 
+// Miter triangulates given array of points in O(n) time, using provided width
+// and producing miter joints, i.e. extending the lines until they meet at some
+// point.
+//
+// Returns array of two-coordinate CCW triangles one after another.
 func Miter(points []Point, width int) (triangles []float64) {
 	width /= 2.0
 	triangles = make([]float64, 0, len(points)*12)

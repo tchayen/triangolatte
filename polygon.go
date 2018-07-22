@@ -6,16 +6,19 @@ import (
 	"sort"
 )
 
+// Set of int values.
 type Set map[int]bool
 
 func cyclic(i, n int) int {
 	return (i%n + n) % n
 }
 
+// IsReflex checks if given point B in relation to points A and B is reflex.
 func IsReflex(a, b, c Point) bool {
 	return b.Sub(a).Cross(c.Sub(b)) < 0.0
 }
 
+// IsInsideTriangle checks if given point P lays inside triangle [A, B, C].
 func IsInsideTriangle(a, b, c, p Point) bool {
 	return (c.X-p.X)*(a.Y-p.Y)-(a.X-p.X)*(c.Y-p.Y) >= 0 &&
 		(a.X-p.X)*(b.Y-p.Y)-(b.X-p.X)*(a.Y-p.Y) >= 0 &&
@@ -258,6 +261,10 @@ func checkVertex(element *Element, ears *list.List) {
 	}
 }
 
+// EarCut triangulates given CCW polygon using ear clipping algorithm (takes
+// O(n^2) time).
+//
+// Produces  array of two-coordinate, CCW triangles, put one after another.
 func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 	n := len(points)
 	if n < 3 {

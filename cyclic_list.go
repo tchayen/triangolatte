@@ -9,7 +9,6 @@ import (
 // NOTE: in one element list e == e.next
 //
 // Parameters
-// - find O(n)
 //
 // - removal O(1)
 //
@@ -45,6 +44,7 @@ type Element struct {
 	Ear    *list.Element
 }
 
+// Init sets up fresh CyclicList.
 func (c *CyclicList) Init() *CyclicList {
 	c.root.next = &c.root
 	c.root.prev = &c.root
@@ -53,10 +53,12 @@ func (c *CyclicList) Init() *CyclicList {
 	return c
 }
 
+// New call new(CyclicList) and initializes it.
 func New() *CyclicList {
 	return new(CyclicList).Init()
 }
 
+// NewFromArray takes []Point and puts it inside CyclicList.
 func NewFromArray(points []Point) *CyclicList {
 	c := New()
 	after := &c.root
@@ -66,14 +68,12 @@ func NewFromArray(points []Point) *CyclicList {
 	return c
 }
 
-func (c *CyclicList) First() *Element {
-	return &c.root
-}
-
+// Len returns length of the CyclicList.
 func (c *CyclicList) Len() int {
 	return c.len
 }
 
+// Front returns first element (head) of the CyclicList.
 func (c *CyclicList) Front() *Element {
 	if c.len == 0 {
 		return nil
@@ -81,6 +81,8 @@ func (c *CyclicList) Front() *Element {
 	return c.root.next
 }
 
+// InsertAfter puts given Point after given *Element (as its next element and
+// previous to the given element's successor)
 func (c *CyclicList) InsertAfter(p Point, e *Element) *Element {
 	new := Element{Point: p, prev: e, next: e.next, List: e.List}
 	e.next.prev = &new
@@ -89,6 +91,7 @@ func (c *CyclicList) InsertAfter(p Point, e *Element) *Element {
 	return &new
 }
 
+// Push inserts variable number of points to the CyclicList.
 func (c *CyclicList) Push(points ...Point) {
 	after := c.root.prev
 	for _, p := range points {
@@ -96,6 +99,7 @@ func (c *CyclicList) Push(points ...Point) {
 	}
 }
 
+// Remove detaches given *Element from the CyclicList and resets its pointers.
 func (c *CyclicList) Remove(e *Element) *Element {
 	e.prev.next = e.next
 	e.next.prev = e.prev
@@ -110,6 +114,8 @@ func (c *CyclicList) Remove(e *Element) *Element {
 	return e
 }
 
+// Next returns next element on the list (or first if given element was
+// the last one).
 func (e *Element) Next() *Element {
 	if e.List == nil {
 		return nil
@@ -122,6 +128,8 @@ func (e *Element) Next() *Element {
 	return e.next
 }
 
+// Prev returns previous element on the list (or last one if given element
+// was the first one).
 func (e *Element) Prev() *Element {
 	if e.List == nil {
 		return nil
