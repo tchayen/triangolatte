@@ -3,8 +3,7 @@ package main
 import (
     "net/http"
     "log"
-    . "triangolatte/pkg/point"
-    . "triangolatte/pkg/polygon"
+    . "triangolatte"
     "io/ioutil"
     "encoding/json"
 )
