@@ -81,6 +81,10 @@ const width = window.innerWidth
 const height = window.innerHeight
 const scalingFactor = window.devicePixelRatio || 1
 
+const canvas = WebGLUtils.setUpCanvas(width, height, scalingFactor)
+const gl = canvas.getContext('webgl')
+if (!gl) throw 'WebGL is not supported'
+
 const constants = {
     type: gl.FLOAT,
     // Normalization means translating value in any type to [-1.0, 1.0] range
@@ -91,17 +95,12 @@ const constants = {
     // 2 components per iteration, i.e. for
     // a {x, y, z, w} vector we provide only {x, y}, z
     // and w will default to 0 and 1 respectively.
-    // WIP: changed to 3 to store color
-    size: 3,
+    size: 2,
     // 0 = move forward size * sizeof(type) each iteration to get the next position
     stride: 0,
     arrayOffset: 0,
     primitiveType: gl.LINE_STRIP,
 }
-
-const canvas = WebGLUtils.setUpCanvas(width, height, scalingFactor)
-const gl = canvas.getContext('webgl')
-if (!gl) throw 'WebGL is not supported'
 
 const vertexShader = WebGLUtils.createShader(
     gl, gl.VERTEX_SHADER,
