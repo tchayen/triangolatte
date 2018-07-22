@@ -1,8 +1,8 @@
 # triangolatte
 
-[![GoDoc](https://godoc.org/github.com/Tchayen/triangolatte?status.svg)](https://godoc.org/github.com/Tchayen/triangolatte)
-[![Coverage Status](https://coveralls.io/repos/github/Tchayen/triangolatte/badge.svg?branch=master)](https://coveralls.io/github/Tchayen/triangolatte?branch=master)
 [![Build Status](https://travis-ci.org/Tchayen/triangolatte.svg?branch=master)](https://travis-ci.org/Tchayen/triangolatte)
+[![Coverage Status](https://coveralls.io/repos/github/Tchayen/triangolatte/badge.svg?branch=master)](https://coveralls.io/github/Tchayen/triangolatte?branch=master)
+[![GoDoc](https://godoc.org/github.com/Tchayen/triangolatte?status.svg)](https://godoc.org/github.com/Tchayen/triangolatte)
 
 > **NOTE:** _The library is in its very early stage. Near future will bring more
 tests and optimizations._
@@ -95,6 +95,49 @@ Code is (more or less) covered in tests. You can run them:
 ```bash
 go test -v
 ```
+
+You can for example benchmark speed of checking if point is inside triangle:
+```bash
+go test -run NONE -bench IsInsideTriangle
+```
+
+### Flame Graphs
+
+What is a _flame graph_? Simply speaking, a human-readable insight into what
+kept CPU busy.
+
+![assets/torch.svg](assets/torch.svg)
+
+You can view an example in `assets/torch.svg`.
+
+#### Generating flame graph
+
+Run benchmark and save data
+
+```bash
+go test -run NONE -bench EarCut -cpuprofile prof.cpu
+```
+
+Init `pprof`
+
+```bash
+go tool pprof triangolatte.test prof.cpu
+```
+
+Install [go-torch](https://github.com/uber/go-torch) and [FlameGraph](https://github.com/brendangregg/FlameGraph)
+if you haven't done it before
+
+```bash
+go get github.com/uber/go-torch
+git clone https://github.com/brendangregg/FlameGraph
+export PATH=$PATH:$(pwd)/FlameGraph # You might want to add this to your .bashrc or other equivalent
+```
+
+Create flame graph
+```bash
+go-torch triangolatte.test prof.cpu
+```
+Now you can open newly generated `torch.svg` in your web browser.
 
 ## Future plans
 

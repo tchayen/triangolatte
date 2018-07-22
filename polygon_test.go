@@ -141,6 +141,12 @@ func TestEarCut(t *testing.T) {
 	checkFloat64Array(t, result, expected)
 }
 
+func BenchmarkEarCut(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		EarCut(vertices, [][]Point{})
+	}
+}
+
 func TestIncorrectEarCut(t *testing.T) {
 	var err error
 	_, err = EarCut([]Point{{0, 0}}, [][]Point{})

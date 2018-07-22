@@ -9,3 +9,8 @@ bundle.js
 # CI, code coverage
 coverage.out
 profile.cov
+
+# Profiling
+prof.cpu
+torch.svg
+triangolatte.test
