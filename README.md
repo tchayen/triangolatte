@@ -108,7 +108,7 @@ kept CPU busy.
 
 ![assets/torch.svg](assets/torch.svg)
 
-You can view an example in `assets/torch.svg`.
+You can view an example of `EarCut` benchmark  flame graph in [assets/torch.svg](assets/torch.svg).
 
 #### Generating flame graph
 
