@@ -109,8 +109,6 @@ but taking only non-zero coordinate as result)
 **`(p Point) Distance2(r Point) float64`** – squared distance to given point.
 _Useful for comparisons._
 
-**`(p Point) Pair() (x, y float64)`** – split point into pair of floats.
-
 ### Types
 
 ```
@@ -123,15 +121,12 @@ type Point struct {
 type Set map[int]bool
 ```
 
-```
-type Triangle struct {
-  A, B, C Point
-}
-```
-
 ## Tests
 
-Running tests during development happens in IDE and project currently lacks support for running tests in the CLI.
+Running tests during development happens in IDE and project currently lacks
+support for running tests in the CLI. I am sorry for that.
+
+**TODO:** _provide an instruction set for running tests (all at once)._
 
 ## Contributing
 
