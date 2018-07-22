@@ -1,4 +1,10 @@
-// Package implements double linked cyclic lists.
+package triangolatte
+
+import (
+	"container/list"
+)
+
+// Implements double linked cyclic lists.
 //
 // NOTE: in one element list e == e.next
 //
@@ -19,12 +25,6 @@
 //          // do something with e.Point, e.Reflex, e.Ear...
 //      }
 //
-package triangolatte
-
-import (
-	"container/list"
-)
-
 type CyclicList struct {
 	root Element
 	len  int
