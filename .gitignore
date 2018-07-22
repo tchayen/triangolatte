@@ -1,6 +1,11 @@
 .idea/
+
+# Examples
 *_tmp
 node_modules/
 yarn-error.log
 bundle.js
+
+# CI, code coverage
 coverage.out
+profile.cov

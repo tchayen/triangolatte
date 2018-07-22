@@ -34,6 +34,12 @@ For rendering examples, go to `examples/webgl` directory.
 
 You will find instructions for running the code there.
 
+## Docs
+[![GoDoc](https://godoc.org/github.com/Tchayen/triangolatte?status.svg)](https://godoc.org/github.com/Tchayen/triangolatte)
+
+Visit [godoc](https://godoc.org/github.com/Tchayen/triangolatte) for complete
+documentation of the project.
+
 ## Features
 
 > **NOTE**: _this library is developed mostly with map data triangulation in
