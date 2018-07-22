@@ -7,6 +7,12 @@
 > **NOTE:** _The library is in its very early stage. Near future will bring more
 tests and optimizations._
 
+---
+
+_Should I use it?_ **Not yet**
+
+---
+
 Triangulation library. Allows translating lines and polygons (both based on
 points) to the language of GPUs.
 

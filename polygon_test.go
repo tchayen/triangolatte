@@ -184,13 +184,20 @@ func TestEarCut(t *testing.T) {
 }
 
 func TestEarCut2(t *testing.T) {
-	// v := []Point{{50, 50}, {50, 200}, {200, 200}, {200, 50}}
+	v := []Point{{0, 4}, {3, 1}, {8, 2}, {9, 5}, {4, 6}}
+	//v := []Point{{50, 50}, {50, 200}, {200, 200}, {200, 50}}
 	//v := []Point{{50, 110}, {150, 30}, {95, 125}, {100, 215}}
-	v := []Point{{10, 0}, {0, 50}, {60, 60}, {70, 10}}
+	//v := []Point{{10, 0}, {0, 50}, {60, 60}, {70, 10}}
 
 	res, err := EarCut(v, [][]Point{})
 	if err != nil {
 		t.Error(err)
+	}
+
+	real, actual, dif := deviation(v, res)
+
+	if dif != 0 {
+		t.Errorf("real area: %f; result: %f", real, actual)
 	}
 	t.Log(res)
 }
