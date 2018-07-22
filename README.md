@@ -34,17 +34,7 @@ t, err = triangolatte.EarCut(vertices, [][]Point{})
 
 For rendering examples, go to `examples/webgl` directory.
 
-Run the server with
-
-```bash
-go run server.go
-```
-
-then, in separate terminal
-```bash
-yarn start
-```
-and finally, visit `localhost:3000`.
+You will find instructions for running the code there.
 
 ## Features
 
