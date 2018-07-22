@@ -40,7 +40,11 @@ Run the server with
 go run server.go
 ```
 
-and visit `localhost:3000`.
+then, in separate terminal
+```bash
+yarn start
+```
+and finally, visit `localhost:3000`.
 
 ## Features
 

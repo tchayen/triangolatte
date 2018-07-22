@@ -1,2 +1,4 @@
 .idea/
 *_tmp
+node_modules/
+yarn-error.log

@@ -1,0 +1,28 @@
+{
+  "name": "triangolatte-example-webgl",
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": {
+    "name": "Tomasz Czajęcki",
+    "url": "https://github.com/Tchayen"
+  },
+  "license": "MIT",
+  "scripts": {
+    "start": "webpack-dev-server --mode development",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.7.0",
+    "css-loader": "^0.28.11",
+    "node-sass": "^4.9.0",
+    "sass-loader": "^7.0.3",
+    "style-loader": "^0.21.0",
+    "webpack": "^4.12.1",
+    "webpack-cli": "^3.0.8",
+    "webpack-dev-server": "^3.1.4",
+    "webpack-glsl-loader": "^1.0.1"
+  }
+}
