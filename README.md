@@ -1,6 +1,6 @@
 # triangolatte
 
-[![GoDoc](https://godoc.org/golang.org/x/tools/cmd/godoc?status.svg)](https://godoc.org/golang.org/x/tools/cmd/godoc)
+[![GoDoc](https://godoc.org/github.com/tchayen/triangolatte/pkg?status.svg)](https://godoc.org/github.com/tchayen/triangolatte/pkg)
 
 > **NOTE:** _The library is in its very early stage. Near future will bring
 usable API, tests and optimizations._

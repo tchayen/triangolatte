@@ -1,6 +1,4 @@
-package line
-
-import . "triangolatte/pkg/point"
+package triangolatte
 
 func Normal(points []Point, width int) (triangles []float64) {
 	width /= 2.0
@@ -11,12 +9,12 @@ func Normal(points []Point, width int) (triangles []float64) {
 		n1 := Point{dy, -dx}.Scale(float64(width))
 		n2 := Point{-dy, dx}.Scale(float64(width))
 
-		v0, v1 := points[i+1].Add(n2).Pair()
-		v2, v3 := points[i].Add(n2).Pair()
-		v4, v5 := points[i].Add(n1).Pair()
-		v6, v7 := points[i].Add(n1).Pair()
-		v8, v9 := points[i+1].Add(n1).Pair()
-		v10, v11 := points[i+1].Add(n2).Pair()
+		v0, v1 := points[i+1].Add(n2).X, points[i+1].Add(n2).Y
+		v2, v3 := points[i].Add(n2).X, points[i].Add(n2).Y
+		v4, v5 := points[i].Add(n1).X, points[i].Add(n1).Y
+		v6, v7 := points[i].Add(n1).X, points[i].Add(n1).Y
+		v8, v9 := points[i+1].Add(n1).X, points[i+1].Add(n1).Y
+		v10, v11 := points[i+1].Add(n2).X, points[i+1].Add(n2).Y
 
 		triangles = append(triangles, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11)
 	}
@@ -66,12 +64,12 @@ func Miter(points []Point, width int) (triangles []float64) {
 		miterLength := float64(width) / unitMiter.Dot(n1[0])
 		miter2 = unitMiter.Scale(miterLength)
 
-		v0, v1 := points[i].Sub(miter2).Pair()
-		v2, v3 := points[i-1].Sub(miter1).Pair()
-		v4, v5 := points[i-1].Add(miter1).Pair()
-		v6, v7 := points[i-1].Add(miter1).Pair()
-		v8, v9 := points[i].Add(miter2).Pair()
-		v10, v11 := points[i].Sub(miter2).Pair()
+		v0, v1 := points[i].Sub(miter2).X, points[i].Sub(miter2).Y
+		v2, v3 := points[i-1].Sub(miter1).X, points[i-1].Sub(miter1).Y
+		v4, v5 := points[i-1].Add(miter1).X, points[i-1].Add(miter1).Y
+		v6, v7 := points[i-1].Add(miter1).X, points[i-1].Add(miter1).Y
+		v8, v9 := points[i].Add(miter2).X, points[i].Add(miter2).Y
+		v10, v11 := points[i].Sub(miter2).X, points[i].Sub(miter2).Y
 
 		triangles = append(triangles, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11)
 	}
@@ -80,12 +78,12 @@ func Miter(points []Point, width int) (triangles []float64) {
 	n := len(points)
 	lastMiter := n2[0].Scale(float64(width))
 
-	v0, v1 := points[n-1].Sub(lastMiter).Pair()
-	v2, v3 := points[n-2].Sub(miter1).Pair()
-	v4, v5 := points[n-2].Add(miter1).Pair()
-	v6, v7 := points[n-2].Add(miter1).Pair()
-	v8, v9 := points[n-1].Add(lastMiter).Pair()
-	v10, v11 := points[n-1].Sub(lastMiter).Pair()
+	v0, v1 := points[n-1].Sub(lastMiter).X, points[n-1].Sub(lastMiter).Y
+	v2, v3 := points[n-2].Sub(miter1).X, points[n-2].Sub(miter1).Y
+	v4, v5 := points[n-2].Add(miter1).X, points[n-2].Add(miter1).Y
+	v6, v7 := points[n-2].Add(miter1).X, points[n-2].Add(miter1).Y
+	v8, v9 := points[n-1].Add(lastMiter).X, points[n-1].Add(lastMiter).Y
+	v10, v11 := points[n-1].Sub(lastMiter).X, points[n-1].Sub(lastMiter).Y
 
 	triangles = append(triangles, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11)
 

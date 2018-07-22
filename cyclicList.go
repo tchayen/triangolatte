@@ -16,12 +16,10 @@
 //          // do something with e.Point, e.Reflex, e.Ear...
 //      }
 //
-
-package cyclicList
+package triangolatte
 
 import (
 	"container/list"
-	. "triangolatte/pkg/point"
 )
 
 type CyclicList struct {

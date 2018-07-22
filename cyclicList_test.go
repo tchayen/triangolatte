@@ -1,8 +1,7 @@
-package cyclicList
+package triangolatte
 
 import (
 	"testing"
-	. "triangolatte/pkg/point"
 )
 
 func TestCyclicList_NewFromArray(t *testing.T) {
@@ -17,9 +16,9 @@ func TestCyclicList_NewFromArray(t *testing.T) {
 }
 func TestCyclicList(t *testing.T) {
 	c, p1 := New(), Point{0, 1}
-	p2, p3 :=Point{1, 1}, Point{2, 1}
+	p2, p3 := Point{1, 1}, Point{2, 1}
 
-	t.Run("push", func (t *testing.T) {
+	t.Run("push", func(t *testing.T) {
 		c.Push(p1)
 
 		if c.Len() != 1 || c.Front().Point != p1 || c.Front().Prev().Point != p1 {
@@ -27,11 +26,11 @@ func TestCyclicList(t *testing.T) {
 		}
 	})
 
-	t.Run("push multiple", func (t *testing.T) {
+	t.Run("push multiple", func(t *testing.T) {
 		c.Push(p2, p3)
 	})
 
-	t.Run("removal", func (t *testing.T) {
+	t.Run("removal", func(t *testing.T) {
 		c.Remove(c.Front().Next())
 
 		if c.Len() != 2 || c.Front().Next().Point != p3 || c.Front().Prev().Prev().Point != p1 {
@@ -39,13 +38,13 @@ func TestCyclicList(t *testing.T) {
 		}
 	})
 
-	t.Run("length", func (t *testing.T) {
+	t.Run("length", func(t *testing.T) {
 		if c.Len() != 2 {
 			t.Error("Incorrect length")
 		}
 	})
 
-	t.Run("next", func (t *testing.T) {
+	t.Run("next", func(t *testing.T) {
 		if c.Front().Point != p1 {
 			t.Error("Incorrect front element")
 		}

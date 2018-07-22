@@ -1,11 +1,9 @@
-package polygon
+package triangolatte
 
 import (
 	"container/list"
 	"errors"
 	"sort"
-	"triangolatte/pkg/cyclicList"
-	. "triangolatte/pkg/point"
 )
 
 type Set map[int]bool
@@ -24,7 +22,7 @@ func IsInsideTriangle(a, b, c, p Point) bool {
 		(b.X-p.X)*(c.Y-p.Y)-(c.X-p.X)*(b.Y-p.Y) >= 0
 }
 
-func setReflex(points *cyclicList.CyclicList) {
+func setReflex(points *CyclicList) {
 	n := points.Len()
 
 	for i, p := 0, points.Front(); i < n; i, p = i+1, p.Next() {
@@ -36,7 +34,7 @@ func setReflex(points *cyclicList.CyclicList) {
 	}
 }
 
-func isEar(p *cyclicList.Element, a, b, c Point) bool {
+func isEar(p *Element, a, b, c Point) bool {
 	n := p.List.Len()
 	for i, r := 0, p.List.Front(); i < n; i, r = i+1, r.Next() {
 		// It is ok to skip reflex vertices and the ones that actually belong to
@@ -53,7 +51,7 @@ func isEar(p *cyclicList.Element, a, b, c Point) bool {
 	return true
 }
 
-func detectEars(points *cyclicList.CyclicList) *list.List {
+func detectEars(points *CyclicList) *list.List {
 	ears := list.New()
 
 	n := points.Len()
@@ -241,7 +239,7 @@ func eliminateHoles(outer []Point, inners [][]Point) ([]Point, error) {
 // If an adjacent vertex is an ear, it does not necessarily remain an ear.
 // If an adjacent vertex is reflex, it is possible that it becomes
 // convex and, possibly, an ear.
-func checkVertex(element *cyclicList.Element, ears *list.List) {
+func checkVertex(element *Element, ears *list.List) {
 	a, b, c := element.Prev().Point, element.Point, element.Next().Point
 
 	if element.Reflex {
@@ -266,27 +264,19 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 		return nil, errors.New("cannot triangulate less than three points")
 	}
 
-	c := cyclicList.NewFromArray(points)
-
-	// if len(holes) > 0 {
-	// 	var err error
-	// 	points, err = eliminateHoles(points, holes)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// }
+	c := NewFromArray(points)
 
 	setReflex(c)
 	var ears = detectEars(c)
 
 	// Any triangulation of simple polygon has `n-2` triangles.
-	i, t := 0, make([]float64, (n-2) * 6)
+	i, t := 0, make([]float64, (n-2)*6)
 	for c.Len() > 3 {
 		if ears.Len() == 0 {
 			return nil, errors.New("could not detect any ear tip in a non-empty polygon")
 		}
 
-		ear := ears.Remove(ears.Front()).(*cyclicList.Element)
+		ear := ears.Remove(ears.Front()).(*Element)
 		ear.Ear = nil
 
 		t[i+0], t[i+1] = ear.Prev().Point.X, ear.Prev().Point.Y
@@ -309,6 +299,6 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 	t[i+2], t[i+3] = p.Point.X, p.Point.Y
 	p = p.Next()
 	t[i+4], t[i+5] = p.Point.X, p.Point.Y
-	
+
 	return t, nil
 }

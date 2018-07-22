@@ -1,4 +1,4 @@
-package polygon
+package triangolatte
 
 import (
 	"encoding/json"
@@ -6,8 +6,6 @@ import (
 	"math"
 	"sort"
 	"testing"
-	"triangolatte/pkg/cyclicList"
-	. "triangolatte/pkg/point"
 )
 
 var vertices = []Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
@@ -69,7 +67,7 @@ func BenchmarkIsInsideTriangle(b *testing.B) {
 }
 
 func TestSplitConvexAndReflex(t *testing.T) {
-	c := cyclicList.NewFromArray([]Point{{0, 0}, {2, 3}, {4, 2}, {0, 7}})
+	c := NewFromArray([]Point{{0, 0}, {2, 3}, {4, 2}, {0, 7}})
 	setReflex(c)
 
 	if !(c.Front().Next().Reflex && !c.Front().Next().Next().Reflex) {
@@ -78,7 +76,7 @@ func TestSplitConvexAndReflex(t *testing.T) {
 }
 
 func TestDetectEars(t *testing.T) {
-	c := cyclicList.NewFromArray(vertices)
+	c := NewFromArray(vertices)
 	setReflex(c)
 	earList := detectEars(c)
 
@@ -86,7 +84,7 @@ func TestDetectEars(t *testing.T) {
 	i, e := 0, earList.Front()
 
 	for e != nil {
-		ears[i] = e.Value.(*cyclicList.Element).Point
+		ears[i] = e.Value.(*Element).Point
 		i, e = i+1, e.Next()
 	}
 
@@ -102,7 +100,7 @@ func TestDetectEars(t *testing.T) {
 
 func BenchmarkDetectEars(b *testing.B) {
 	b.StopTimer()
-	c := cyclicList.NewFromArray(vertices)
+	c := NewFromArray(vertices)
 	setReflex(c)
 	b.StartTimer()
 
