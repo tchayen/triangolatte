@@ -90,10 +90,11 @@ type Point struct {
 
 ## Tests
 
-Running tests during development happens in IDE and project currently lacks
-support for running tests in the CLI. I am sorry for that.
+Code is (more or less) covered in tests. You can run them:
 
-**TODO:** _provide an instruction set for running tests (all at once)._
+```bash
+go test -v
+```
 
 ## Future plans
 
@@ -115,6 +116,10 @@ libraries. Testing behavior on huge, unusual real life examples.
 One of the core plans for this library's development is creating, as soon as it
 becomes possible, some kind of [WebAssembly](https://webassembly.org/) module
 for use in JS.
+
+## License
+
+MIT License (refer to the [LICENSE](LICENSE) file).
 
 ## Contributing
 
