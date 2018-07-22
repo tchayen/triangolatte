@@ -10,7 +10,9 @@ import (
 
 func main() {
 	// Triangulate data
-	v := []triangolatte.Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
+	//v := []triangolatte.Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
+
+	v := []triangolatte.Point{{0, 0}, {0, 200}, {200, 200}, {200, 0}}
 	triangulated, err := triangolatte.EarCut(v, [][]triangolatte.Point{})
 	if err != nil {
 		log.Fatal("Failed to triangulate polygon")

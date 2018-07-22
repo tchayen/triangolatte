@@ -41,9 +41,16 @@ func TestCyclic(t *testing.T) {
 }
 
 func TestIsReflex(t *testing.T) {
-	if IsReflex(Point{0, 0}, Point{1, 1}, Point{2, 0}) != true || IsReflex(Point{0, 0}, Point{1, 0}, Point{1, 1}) != false {
-		t.Error("IsReflex is broken")
+	if IsReflex(Point{0, 0}, Point{1, 1}, Point{2, 0}) != true {
+		t.Error("IsReflex: false negative")
 	}
+	if IsReflex(Point{1, 2}, Point{0, 0}, Point{1, 0}) != false {
+		t.Error("IsReflex: false positive")
+	}
+
+	// if IsReflex(Point{4, 1}, Point{1, 1}, Point{1, 4}) != false {
+	// 	t.Error("Sth went wrong")
+	// }
 }
 
 func BenchmarkIsReflex(b *testing.B) {
@@ -141,6 +148,18 @@ func TestEarCut(t *testing.T) {
 	checkFloat64Array(t, result, expected)
 }
 
+func TestEarCut2(t *testing.T) {
+	// v := []Point{{50, 50}, {50, 200}, {200, 200}, {200, 50}}
+	//v := []Point{{50, 110}, {150, 30}, {95, 125}, {100, 215}}
+	v := []Point{{10, 0}, {0, 50}, {60, 60}, {70, 10}}
+
+	res, err := EarCut(v, [][]Point{})
+	if err != nil {
+		t.Error(err)
+	}
+	t.Log(res)
+}
+
 func BenchmarkEarCut(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		EarCut(vertices, [][]Point{})
@@ -156,7 +175,7 @@ func TestIncorrectEarCut(t *testing.T) {
 }
 
 func TestSortingByXMax(t *testing.T) {
-	inners := [][]Point{{{1, 2}}, {{0, 0}},}
+	inners := [][]Point{{{1, 2}}, {{0, 0}}}
 	sort.Sort(byMaxX(inners))
 }
 
@@ -189,7 +208,7 @@ func TestSingleTriangleTriangulation(t *testing.T) {
 func TestAghA0(t *testing.T) {
 	// agh, _ := loadPointsFromFile("../../assets/agh_a0")
 	// result, err := EarCut(agh[0], [][]Point{}) // agh[1:]
-    //
+	//
 	// t.Log(err)
 	// t.Log(result)
 }
@@ -202,6 +221,6 @@ func TestLakeSuperior(t *testing.T) {
 
 	// lakeSuperior, _ := loadPointsFromFile("../../assets/lake_superior")
 	// result, _ := EarCut(lakeSuperior[0], [][]Point{}) // lakeSuperior[1:]
-    //
+	//
 	// t.Log(result)
 }

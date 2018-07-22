@@ -15,7 +15,7 @@ func cyclic(i, n int) int {
 
 // IsReflex checks if given point B in relation to points A and B is reflex.
 func IsReflex(a, b, c Point) bool {
-	return b.Sub(a).Cross(c.Sub(b)) < 0.0
+	return (b.Y-a.Y)*(c.X-b.X)-(b.X-a.X)*(c.Y-b.Y) >= 0
 }
 
 // IsInsideTriangle checks if given point P lays inside triangle [A, B, C].
@@ -37,19 +37,20 @@ func setReflex(points *CyclicList) {
 	}
 }
 
-func isEar(p *Element, a, b, c Point) bool {
-	n := p.List.Len()
-	for i, r := 0, p.List.Front(); i < n; i, r = i+1, r.Next() {
-		// It is ok to skip reflex vertices and the ones that actually belong to
-		// the triangle.
-		if p.Reflex || r == p.Prev() || r == p || r == p.Next() {
+func isEar(p *Element) bool {
+	// Skip given point and its neighbours.
+	r := p.Next().Next()
+	for r != p.Prev() {
+		if p.Reflex {
 			continue
 		}
 
 		// If triangle contains points[j], points[i] cannot be an ear tip.
+		a, b, c := p.Prev().Point, p.Point, p.Next().Point
 		if IsInsideTriangle(a, b, c, r.Point) {
 			return false
 		}
+		r = r.Next()
 	}
 	return true
 }
@@ -63,7 +64,7 @@ func detectEars(points *CyclicList) *list.List {
 			continue
 		}
 
-		if isEar(p, p.Prev().Point, p.Point, p.Next().Point) {
+		if isEar(p) {
 			ears.PushBack(p)
 		}
 	}
@@ -243,18 +244,16 @@ func eliminateHoles(outer []Point, inners [][]Point) ([]Point, error) {
 // If an adjacent vertex is reflex, it is possible that it becomes
 // convex and, possibly, an ear.
 func checkVertex(element *Element, ears *list.List) {
-	a, b, c := element.Prev().Point, element.Point, element.Next().Point
-
 	if element.Reflex {
-		if !IsReflex(a, b, c) {
+		if !IsReflex(element.Prev().Point, element.Point, element.Next().Point) {
 			element.Reflex = false
 
-			if isEar(element, a, b, c) {
+			if isEar(element) {
 				element.Ear = ears.PushBack(element)
 			}
 		}
 	} else {
-		if element.Ear != nil && !isEar(element, a, b, c) {
+		if element.Ear != nil && !isEar(element) {
 			ears.Remove(element.Ear)
 			element.Ear = nil
 		}
@@ -271,6 +270,15 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 		return nil, errors.New("cannot triangulate less than three points")
 	}
 
+	if len(holes) > 0 {
+		var err error
+		points, err = eliminateHoles(points, holes)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	c := NewFromArray(points)
 
 	setReflex(c)
@@ -280,7 +288,7 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 	i, t := 0, make([]float64, (n-2)*6)
 	for c.Len() > 3 {
 		if ears.Len() == 0 {
-			return nil, errors.New("could not detect any ear tip in a non-empty polygon")
+			return nil, errors.New("could not detect any more ear tips in a non-empty polygon")
 		}
 
 		ear := ears.Remove(ears.Front()).(*Element)
