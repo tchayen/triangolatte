@@ -1,5 +1,5 @@
-import * as WebGLUtils from './WebGLUtils'
-import * as Matrix from './matrix'
+import * as webgl from './webgl'
+import * as matrix from './matrix'
 
 let positionLocation, resolutionLocation, matrixLocation
 
@@ -52,10 +52,10 @@ const drawScene = (gl, program, objects, constants) => {
 
         gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height)
 
-        const matrix = Matrix.calculateSRTP(
+        const m = matrix.calculateSRTP(
             [gl.canvas.clientWidth, gl.canvas.clientHeight], [0, 0], [1, 1], 0)
 
-        gl.uniformMatrix3fv(matrixLocation, false, matrix)
+        gl.uniformMatrix3fv(matrixLocation, false, m)
 
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
 
@@ -72,7 +72,7 @@ const drawScene = (gl, program, objects, constants) => {
         gl.drawArrays(
             constants.primitiveType,
             constants.arrayOffset,
-            object.triangles.length / 3,
+            object.triangles.length / 2,
         )
     })
 }
@@ -81,7 +81,7 @@ const width = window.innerWidth
 const height = window.innerHeight
 const scalingFactor = window.devicePixelRatio || 1
 
-const canvas = WebGLUtils.setUpCanvas(width, height, scalingFactor)
+const canvas = webgl.setUpCanvas(width, height, scalingFactor)
 const gl = canvas.getContext('webgl')
 if (!gl) throw 'WebGL is not supported'
 
@@ -99,25 +99,31 @@ const constants = {
     // 0 = move forward size * sizeof(type) each iteration to get the next position
     stride: 0,
     arrayOffset: 0,
-    primitiveType: gl.LINE_STRIP,
+    primitiveType: gl.TRIANGLES,
 }
 
-const vertexShader = WebGLUtils.createShader(
+const vertexShader = webgl.createShader(
     gl, gl.VERTEX_SHADER,
     require('./shaders/vertex.glsl')
 )
 
-const fragmentShader = WebGLUtils.createShader(
+const fragmentShader = webgl.createShader(
     gl, gl.FRAGMENT_SHADER,
     require('./shaders/fragment.glsl')
 )
 
-const program = WebGLUtils.createProgram(gl, vertexShader, fragmentShader)
+const program = webgl.createProgram(gl, vertexShader, fragmentShader)
 
 ;(async () => {
     const response = await fetch('http://localhost:3000/polygon_tmp')
     const data = await response.json()
-    const objects = setupScene(gl, program, [data])
+
+    const f = [
+        0, 0, 30, 0, 0, 150, 0, 150, 30, 0, 30, 150,
+        30, 0, 100, 0, 30, 30, 30, 30, 100, 0, 100, 30,
+        30, 60, 67, 60, 30, 90, 30, 90, 67, 60, 67, 90,
+    ]
+    const objects = setupScene(gl, program, [new Float32Array(f)])
 
     drawScene(gl, program, objects, constants)
 })()
