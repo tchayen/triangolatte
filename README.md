@@ -27,27 +27,20 @@ go get github.com/Tchayen/triangolatte
 #### Basic example
 ```go
 vertices := []Point{{10, 20}, {30, 40}, {50, 60}}
-holes := [][]Point{}
-t, err = triangolatte.EarCut(vertices, holes)
+t, err = triangolatte.EarCut(vertices, [][]Point{})
 ```
 
-#### Reading from OpenStreetMap XML
+## Examples
 
-```go
-// TODO
+For rendering examples, go to `examples/webgl` directory.
+
+Run the server with
+
+```bash
+go run server.go
 ```
 
-#### Reading from GeoJSON file
-
-```go
-// TODO
-```
-
-#### Rendering triangles
-
-```go
-// TODO
-```
+and visit `localhost:3000`.
 
 ## Features
 
@@ -77,8 +70,10 @@ Based on the following [paper](https://www.geometrictools.com/Documentation/Tria
 
 Removes holes, joining them with the rest of the polygon.
 
-Biggest place for impromevent. Ranging from more effective data structures for
-vertex removal, spatial indices, z-ordering and so on...
+Currently uses `O(n^2)` algorithm which does not have much space remaining for
+improvement. Most obvious option is speeding up vertex traversal using some kind
+of z-ordering (checking close vertices first increases chance of proving that
+given vertex cannot be an ear and therefore makes occasion for early return).
 
 ### Helpers
 
@@ -136,25 +131,21 @@ type Triangle struct {
 
 ## Tests
 
-```bash
-# line package
-go test pkg/line/line.go pkg/line/line_test.go
-
-# polygon package
-go test pkg/polygon/polygon.go pkg/polygon/polygon_test.go
-```
+Running tests during development happens in IDE and project currently lacks support for running tests in the CLI.
 
 ## Contributing
 
-You are welcome to create an issue or pull request. I will be glad to help.
+You are welcome to create an issue or pull request if you've got an idea what to do.
+
+Don't have one, but still want to contribute? Get in touch with me via email (**TODO:** _put some email address here_) and we will brainstorm some ideas.
 
 ## Roadmap
 
+- finish rendering example
 - fix bug with incorrect hole elimination in AGH A0 example
 - provide proper, tested installation and usage info
 - complete usage example
 - try to break something – more solid error handling
 - research WebAssembly usage in Go
-- setup meaningful benchmarks
-- more agressive optimizations
+- optimize using z-order curve
 - docs website on `github.io`
