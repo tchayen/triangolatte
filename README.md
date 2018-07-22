@@ -1,5 +1,7 @@
 # triangolatte
 
+[![GoDoc](https://godoc.org/golang.org/x/tools/cmd/godoc?status.svg)](https://godoc.org/golang.org/x/tools/cmd/godoc)
+
 > **NOTE:** _The library is in its very early stage. Near future will bring
 usable API, tests and optimizations._
 

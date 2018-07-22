@@ -15,53 +15,43 @@ func TestCyclicList_NewFromArray(t *testing.T) {
 		}
 	}
 }
-func TestCyclicList_PushOne(t *testing.T) {
-	c, p := New(), Point{1, 1}
-	c.Push(p)
+func TestCyclicList(t *testing.T) {
+	c, p1 := New(), Point{0, 1}
+	p2, p3 :=Point{1, 1}, Point{2, 1}
 
-	if c.Len() != 1 || c.Front().Point != p || c.Front().Prev().Point != p {
-		t.Error("Insertion of one point failed")
-	}
-}
+	t.Run("push", func (t *testing.T) {
+		c.Push(p1)
 
-func TestCyclicList_Push(t *testing.T) {
-	c := New()
-	p1, p2, p3 := Point{0, 0}, Point{1, 0}, Point{2, 0}
-	c.Push(p1, p2, p3)
-}
+		if c.Len() != 1 || c.Front().Point != p1 || c.Front().Prev().Point != p1 {
+			t.Error("Insertion of one point failed")
+		}
+	})
 
-func TestCyclicList_Remove(t *testing.T) {
-	c := New()
-	p1, p2, p3 := Point{0, 0}, Point{1, 0}, Point{2, 0}
-	c.Push(p1, p2, p3)
+	t.Run("push multiple", func (t *testing.T) {
+		c.Push(p2, p3)
+	})
 
-	c.Remove(c.Front().Next())
+	t.Run("removal", func (t *testing.T) {
+		c.Remove(c.Front().Next())
 
-	if c.Len() != 2 || c.Front().Next().Point != p3 || c.Front().Prev().Prev().Point != p1 {
-		t.Error("Removal failed")
-	}
-}
+		if c.Len() != 2 || c.Front().Next().Point != p3 || c.Front().Prev().Prev().Point != p1 {
+			t.Error("Removal failed")
+		}
+	})
 
-func TestCyclicList_Len(t *testing.T) {
-	c := New()
-	p1, p2, p3 := Point{0, 0}, Point{1, 0}, Point{2, 0}
-	c.Push(p1, p2, p3)
+	t.Run("length", func (t *testing.T) {
+		if c.Len() != 2 {
+			t.Error("Incorrect length")
+		}
+	})
 
-	if c.Len() != 3 {
-		t.Error("Incorrect length")
-	}
-}
+	t.Run("next", func (t *testing.T) {
+		if c.Front().Point != p1 {
+			t.Error("Incorrect front element")
+		}
 
-func TestElement_Next(t *testing.T) {
-	c := New()
-	p1, p2, p3 := Point{0, 1}, Point{1, 1}, Point{2, 1}
-	c.Push(p1, p2, p3)
-
-	if c.Front().Point != p1 {
-		t.Error("Incorrect front element")
-	}
-
-	if c.Front().Prev().Point != p3 {
-		t.Error("Looping does not work as intented")
-	}
+		if c.Front().Prev().Point != p3 {
+			t.Error("Looping does not work as intented")
+		}
+	})
 }

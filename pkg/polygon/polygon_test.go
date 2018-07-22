@@ -12,24 +12,6 @@ import (
 
 var vertices = []Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
 
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-func checkIntArray(t *testing.T, result, expected []int) {
-	if len(result) != len(expected) {
-		t.Error("Array sizes don't match")
-	}
-
-	for i, r := range result {
-		if math.Abs(float64(r-expected[i])) > 0.001 {
-			t.Error("Value error beyond floating point precision problem")
-		}
-	}
-}
-
 func checkFloat64Array(t *testing.T, result, expected []float64) {
 	if len(result) != len(expected) {
 		t.Error("Array sizes don't match")
@@ -42,7 +24,6 @@ func checkFloat64Array(t *testing.T, result, expected []float64) {
 	}
 }
 
-// TODO: generalise function above
 func checkPointArray(t *testing.T, result, expected []Point) {
 	if len(result) != len(expected) {
 		t.Error("Array sizes don't match")

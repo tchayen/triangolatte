@@ -118,12 +118,7 @@ const program = webgl.createProgram(gl, vertexShader, fragmentShader)
     const response = await fetch('http://localhost:3000/polygon_tmp')
     const data = await response.json()
 
-    const f = [
-        0, 0, 30, 0, 0, 150, 0, 150, 30, 0, 30, 150,
-        30, 0, 100, 0, 30, 30, 30, 30, 100, 0, 100, 30,
-        30, 60, 67, 60, 30, 90, 30, 90, 67, 60, 67, 90,
-    ]
-    const objects = setupScene(gl, program, [new Float32Array(f)])
+    const objects = setupScene(gl, program, [new Float32Array(data)])
 
     drawScene(gl, program, objects, constants)
 })()
