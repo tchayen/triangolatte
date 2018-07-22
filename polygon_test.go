@@ -10,6 +10,40 @@ import (
 
 var vertices = []Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
 
+func polygonArea(data []Point) float64 {
+	area := 0.0
+	for i, j := 0, len(data)-1; i < len(data); i++ {
+		area += data[i].X*data[j].Y - data[i].Y*data[j].X
+		j = i
+	}
+	return math.Abs(area / 2)
+}
+
+func TestPolygonArea(t *testing.T) {
+	points := []Point{{2, 2}, {11, 2}, {9, 7}, {4, 10}}
+	area := polygonArea(points)
+
+	if area != 45.5 {
+		t.Error("polygonArea implementation is wrong")
+	}
+}
+
+func deviation(data []Point, t []float64) (real, triangles, deviation float64) {
+	trianglesArea := 0.0
+	for i := 0; i < len(t); i += 6 {
+		trianglesArea += math.Abs((t[0]*(t[3]-t[5]) + t[2]*(t[4]-t[1]) + t[4]*(t[1]-t[3])) / 2)
+	}
+	area := polygonArea(data)
+	return area, trianglesArea, math.Abs(trianglesArea - area)
+}
+
+func TestDeviation(t *testing.T) {
+	data := []Point{{0, 0}, {2, 0}, {2, 2}, {0, 2}}
+	triangles := []float64{0, 0, 2, 0, 2, 2, 0, 2}
+
+	t.Log(deviation(data, triangles))
+}
+
 func checkFloat64Array(t *testing.T, result, expected []float64) {
 	if len(result) != len(expected) {
 		t.Error("Array sizes don't match")
@@ -73,7 +107,7 @@ func BenchmarkIsInsideTriangle(b *testing.B) {
 	}
 }
 
-func TestSplitConvexAndReflex(t *testing.T) {
+func TestSetReflex(t *testing.T) {
 	c := NewFromArray([]Point{{0, 0}, {2, 3}, {4, 2}, {0, 7}})
 	setReflex(c)
 
@@ -145,6 +179,7 @@ func TestEarCut(t *testing.T) {
 	result, _ := EarCut(vertices, [][]Point{})
 	expected := []float64{240, 115, 320, 65, 395, 170, 240, 115, 395, 170, 305, 160, 305, 160, 265, 240, 190, 100, 95, 125, 100, 215, 50, 110, 240, 115, 305, 160, 190, 100, 190, 100, 95, 125, 50, 110, 150, 30, 240, 115, 190, 100, 50, 110, 150, 30, 190, 100}
 
+	t.Log(deviation(vertices, expected))
 	checkFloat64Array(t, result, expected)
 }
 
