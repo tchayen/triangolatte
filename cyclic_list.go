@@ -1,11 +1,14 @@
 // Package implements double linked cyclic lists.
 //
-// **NOTE:** _in one element list `e == e.next`_
+// NOTE: in one element list e == e.next
 //
 // Parameters
 // - find O(n)
+//
 // - removal O(1)
+//
 // - addition O(1)
+//
 // - length O(1)
 //
 // Initialize using
