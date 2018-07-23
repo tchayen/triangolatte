@@ -13,7 +13,7 @@ func cyclic(i, n int) int {
 	return (i%n + n) % n
 }
 
-// IsReflex checks if given point B in relation to points A and B is reflex.
+// IsReflex checks if angle created by points a, b and c is reflex.
 //
 // Angle equal to math.Pi is considered convex for practical reasons (it can be
 // used just fine in the triangulation).

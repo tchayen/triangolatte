@@ -212,7 +212,12 @@ func TestEliminateHoles(t *testing.T) {
 		{50, 40}, {90, 40}, {30, 70},
 	}
 
-	eliminated, _ := eliminateHoles(polygon, holes)
+	eliminated, err := eliminateHoles(polygon, holes)
+
+	if err != nil {
+		t.Errorf("EliminateHoles: %s", err)
+	}
+
 	checkPointArray(t, eliminated, polygonWithEliminatedHoles)
 }
 
@@ -225,8 +230,12 @@ func TestEliminateHolesWithNoPossibleVisibleVertex(t *testing.T) {
 }
 
 func TestEarCut(t *testing.T) {
-	result, _ := EarCut(vertices, [][]Point{})
+	result, err := EarCut(vertices, [][]Point{})
 	expected := []float64{240, 115, 320, 65, 395, 170, 240, 115, 395, 170, 305, 160, 305, 160, 265, 240, 190, 100, 95, 125, 100, 215, 50, 110, 240, 115, 305, 160, 190, 100, 190, 100, 95, 125, 50, 110, 150, 30, 240, 115, 190, 100, 50, 110, 150, 30, 190, 100}
+
+	if err != nil {
+		t.Errorf("EarCut: %s", err)
+	}
 
 	t.Log(deviation(vertices, expected))
 	checkFloat64Array(t, result, expected)
@@ -291,7 +300,8 @@ func TestAghA0(t *testing.T) {
 	agh, _ := loadPointsFromFile("assets/agh_a0")
 	for i := range agh {
 		for j := range agh[i] {
-			agh[i][j] = degreesToMeters(agh[i][j])
+			p := degreesToMeters(agh[i][j])
+			agh[i][j] = Point{3 * (p.X - 2217750), 3 * (p.Y - 6457350)}
 		}
 	}
 

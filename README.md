@@ -13,7 +13,7 @@ _Should I use it?_ **Not yet**
 
 ---
 
-Triangulation library. Allows translating lines and polygons (both based on
+2D triangulation library. Allows translating lines and polygons (both based on
 points) to the language of GPUs.
 
 Features normal and miter joint line triangulation. Handles polygons using ear
@@ -79,11 +79,16 @@ for sketches, code examples and ideas.
 Some helpers for polygon-related operations. Exported since they might turn out
 being convenient in external usage.
 
-**`IsInsideTriangle(t Triangle, p Point) bool`** – checks whether
-`point` lies in the `triangle` or not.
+####`IsInsideTriangle(t Triangle, p Point) bool`
 
-**`IsReflex(a, b, c Point) bool`** – checks if given point `b` is
-reflex with respect to neighbor vertices `a` and `c`.
+Checks whether `point` lies in the `triangle` or not.
+
+####`IsReflex(a, b, c Point) bool`
+
+Checks if angle created by points `a`, `b` and `c` is reflex.
+
+_In other words:_ considering vectors `a->b` and `b->c`,
+are we doing a right turn from going from `b` to `c`?
 
 ### Types
 
@@ -110,25 +115,13 @@ go test -run NONE -bench IsInsideTriangle
 ### Flame Graphs
 
 What is a _flame graph_? Simply speaking, a human-readable insight into what
-kept CPU busy.
+kept CPU busy (and it resembles fire 🔥).
 
 ![assets/torch.svg](assets/torch.svg)
 
 You can view an example of `EarCut` benchmark  flame graph in [assets/torch.svg](assets/torch.svg).
 
 #### Generating flame graph
-
-Run benchmark and save data
-
-```bash
-go test -run NONE -bench EarCut -cpuprofile prof.cpu
-```
-
-Init `pprof`
-
-```bash
-go tool pprof triangolatte.test prof.cpu
-```
 
 Install [go-torch](https://github.com/uber/go-torch) and [FlameGraph](https://github.com/brendangregg/FlameGraph)
 if you haven't done it before
@@ -139,10 +132,20 @@ git clone https://github.com/brendangregg/FlameGraph
 export PATH=$PATH:$(pwd)/FlameGraph # You might want to add this to your .bashrc or other equivalent
 ```
 
-Create flame graph
+From now on, every time you want to generate a flame graph, simply run the
+commands below:
+
+> You can replace `EarCut` with any function name from `*_test.go` file, with
+> name starting with `Benchmark*`, stripping the prefix.
+>
+> For example, `func BenchmarkEarCut(...)` became `EarCut`.
+
 ```bash
+go test -run NONE -bench EarCut -cpuprofile prof.cpu
+go tool pprof triangolatte.test prof.cpu
 go-torch triangolatte.test prof.cpu
 ```
+
 Now you can open newly generated `torch.svg` in your web browser.
 
 ## Future plans
