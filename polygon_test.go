@@ -104,56 +104,56 @@ func TestCyclic(t *testing.T) {
 func TestIsReflex(t *testing.T) {
 	t.Run("convex", func(t *testing.T) {
 		convex := []Point{{0, 1}, {1, 0}, {2, 1}}
-		if IsReflex(convex[0], convex[1], convex[2]) {
-			t.Error("IsReflex: false negative")
+		if isReflex(convex[0], convex[1], convex[2]) {
+			t.Error("isReflex: false negative")
 		}
 	})
 
 	t.Run("reflex", func(t *testing.T) {
 		reflex := []Point{{0, 0}, {0, 3}, {2, 3}}
-		if !IsReflex(reflex[0], reflex[1], reflex[2]) {
-			t.Error("IsReflex: false positive")
+		if !isReflex(reflex[0], reflex[1], reflex[2]) {
+			t.Error("isReflex: false positive")
 		}
 	})
 
 	t.Run("square", func(t *testing.T) {
 		square := []Point{{1, 1}, {0, 1}, {0, 0}}
-		if IsReflex(square[0], square[1], square[2]) {
-			t.Error("IsReflex: false negative")
+		if isReflex(square[0], square[1], square[2]) {
+			t.Error("isReflex: false negative")
 		}
 	})
 
 	t.Run("another reflex", func(t *testing.T) {
 		anotherReflex := []Point{{0, 0}, {2, 3}, {4, 2}}
-		if !IsReflex(anotherReflex[0], anotherReflex[1], anotherReflex[2]) {
-			t.Error("IsReflex: false positive")
+		if !isReflex(anotherReflex[0], anotherReflex[1], anotherReflex[2]) {
+			t.Error("isReflex: false positive")
 		}
 	})
 }
 
 func BenchmarkIsReflex(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		IsReflex(Point{0, 0}, Point{1, 1}, Point{2, 0})
+		isReflex(Point{0, 0}, Point{1, 1}, Point{2, 0})
 	}
 }
 
 func TestIsInsideTriangle(t *testing.T) {
 	t.Run("case 1", func(t *testing.T) {
-		if IsInsideTriangle(vertices[0], vertices[8], vertices[9], vertices[7]) {
-			t.Error("IsInsideTriangle is broken")
+		if isInsideTriangle(vertices[0], vertices[8], vertices[9], vertices[7]) {
+			t.Error("isInsideTriangle is broken")
 		}
 	})
 
 	t.Run("case 2", func(t *testing.T) {
-		if !IsInsideTriangle(vertices[0], vertices[1], vertices[5], vertices[7]) {
-			t.Error("IsInsideTriangle is broken")
+		if !isInsideTriangle(vertices[0], vertices[1], vertices[5], vertices[7]) {
+			t.Error("isInsideTriangle is broken")
 		}
 	})
 }
 
 func BenchmarkIsInsideTriangle(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		IsInsideTriangle(vertices[0], vertices[1], vertices[2], vertices[3])
+		isInsideTriangle(vertices[0], vertices[1], vertices[2], vertices[3])
 	}
 }
 
@@ -251,6 +251,10 @@ func TestEarCutSimpleShapes(t *testing.T) {
 		{{0, 0}, {1, 0}, {1, 1}, {0, 1}},
 		// #3: one reflex
 		{{0, 6}, {0, 1}, {2, 2}, {3, 2}},
+		// #4: shuriken
+		{{0, 4}, {2, 2}, {2, 0}, {4, 2}, {6, 2}, {4, 4}, {4, 6}, {2, 4}},
+		// #5: building
+		{{1, 0}, {7, 0}, {7, 1}, {6, 1}, {6, 10}, {7, 10}, {7, 11}, {1, 11}, {1, 10}, {2, 10}, {2, 7}, {0, 7}, {0, 4}, {2, 4}, {2, 1}, {1, 1}},
 	}
 
 	for i, s := range shapes {

@@ -11,6 +11,12 @@ tests and optimizations._
 
 _Should I use it?_ **Not yet**
 
+_The algorithm is generally working and should be quite optimal. The tests are
+quite rich now and cover many aspects and things that can go wrong. However, I
+am at a stage at which I keep finding bugs and not working cases. Come back in
+two weeks and you should see vastly improved and optimized version, hopefully
+ready for a real usage._
+
 ---
 
 2D triangulation library. Allows translating lines and polygons (both based on
@@ -74,22 +80,6 @@ angles can potentially explode to infinity.
 Refer to this [forum post](https://forum.libcinder.org/topic/smooth-thick-lines-using-geometry-shader)
 for sketches, code examples and ideas.
 
-### Helpers
-
-Some helpers for polygon-related operations. Exported since they might turn out
-being convenient in external usage.
-
-####`IsInsideTriangle(t Triangle, p Point) bool`
-
-Checks whether `point` lies in the `triangle` or not.
-
-####`IsReflex(a, b, c Point) bool`
-
-Checks if angle created by points `a`, `b` and `c` is reflex.
-
-_In other words:_ considering vectors `a->b` and `b->c`,
-are we doing a right turn from going from `b` to `c`?
-
 ### Types
 
 For calculations using points.
@@ -152,8 +142,13 @@ Now you can open newly generated `torch.svg` in your web browser.
 
 ### Optimizations
 
+**First:** rewrite ear list from list to a queue implemented on array. It should
+be rather easy and will save tons of mallocs.
+
 `EarCut` currently uses `O(n^2)` algorithm which does not have much space
-remaining for improvement. However, there are other obvious options for
+remaining for improvement.
+
+However, there are other obvious options for
 speeding up vertex traversal using some kind of z-ordering (checking close
 vertices first increases chance of proving that given vertex cannot be an ear
 and therefore makes occasion for early return).
@@ -177,5 +172,15 @@ MIT License (refer to the [LICENSE](LICENSE) file).
 
 You are welcome to create an issue or pull request if you've got an idea what to do.
 
-Don't have one, but still want to contribute? Get in touch with me via email
-(**TODO:** _put some email address here_) and we will brainstorm some ideas.
+Don't have one, but still want to contribute? Get in touch with me and we can
+brainstorm some ideas.
+
+
+## Appendix
+
+> We like to ask ourselves why are we studying all those algorithms and they keep asking us to implement quicksort by
+> hand from scratch. So this is one of those rare moments that you can feel that all those algorithm courses finally pay
+> off and you can use all your knowledge about computational complexity and implementing broken data structures on plain
+> arrays. It feels like this is the time of your life and it truly is.
+
+_**author's thoughts**_
