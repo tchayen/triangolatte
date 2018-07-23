@@ -65,43 +65,70 @@ func checkPointArray(t *testing.T, result, expected []Point) {
 }
 
 func TestCyclic(t *testing.T) {
-	if cyclic(1, 5) != 1 || cyclic(4, 5) != 4 || cyclic(6, 5) != 1 || cyclic(-1, 5) != 4 || cyclic(-5, 5) != 0 || cyclic(-6, 5) != 4 {
-		t.Error("cyclicList is broken")
-	}
+	t.Run("regular", func(t *testing.T) {
+		r := cyclic(1, 5)
+		if r != 1 {
+			t.Errorf("%d != %d", r, 1)
+		}
+	})
+
+	t.Run("overflow", func(t *testing.T) {
+		r := cyclic(6, 5)
+		if r != 1 {
+			t.Errorf("%d != %d", r, 1)
+		}
+	})
+
+	t.Run("negative overflow", func(t *testing.T) {
+		r := cyclic(-1, 5)
+		if r != 4 {
+			t.Errorf("%d != %d", r, 4)
+		}
+	})
+
+	t.Run("full loop", func(t *testing.T) {
+		r := cyclic(-5, 5)
+		if r != 0 {
+			t.Errorf("%d != %d", r, 0)
+		}
+	})
+
+	t.Run("double negative overflow", func(t *testing.T) {
+		r := cyclic(-6, 5)
+		if r != 4 {
+			t.Errorf("%d != %d", r, 4)
+		}
+	})
 }
 
 func TestIsReflex(t *testing.T) {
-	convex := []Point{{0, 1}, {1, 0}, {2, 1}}
-	reflex := []Point{{0, 0}, {0, 3}, {2, 3}}
-	square := []Point{{1, 1}, {0, 1}, {0, 0}}
+	t.Run("convex", func(t *testing.T) {
+		convex := []Point{{0, 1}, {1, 0}, {2, 1}}
+		if IsReflex(convex[0], convex[1], convex[2]) {
+			t.Error("IsReflex: false negative")
+		}
+	})
 
-	anotherReflex := []Point{{0, 0}, {2, 3}, {4, 2}}
+	t.Run("reflex", func(t *testing.T) {
+		reflex := []Point{{0, 0}, {0, 3}, {2, 3}}
+		if !IsReflex(reflex[0], reflex[1], reflex[2]) {
+			t.Error("IsReflex: false positive")
+		}
+	})
 
-	if IsReflex(convex[0], convex[1], convex[2]) {
-		t.Error("IsReflex: false negative")
-	}
-	if !IsReflex(reflex[0], reflex[1], reflex[2]) {
-		t.Error("IsReflex: false positive")
-	}
+	t.Run("square", func(t *testing.T) {
+		square := []Point{{1, 1}, {0, 1}, {0, 0}}
+		if IsReflex(square[0], square[1], square[2]) {
+			t.Error("IsReflex: false negative")
+		}
+	})
 
-	if IsReflex(square[0], square[1], square[2]) {
-		t.Error("IsReflex: false negative")
-	}
-
-	if !IsReflex(anotherReflex[0], anotherReflex[1], anotherReflex[2]) {
-		t.Error("IsReflex: false positive")
-	}
-
-	ref := func(a, b, c Point) float64 {
-		return (b.X-a.X)*(c.Y-b.Y) - (c.X-b.X)*(b.Y-a.Y)
-	}
-
-	t.Log(
-		ref(convex[0], convex[1], convex[2]),
-		ref(reflex[0], reflex[1], reflex[2]),
-		ref(square[0], square[1], square[2]),
-		ref(anotherReflex[0], anotherReflex[1], anotherReflex[2]),
-	)
+	t.Run("another reflex", func(t *testing.T) {
+		anotherReflex := []Point{{0, 0}, {2, 3}, {4, 2}}
+		if !IsReflex(anotherReflex[0], anotherReflex[1], anotherReflex[2]) {
+			t.Error("IsReflex: false positive")
+		}
+	})
 }
 
 func BenchmarkIsReflex(b *testing.B) {
@@ -111,11 +138,17 @@ func BenchmarkIsReflex(b *testing.B) {
 }
 
 func TestIsInsideTriangle(t *testing.T) {
-	case1 := IsInsideTriangle(vertices[0], vertices[8], vertices[9], vertices[7])
-	case2 := IsInsideTriangle(vertices[0], vertices[1], vertices[5], vertices[7])
-	if case1 == true || case2 == false {
-		t.Error("IsInsideTriangle is broken")
-	}
+	t.Run("case 1", func(t *testing.T) {
+		if IsInsideTriangle(vertices[0], vertices[8], vertices[9], vertices[7]) {
+			t.Error("IsInsideTriangle is broken")
+		}
+	})
+
+	t.Run("case 2", func(t *testing.T) {
+		if !IsInsideTriangle(vertices[0], vertices[1], vertices[5], vertices[7]) {
+			t.Error("IsInsideTriangle is broken")
+		}
+	})
 }
 
 func BenchmarkIsInsideTriangle(b *testing.B) {
@@ -145,18 +178,11 @@ func TestDetectEars(t *testing.T) {
 	earList := detectEars(c)
 
 	ears := make([]Point, earList.Len())
-	i, e := 0, earList.Front()
-
-	for e != nil {
+	for i, e := 0, earList.Front(); e != nil; i, e = i+1, e.Next() {
 		ears[i] = e.Value.(*Element).Point
-		i, e = i+1, e.Next()
 	}
 
-	third := c.Front().Next().Next().Next()
-	sixth := third.Next().Next().Next()
-	ninth := sixth.Next().Next().Next()
-	expectedEars := []Point{third.Point, third.Next().Point, sixth.Point, ninth.Point}
-
+	expectedEars := []Point{vertices[3], vertices[4], vertices[6], vertices[9]}
 	checkPointArray(t, ears, expectedEars)
 }
 
@@ -277,7 +303,7 @@ func TestAghA0(t *testing.T) {
 
 	real, actual, deviation := deviation(agh[0], result)
 	if deviation != 0 {
-		t.Errorf("real: %f; actual: %f", real, actual)
+		t.Errorf("real area: %f; result: %f", real, actual)
 	}
 }
 
