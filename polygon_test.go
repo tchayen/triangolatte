@@ -1,23 +1,13 @@
 package triangolatte
 
 import (
-	"encoding/json"
-	"io/ioutil"
+	"fmt"
 	"math"
 	"sort"
 	"testing"
 )
 
 var vertices = []Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
-
-func polygonArea(data []Point) float64 {
-	area := 0.0
-	for i, j := 0, len(data)-1; i < len(data); i++ {
-		area += data[i].X*data[j].Y - data[i].Y*data[j].X
-		j = i
-	}
-	return math.Abs(area / 2)
-}
 
 func TestPolygonArea(t *testing.T) {
 	points := []Point{{2, 2}, {11, 2}, {9, 7}, {4, 10}}
@@ -28,20 +18,14 @@ func TestPolygonArea(t *testing.T) {
 	}
 }
 
-func deviation(data []Point, t []float64) (real, triangles, deviation float64) {
-	trianglesArea := 0.0
-	for i := 0; i < len(t); i += 6 {
-		trianglesArea += math.Abs((t[0]*(t[3]-t[5]) + t[2]*(t[4]-t[1]) + t[4]*(t[1]-t[3])) / 2)
-	}
-	area := polygonArea(data)
-	return area, trianglesArea, math.Abs(trianglesArea - area)
-}
-
 func TestDeviation(t *testing.T) {
-	data := []Point{{0, 0}, {2, 0}, {2, 2}, {0, 2}}
-	triangles := []float64{0, 0, 2, 0, 2, 2, 0, 2}
+	data := []Point{{0, 4}, {3, 1}, {8, 2}, {9, 5}, {4, 6}}
+	triangles := []float64{4, 6, 0, 4, 3, 1, 4, 6, 3, 1, 8, 2, 8, 2, 9, 5, 4, 6}
 
-	t.Log(deviation(data, triangles))
+	real, actual, deviation := deviation(data, triangles)
+	if deviation > 0 {
+		t.Errorf("real: %f, actual: %f", real, actual)
+	}
 }
 
 func checkFloat64Array(t *testing.T, result, expected []float64) {
@@ -52,6 +36,18 @@ func checkFloat64Array(t *testing.T, result, expected []float64) {
 	for i, r := range result {
 		if math.Abs(r-expected[i]) > 0.001 {
 			t.Error("Value error beyond floating point precision problem")
+		}
+	}
+}
+
+func checkBoolArray(t *testing.T, result, expected []bool) {
+	if len(result) != len(expected) {
+		t.Error("Array sizes don't match")
+	}
+
+	for i, r := range result {
+		if r != expected[i] {
+			t.Error("Value error")
 		}
 	}
 }
@@ -75,16 +71,37 @@ func TestCyclic(t *testing.T) {
 }
 
 func TestIsReflex(t *testing.T) {
-	if IsReflex(Point{0, 0}, Point{1, 1}, Point{2, 0}) != true {
+	convex := []Point{{0, 1}, {1, 0}, {2, 1}}
+	reflex := []Point{{0, 0}, {0, 3}, {2, 3}}
+	square := []Point{{1, 1}, {0, 1}, {0, 0}}
+
+	anotherReflex := []Point{{0, 0}, {2, 3}, {4, 2}}
+
+	if IsReflex(convex[0], convex[1], convex[2]) {
 		t.Error("IsReflex: false negative")
 	}
-	if IsReflex(Point{1, 2}, Point{0, 0}, Point{1, 0}) != false {
+	if !IsReflex(reflex[0], reflex[1], reflex[2]) {
 		t.Error("IsReflex: false positive")
 	}
 
-	// if IsReflex(Point{4, 1}, Point{1, 1}, Point{1, 4}) != false {
-	// 	t.Error("Sth went wrong")
-	// }
+	if IsReflex(square[0], square[1], square[2]) {
+		t.Error("IsReflex: false negative")
+	}
+
+	if !IsReflex(anotherReflex[0], anotherReflex[1], anotherReflex[2]) {
+		t.Error("IsReflex: false positive")
+	}
+
+	ref := func(a, b, c Point) float64 {
+		return (b.X-a.X)*(c.Y-b.Y) - (c.X-b.X)*(b.Y-a.Y)
+	}
+
+	t.Log(
+		ref(convex[0], convex[1], convex[2]),
+		ref(reflex[0], reflex[1], reflex[2]),
+		ref(square[0], square[1], square[2]),
+		ref(anotherReflex[0], anotherReflex[1], anotherReflex[2]),
+	)
 }
 
 func BenchmarkIsReflex(b *testing.B) {
@@ -108,12 +125,18 @@ func BenchmarkIsInsideTriangle(b *testing.B) {
 }
 
 func TestSetReflex(t *testing.T) {
-	c := NewFromArray([]Point{{0, 0}, {2, 3}, {4, 2}, {0, 7}})
+	points := []Point{{0, 0}, {2, 3}, {4, 2}, {0, 7}}
+	c := NewFromArray(points)
 	setReflex(c)
 
-	if !(c.Front().Next().Reflex && !c.Front().Next().Next().Reflex) {
-		t.Error("splitConvexAndReflex is broken")
+	result := make([]bool, 4)
+	for i, p := 0, c.Front(); i < c.Len(); i, p = i+1, p.Next() {
+		result[i] = p.Reflex
 	}
+	expected := []bool{false, true, false, false}
+
+	t.Log(result, expected)
+	checkBoolArray(t, result, expected)
 }
 
 func TestDetectEars(t *testing.T) {
@@ -183,23 +206,33 @@ func TestEarCut(t *testing.T) {
 	checkFloat64Array(t, result, expected)
 }
 
-func TestEarCut2(t *testing.T) {
-	v := []Point{{0, 4}, {3, 1}, {8, 2}, {9, 5}, {4, 6}}
-	//v := []Point{{50, 50}, {50, 200}, {200, 200}, {200, 50}}
-	//v := []Point{{50, 110}, {150, 30}, {95, 125}, {100, 215}}
-	//v := []Point{{10, 0}, {0, 50}, {60, 60}, {70, 10}}
-
-	res, err := EarCut(v, [][]Point{})
-	if err != nil {
-		t.Error(err)
+func TestEarCutSimpleShapes(t *testing.T) {
+	shapes := [][]Point{
+		// #0: 4 points, no reflex, results in a triangle fan
+		{{0, 4}, {3, 1}, {8, 2}, {9, 5}, {4, 6}},
+		// #1: diamond
+		{{0, 3}, {1, 0}, {4, 1}, {3, 4}},
+		// #2: square
+		{{0, 0}, {1, 0}, {1, 1}, {0, 1}},
+		// #3: one reflex
+		{{0, 6}, {0, 1}, {2, 2}, {3, 2}},
 	}
 
-	real, actual, dif := deviation(v, res)
+	for i, s := range shapes {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			res, err := EarCut(s, [][]Point{})
+			if err != nil {
+				t.Error(err)
+			}
 
-	if dif != 0 {
-		t.Errorf("real area: %f; result: %f", real, actual)
+			real, actual, dif := deviation(s, res)
+
+			if dif != 0 {
+				t.Errorf("#%d: real area: %f; result: %f", i, real, actual)
+			}
+			t.Logf("#%d: %v", i, res)
+		})
 	}
-	t.Log(res)
 }
 
 func BenchmarkEarCut(b *testing.B) {
@@ -221,25 +254,6 @@ func TestSortingByXMax(t *testing.T) {
 	sort.Sort(byMaxX(inners))
 }
 
-func loadPointsFromFile(fileName string) ([][]Point, error) {
-	data, err := ioutil.ReadFile(fileName)
-	if err != nil {
-		return nil, err
-	}
-
-	polygons := make([][][]float64, 0)
-	json.Unmarshal([]byte(data), &polygons)
-
-	points := make([][]Point, len(polygons))
-	for i := range polygons {
-		points[i] = make([]Point, len(polygons[i]))
-		for j := range polygons[i] {
-			points[i][j] = Point{polygons[i][j][0], polygons[i][j][1]}
-		}
-	}
-	return points, nil
-}
-
 func TestSingleTriangleTriangulation(t *testing.T) {
 	result, _ := EarCut([]Point{{0, 0}, {0, 1}, {1, 1}}, [][]Point{})
 	expected := []float64{0, 0, 0, 1, 1, 1}
@@ -248,11 +262,23 @@ func TestSingleTriangleTriangulation(t *testing.T) {
 }
 
 func TestAghA0(t *testing.T) {
-	// agh, _ := loadPointsFromFile("../../assets/agh_a0")
-	// result, err := EarCut(agh[0], [][]Point{}) // agh[1:]
-	//
-	// t.Log(err)
-	// t.Log(result)
+	agh, _ := loadPointsFromFile("assets/agh_a0")
+	for i := range agh {
+		for j := range agh[i] {
+			agh[i][j] = degreesToMeters(agh[i][j])
+		}
+	}
+
+	result, err := EarCut(agh[0], [][]Point{}) // agh[1:]
+
+	if err != nil {
+		t.Errorf("AghA0: %s", err)
+	}
+
+	real, actual, deviation := deviation(agh[0], result)
+	if deviation != 0 {
+		t.Errorf("real: %f; actual: %f", real, actual)
+	}
 }
 
 // **WARNING**

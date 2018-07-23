@@ -14,8 +14,14 @@ func cyclic(i, n int) int {
 }
 
 // IsReflex checks if given point B in relation to points A and B is reflex.
+//
+// Angle equal to math.Pi is considered convex for practical reasons (it can be
+// used just fine in the triangulation).
+//
+// But generally, math.Pi angle should not happen since collinear points are
+// redundant and therefore they should be eliminated in preprocessing.
 func IsReflex(a, b, c Point) bool {
-	return (b.Y-a.Y)*(c.X-b.X)-(b.X-a.X)*(c.Y-b.Y) >= 0
+	return (b.X-a.X)*(c.Y-b.Y)-(c.X-b.X)*(b.Y-a.Y) < 0
 }
 
 // IsInsideTriangle checks if given point P lays inside triangle [A, B, C].
@@ -288,7 +294,7 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 	i, t := 0, make([]float64, (n-2)*6)
 	for c.Len() > 3 {
 		if ears.Len() == 0 {
-			return nil, errors.New("could not detect any more ear tips in a non-empty polygon")
+			return nil, errors.New("could not detect any more ear tips")
 		}
 
 		ear := ears.Remove(ears.Front()).(*Element)
