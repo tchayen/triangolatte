@@ -13,6 +13,10 @@ func cyclic(i, n int) int {
 	return (i%n + n) % n
 }
 
+func triangleArea(a, b, c Point) float64 {
+	return a.X*(b.Y-c.Y) + b.X*(c.Y-a.Y) + c.X*(a.Y-b.Y)
+}
+
 // isReflex checks if angle created by points a, b and c is reflex.
 //
 // Angle equal to math.Pi is considered convex for practical reasons (it can be
@@ -250,8 +254,10 @@ func eliminateHoles(outer []Point, inners [][]Point) ([]Point, error) {
 // If an adjacent vertex is reflex, it is possible that it becomes
 // convex and, possibly, an ear.
 func checkVertex(element *Element, ears *list.List) {
+	a, b, c := element.Prev().Point, element.Point, element.Next().Point
+
 	if element.Reflex {
-		if !isReflex(element.Prev().Point, element.Point, element.Next().Point) {
+		if !isReflex(a, b, c) {
 			element.Reflex = false
 
 			if isEar(element) {
@@ -285,14 +291,14 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 		}
 	}
 
-	c := NewFromArray(points)
+	remainingPoints := NewFromArray(points)
 
-	setReflex(c)
-	var ears = detectEars(c)
+	setReflex(remainingPoints)
+	var ears = detectEars(remainingPoints)
 
 	// Any triangulation of simple polygon has `n-2` triangles.
 	i, t := 0, make([]float64, (n-2)*6)
-	for c.Len() > 3 {
+	for remainingPoints.Len() > 3 {
 		if ears.Len() == 0 {
 			return nil, errors.New("could not detect any more ear tips")
 		}
@@ -300,21 +306,28 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 		ear := ears.Remove(ears.Front()).(*Element)
 		ear.Ear = nil
 
-		t[i+0], t[i+1] = ear.Prev().Point.X, ear.Prev().Point.Y
-		t[i+2], t[i+3] = ear.Point.X, ear.Point.Y
-		t[i+4], t[i+5] = ear.Next().Point.X, ear.Next().Point.Y
-		i += 6
+		a, b, c := ear.Prev().Point, ear.Point, ear.Next().Point
 
+		// Skip adding triangles in which all points are collinear.
+		if triangleArea(a, b, c) > 0 {
+			t[i+0], t[i+1] = a.X, a.Y
+			t[i+2], t[i+3] = b.X, b.Y
+			t[i+4], t[i+5] = c.X, c.Y
+			i += 6
+		}
+
+		// Save previous and next before Remove() gets rid of pointers.
 		prev := ear.Prev()
 		next := ear.Next()
-		c.Remove(ear)
+
+		remainingPoints.Remove(ear)
 		n = n - 1
 
 		checkVertex(prev, ears)
 		checkVertex(next, ears)
 	}
 
-	p := c.Front()
+	p := remainingPoints.Front()
 	t[i+0], t[i+1] = p.Point.X, p.Point.Y
 	p = p.Next()
 	t[i+2], t[i+3] = p.Point.X, p.Point.Y

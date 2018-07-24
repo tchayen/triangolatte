@@ -98,6 +98,7 @@ go test -v
 ```
 
 You can for example benchmark speed of checking if point is inside triangle:
+
 ```bash
 go test -run NONE -bench IsInsideTriangle
 ```
@@ -107,9 +108,17 @@ go test -run NONE -bench IsInsideTriangle
 What is a _flame graph_? Simply speaking, a human-readable insight into what
 kept CPU busy (and it resembles fire 🔥).
 
+It has intelligent zoom that lets you narrow down the range to a particular
+function from the flame and go back quickly at will.
+
+It also supports hovering while still being a regular, valid `*.svg` file.
+
 ![assets/torch.svg](assets/torch.svg)
 
-You can view an example of `EarCut` benchmark  flame graph in [assets/torch.svg](assets/torch.svg).
+You can view an example of `EarCut` benchmark flame graph in [assets/torch.svg](assets/torch.svg).
+
+> **NOTE:** _you must display the image file directly to use cool features
+described above._
 
 #### Generating flame graph
 

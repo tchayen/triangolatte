@@ -15,7 +15,7 @@ func TestCyclicList_NewFromArray(t *testing.T) {
 	}
 }
 func TestCyclicList(t *testing.T) {
-	c, p1 := New(), Point{0, 1}
+	c, p1 := NewCyclicList(), Point{0, 1}
 	p2, p3 := Point{1, 1}, Point{2, 1}
 
 	t.Run("push", func(t *testing.T) {

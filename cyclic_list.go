@@ -54,13 +54,13 @@ func (c *CyclicList) Init() *CyclicList {
 }
 
 // New call new(CyclicList) and initializes it.
-func New() *CyclicList {
+func NewCyclicList() *CyclicList {
 	return new(CyclicList).Init()
 }
 
 // NewFromArray takes []Point and puts it inside CyclicList.
 func NewFromArray(points []Point) *CyclicList {
-	c := New()
+	c := NewCyclicList()
 	after := &c.root
 	for _, p := range points {
 		after = c.InsertAfter(p, after)
