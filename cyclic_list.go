@@ -85,6 +85,7 @@ func (c *CyclicList) InsertAfter(p Point, e *Element) *Element {
 	new := Element{Point: p, prev: e, next: e.next, List: e.List}
 	e.next.prev = &new
 	e.next = &new
+	e.Ear = -1
 	c.len++
 	return &new
 }

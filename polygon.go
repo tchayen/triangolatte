@@ -327,12 +327,15 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 		checkVertex(next, ears)
 	}
 
-	p := remainingPoints.Front()
-	t[i+0], t[i+1] = p.Point.X, p.Point.Y
-	p = p.Next()
-	t[i+2], t[i+3] = p.Point.X, p.Point.Y
-	p = p.Next()
-	t[i+4], t[i+5] = p.Point.X, p.Point.Y
+	a := remainingPoints.Front().Point
+	b := remainingPoints.Front().Next().Point
+	c := remainingPoints.Front().Prev().Point
+
+	if triangleArea(a, b, c) > 0 {
+		t[i+0], t[i+1] = a.X, a.Y
+		t[i+2], t[i+3] = b.X, b.Y
+		t[i+4], t[i+5] = c.X, c.Y
+	}
 
 	return t, nil
 }

@@ -242,36 +242,35 @@ func TestEarCut(t *testing.T) {
 }
 
 func TestEarCutSimpleShapes(t *testing.T) {
-	shapes := [][]Point{
-		// #0: 4 points, no reflex, results in a triangle fan
-		{{0, 4}, {3, 1}, {8, 2}, {9, 5}, {4, 6}},
-		// #1: diamond
-		{{0, 3}, {1, 0}, {4, 1}, {3, 4}},
-		// #2: square
-		{{0, 0}, {1, 0}, {1, 1}, {0, 1}},
-		// #3: one reflex
-		{{0, 6}, {0, 1}, {2, 2}, {3, 2}},
-		// #4: shuriken
-		{{0, 4}, {2, 2}, {2, 0}, {4, 2}, {6, 2}, {4, 4}, {4, 6}, {2, 4}},
-		// #5: c letter – two reflex one after another
-		{{0, 0}, {4, 0}, {4, 2}, {2, 2}, {2, 4}, {4, 4}, {4, 6}, {0, 6}},
-		// #6: building
-		{{1, 0}, {7, 0}, {7, 1}, {6, 1}, {6, 10}, {7, 10}, {7, 11}, {1, 11}, {1, 10}, {2, 10}, {2, 7}, {0, 7}, {0, 4}, {2, 4}, {2, 1}, {1, 1}},
+	type TestInfo struct {
+		Name  string
+		Shape []Point
 	}
 
-	for i, s := range shapes {
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			res, err := EarCut(s, [][]Point{})
+	shapes := []TestInfo{
+		{"fan", []Point{{0, 4}, {3, 1}, {8, 2}, {9, 5}, {4, 6}}},
+		{"diamond", []Point{{0, 3}, {1, 0}, {4, 1}, {3, 4}}},
+		{"square", []Point{{0, 0}, {1, 0}, {1, 1}, {0, 1}}},
+		{"one reflex", []Point{{0, 6}, {0, 1}, {2, 2}, {3, 2}}},
+		{"shuriken", []Point{{0, 4}, {2, 2}, {2, 0}, {4, 2}, {6, 2}, {4, 4}, {4, 6}, {2, 4}}},
+		{"c letter", []Point{{0, 0}, {4, 0}, {4, 2}, {2, 2}, {2, 4}, {4, 4}, {4, 6}, {0, 6}}},
+		{"t letter", []Point{{0, 0}, {6, 0}, {6, 2}, {4, 2}, {4, 6}, {2, 6}, {2, 2}, {0, 2}}},
+		{"building", []Point{{1, 0}, {7, 0}, {7, 1}, {6, 1}, {6, 10}, {7, 10}, {7, 11}, {1, 11}, {1, 10}, {2, 10}, {2, 7}, {0, 7}, {0, 4}, {2, 4}, {2, 1}, {1, 1}}},
+	}
+
+	for _, s := range shapes {
+		t.Run(fmt.Sprintf("%s", s.Name), func(t *testing.T) {
+			res, err := EarCut(s.Shape, [][]Point{})
 			if err != nil {
 				t.Error(err)
 			}
 
-			real, actual, dif := deviation(s, res)
+			real, actual, dif := deviation(s.Shape, res)
 
 			if dif != 0 {
-				t.Errorf("#%d: real area: %f; result: %f", i, real, actual)
+				t.Errorf("#%s: real area: %f; result: %f", s.Name, real, actual)
 			}
-			t.Logf("#%d: %v", i, res)
+			t.Logf("#%s: %v", s.Name, res)
 		})
 	}
 }
@@ -329,7 +328,7 @@ func TestLakeSuperior(t *testing.T) {
 	t.Log("Skipping long test")
 	return
 
-	// lakeSuperior, _ := loadPointsFromFile("../../assets/lake_superior")
+	// lakeSuperior, _ := loadPointsFromFile("assets/lake_superior")
 	// result, _ := EarCut(lakeSuperior[0], [][]Point{}) // lakeSuperior[1:]
 	//
 	// t.Log(result)
