@@ -65,8 +65,8 @@ func isEar(p *Element) bool {
 	return true
 }
 
-func detectEars(points *CyclicList) *list.List {
-	ears := list.New()
+func detectEars(points *CyclicList) *Queue {
+	ears := NewQueue(points.Len())
 
 	n := points.Len()
 	for i, p := 0, points.Front(); i < n; i, p = i+1, p.Next() {
@@ -75,7 +75,7 @@ func detectEars(points *CyclicList) *list.List {
 		}
 
 		if isEar(p) {
-			ears.PushBack(p)
+			ears.Push(p)
 		}
 	}
 	return ears
@@ -253,7 +253,7 @@ func eliminateHoles(outer []Point, inners [][]Point) ([]Point, error) {
 // If an adjacent vertex is an ear, it does not necessarily remain an ear.
 // If an adjacent vertex is reflex, it is possible that it becomes
 // convex and, possibly, an ear.
-func checkVertex(element *Element, ears *list.List) {
+func checkVertex(element *Element, ears *Queue) {
 	a, b, c := element.Prev().Point, element.Point, element.Next().Point
 
 	if element.Reflex {
@@ -261,13 +261,13 @@ func checkVertex(element *Element, ears *list.List) {
 			element.Reflex = false
 
 			if isEar(element) {
-				element.Ear = ears.PushBack(element)
+				element.Ear = ears.Push(element)
 			}
 		}
 	} else {
-		if element.Ear != nil && !isEar(element) {
+		if element.Ear != -1 && !isEar(element) {
 			ears.Remove(element.Ear)
-			element.Ear = nil
+			element.Ear = -1
 		}
 	}
 }
@@ -303,8 +303,8 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 			return nil, errors.New("could not detect any more ear tips")
 		}
 
-		ear := ears.Remove(ears.Front()).(*Element)
-		ear.Ear = nil
+		ear := ears.Pop()
+		ear.Ear = -1
 
 		a, b, c := ear.Prev().Point, ear.Point, ear.Next().Point
 

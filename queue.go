@@ -1,17 +1,17 @@
 package triangolatte
 
-import "errors"
-
 type Queue struct {
-	points []*Element
-	start, end, size, capacity int
+	elements   []*Element
+	start, end int
+	len        int
+	capacity   int
 }
 
 func (q *Queue) Init(n int) *Queue {
-	q.points = make([]*Element, n)
+	q.elements = make([]*Element, n)
 	q.start = 0
-	q.end = n - 1
-	q.size = 0
+	q.end = 0
+	q.len = 0
 	q.capacity = n
 	return q
 }
@@ -21,20 +21,55 @@ func NewQueue(n int) *Queue {
 }
 
 func (q *Queue) Pop() *Element {
-	e := q.points[q.start]
-	q.points[q.start] = nil
-	q.start = (q.start + 1) % q.capacity
-	q.size--
+	if q.len == 0 {
+		panic("Cannot pop from empty queue")
+	}
+
+	e := q.elements[q.start]
+	q.elements[q.start] = nil
+	q.len--
+
+	if q.len > 0 {
+		q.start = (q.start + 1) % q.capacity
+	} else {
+		q.start = 0
+		q.end = 0
+	}
+
 	return e
 }
 
-func (q *Queue) Push(e *Element) error {
-	if q.size == q.capacity {
-		return errors.New("cannot push element to queue – maximal capacity reached")
+func (q *Queue) Push(e *Element) int {
+	if q.len == q.capacity {
+		panic("Cannot push to full queue")
 	}
 
-	q.end = (q.end + 1) % q.capacity
-	q.points[q.end] = e
-	q.size++
-	return nil
+	if q.len > 0 {
+		q.end = (q.end + 1) % q.capacity
+	}
+
+	q.elements[q.end] = e
+	q.len++
+	return q.end
+}
+
+func (q *Queue) Remove(i int) {
+	if q.len == 0 {
+		panic("Cannot remove from empty queue")
+	}
+
+	q.elements[i] = q.elements[q.end]
+	q.elements[q.end] = nil
+	q.len--
+
+	if q.len > 0 {
+		q.end = ((q.end-1)%q.capacity + q.capacity) % q.capacity
+	} else {
+		q.start = 0
+		q.end = 0
+	}
+}
+
+func (q *Queue) Len() int {
+	return q.len
 }

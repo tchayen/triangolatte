@@ -178,8 +178,8 @@ func TestDetectEars(t *testing.T) {
 	earList := detectEars(c)
 
 	ears := make([]Point, earList.Len())
-	for i, e := 0, earList.Front(); e != nil; i, e = i+1, e.Next() {
-		ears[i] = e.Value.(*Element).Point
+	for i := 0; i < earList.Len(); i++ {
+		ears[i] = earList.elements[i].Point
 	}
 
 	expectedEars := []Point{vertices[3], vertices[4], vertices[6], vertices[9]}

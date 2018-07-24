@@ -35,4 +35,16 @@ func TestQueue(t *testing.T) {
 	t.Run("Push to the capacity with index wrap", func(t *testing.T) {
 		q.Push(&e4)
 	})
+
+	t.Run("Remove", func(t *testing.T) {
+		q.Remove(1)
+
+		expected := []*Element{nil, &e4, &e3}
+
+		for i := 0; i < q.capacity; i++ {
+			if q.elements[i] != expected[i] {
+				t.Error("Error")
+			}
+		}
+	})
 }

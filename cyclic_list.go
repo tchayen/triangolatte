@@ -1,9 +1,5 @@
 package triangolatte
 
-import (
-	"container/list"
-)
-
 // Implements double linked cyclic lists.
 //
 // NOTE: in one element list e == e.next
@@ -39,9 +35,11 @@ type Element struct {
 	// Value of the element.
 	Point Point
 
-	// Its properties.
+	// Is it reflex?
 	Reflex bool
-	Ear    *list.Element
+
+	// ID of ear in ears array. -1 if not an ear.
+	Ear int
 }
 
 // Init sets up fresh CyclicList.
