@@ -4,9 +4,6 @@
 [![Coverage Status](https://coveralls.io/repos/github/Tchayen/triangolatte/badge.svg?branch=master)](https://coveralls.io/github/Tchayen/triangolatte?branch=master)
 [![GoDoc](https://godoc.org/github.com/Tchayen/triangolatte?status.svg)](https://godoc.org/github.com/Tchayen/triangolatte)
 
-> **NOTE:** _The library is in its very early stage. Near future will bring more
-tests and optimizations._
-
 ---
 
 _Should I use it?_ **Not yet**
@@ -14,8 +11,8 @@ _Should I use it?_ **Not yet**
 _The algorithm is generally working and should be quite optimal. The tests are
 quite rich now and cover many aspects and things that can go wrong. However, I
 am at a stage at which I keep finding bugs and not working cases. Come back in
-two weeks and you should see vastly improved and optimized version, hopefully
-ready for a real usage._
+two weeks and you should see vastly improved (and even faster) version,
+hopefully ready for a real world usage._
 
 ---
 
