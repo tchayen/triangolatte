@@ -138,15 +138,21 @@ func BenchmarkIsReflex(b *testing.B) {
 }
 
 func TestIsInsideTriangle(t *testing.T) {
-	t.Run("case 1", func(t *testing.T) {
-		if isInsideTriangle(vertices[0], vertices[8], vertices[9], vertices[7]) {
-			t.Error("isInsideTriangle is broken")
+	t.Run("outside", func(t *testing.T) {
+		if isInsideTriangle(Point{0, 0}, Point{4, 0}, Point{4, 2}, Point{2, 2}) {
+			t.Error("isInsideTriangle: point outside detected inside")
 		}
 	})
 
-	t.Run("case 2", func(t *testing.T) {
-		if !isInsideTriangle(vertices[0], vertices[1], vertices[5], vertices[7]) {
-			t.Error("isInsideTriangle is broken")
+	t.Run("inside", func(t *testing.T) {
+		if !isInsideTriangle(Point{0, 0}, Point{3, 0}, Point{3, 3}, Point{1, 1}) {
+			t.Error("isInsideTriangle: point inside detected outside")
+		}
+	})
+
+	t.Run("on edge", func(t *testing.T) {
+		if !isInsideTriangle(Point{0, 2}, Point{6, 0}, Point{6, 2}, Point{2, 2}) {
+			t.Error("isInsideTriangle: point on the edge reported as outside")
 		}
 	})
 }
@@ -255,6 +261,8 @@ func TestEarCutSimpleShapes(t *testing.T) {
 		{"shuriken", []Point{{0, 4}, {2, 2}, {2, 0}, {4, 2}, {6, 2}, {4, 4}, {4, 6}, {2, 4}}},
 		{"c letter", []Point{{0, 0}, {4, 0}, {4, 2}, {2, 2}, {2, 4}, {4, 4}, {4, 6}, {0, 6}}},
 		{"t letter", []Point{{0, 0}, {6, 0}, {6, 2}, {4, 2}, {4, 6}, {2, 6}, {2, 2}, {0, 2}}},
+		{"double t", []Point{{0, 0}, {6, 0}, {6, 2}, {4, 2}, {4, 4}, {6, 4}, {6, 6}, {0, 6}, {0, 4}, {2, 4}, {2, 2}, {0, 2}}},
+		{"part of the bulding #0", []Point{{1, 0}, {7, 0}, {7, 1}, {6, 1}, {6, 10}, {7, 10}, {7, 11}, {1, 11}, {1, 10}, {2, 10}, {2, 1}, {1, 1}}},
 		{"building", []Point{{1, 0}, {7, 0}, {7, 1}, {6, 1}, {6, 10}, {7, 10}, {7, 11}, {1, 11}, {1, 10}, {2, 10}, {2, 7}, {0, 7}, {0, 4}, {2, 4}, {2, 1}, {1, 1}}},
 	}
 
@@ -295,9 +303,11 @@ func TestSortingByXMax(t *testing.T) {
 }
 
 func TestSingleTriangleTriangulation(t *testing.T) {
-	result, _ := EarCut([]Point{{0, 0}, {0, 1}, {1, 1}}, [][]Point{})
-	expected := []float64{0, 0, 0, 1, 1, 1}
+	result, _ := EarCut([]Point{{0, 0}, {3, 0}, {4, 4}}, [][]Point{})
+	expected := []float64{0, 0, 3, 0, 4, 4}
 
+	t.Log(result)
+	t.Log(expected)
 	checkFloat64Array(t, result, expected)
 }
 

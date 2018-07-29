@@ -180,13 +180,3 @@ You are welcome to create an issue or pull request if you've got an idea what to
 
 Don't have one, but still want to contribute? Get in touch with me and we can
 brainstorm some ideas.
-
-
-## Appendix
-
-> We like to ask ourselves why are we studying all those algorithms and they keep asking us to implement quicksort by
-> hand from scratch. So this is one of those rare moments that you can feel that all those algorithm courses finally pay
-> off and you can use all your knowledge about computational complexity and implementing broken data structures on plain
-> arrays. It feels like this is the time of your life and it truly is.
-
-_**author's thoughts**_

@@ -23,7 +23,7 @@ func triangleArea(a, b, c Point) float64 {
 // used just fine in the triangulation).
 //
 // But generally, math.Pi angle should not happen since collinear points are
-// redundant and therefore they should be eliminated in preprocessing.
+// redundant and therefore they should be eliminated in pre-processing.
 func isReflex(a, b, c Point) bool {
 	return (b.X-a.X)*(c.Y-b.Y)-(c.X-b.X)*(b.Y-a.Y) < 0
 }
@@ -297,7 +297,8 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 	var ears = detectEars(remainingPoints)
 
 	// Any triangulation of simple polygon has `n-2` triangles.
-	i, t := 0, make([]float64, (n-2)*6)
+	size := (n - 2) * 6
+	i, t := 0, make([]float64, size)
 	for remainingPoints.Len() > 3 {
 		if ears.Len() == 0 {
 			return nil, errors.New("could not detect any more ear tips")
@@ -335,6 +336,11 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 		t[i+0], t[i+1] = a.X, a.Y
 		t[i+2], t[i+3] = b.X, b.Y
 		t[i+4], t[i+5] = c.X, c.Y
+		i += 6
+	}
+
+	for ; i < size; i++ {
+		t[i] = -1
 	}
 
 	return t, nil
