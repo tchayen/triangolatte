@@ -148,16 +148,8 @@ Now you can open newly generated `torch.svg` in your web browser.
 
 ### Optimizations
 
-**First:** rewrite ear list from list to a queue implemented on array. It should
-be rather easy and will save tons of mallocs.
-
-`EarCut` currently uses `O(n^2)` algorithm which does not have much space
-remaining for improvement.
-
-However, there are other obvious options for
-speeding up vertex traversal using some kind of z-ordering (checking close
-vertices first increases chance of proving that given vertex cannot be an ear
-and therefore makes occasion for early return).
+- rewrite point list to operate on static array.
+- use z-ordering for early returning in ear detection
 
 ### Making the library production grade
 

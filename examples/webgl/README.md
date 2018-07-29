@@ -18,4 +18,4 @@ then, watch JS files in separate terminal
 ```bash
 yarn start
 ```
-and finally, visit `localhost:3000`.
+and finally, visit `http://localhost:3000/examples/webgl`.

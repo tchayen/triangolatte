@@ -248,3 +248,22 @@ func TestLakeSuperior(t *testing.T) {
 	//
 	// t.Log(result)
 }
+
+func TestFromFile(t *testing.T) {
+	points, err := loadPointsFromFile("assets/lake")
+
+	if err != nil {
+		t.Errorf("FromFile: %s", err)
+	}
+
+	res, err := EarCut(points[0])
+
+	if err != nil {
+		t.Errorf("FromFile: %s", err)
+	}
+
+	real, actual, deviation := deviation(points[0], res)
+	if deviation > 1e-10 {
+		t.Errorf("real area: %f; result: %f", real, actual)
+	}
+}
