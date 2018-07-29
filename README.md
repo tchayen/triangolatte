@@ -20,14 +20,14 @@ hopefully ready for a real world usage._
 points) to the language of GPUs.
 
 Features normal and miter joint line triangulation. Handles polygons using ear
-clipping algorithm with hole elimination included.
+clipping algorithm ~~with hole elimination included~~ (**WIP**).
 
 ## Usage
 
 #### Basic example
 ```go
 vertices := []Point{{10, 20}, {30, 40}, {50, 60}}
-t, err = triangolatte.EarCut(vertices, [][]Point{})
+t, err = triangolatte.EarCut(vertices)
 ```
 
 ## Installation

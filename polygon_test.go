@@ -7,8 +7,6 @@ import (
 	"testing"
 )
 
-var vertices = []Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
-
 func TestPolygonArea(t *testing.T) {
 	points := []Point{{2, 2}, {11, 2}, {9, 7}, {4, 10}}
 	area := polygonArea(points)
@@ -62,43 +60,6 @@ func checkPointArray(t *testing.T, result, expected []Point) {
 			t.Error("Value error beyond floating point precision problem")
 		}
 	}
-}
-
-func TestCyclic(t *testing.T) {
-	t.Run("regular", func(t *testing.T) {
-		r := cyclic(1, 5)
-		if r != 1 {
-			t.Errorf("%d != %d", r, 1)
-		}
-	})
-
-	t.Run("overflow", func(t *testing.T) {
-		r := cyclic(6, 5)
-		if r != 1 {
-			t.Errorf("%d != %d", r, 1)
-		}
-	})
-
-	t.Run("negative overflow", func(t *testing.T) {
-		r := cyclic(-1, 5)
-		if r != 4 {
-			t.Errorf("%d != %d", r, 4)
-		}
-	})
-
-	t.Run("full loop", func(t *testing.T) {
-		r := cyclic(-5, 5)
-		if r != 0 {
-			t.Errorf("%d != %d", r, 0)
-		}
-	})
-
-	t.Run("double negative overflow", func(t *testing.T) {
-		r := cyclic(-6, 5)
-		if r != 4 {
-			t.Errorf("%d != %d", r, 4)
-		}
-	})
 }
 
 func TestIsReflex(t *testing.T) {
@@ -159,95 +120,35 @@ func TestIsInsideTriangle(t *testing.T) {
 
 func BenchmarkIsInsideTriangle(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		isInsideTriangle(vertices[0], vertices[1], vertices[2], vertices[3])
+		isInsideTriangle(Point{50, 110}, Point{150, 30}, Point{240, 115}, Point{320, 65})
 	}
 }
 
-func TestSetReflex(t *testing.T) {
-	points := []Point{{0, 0}, {2, 3}, {4, 2}, {0, 7}}
-	c := NewFromArray(points)
-	setReflex(c)
-
-	result := make([]bool, 4)
-	for i, p := 0, c.Front(); i < c.Len(); i, p = i+1, p.Next() {
-		result[i] = p.Reflex
-	}
-	expected := []bool{false, true, false, false}
-
-	t.Log(result, expected)
-	checkBoolArray(t, result, expected)
-}
-
-func TestDetectEars(t *testing.T) {
-	c := NewFromArray(vertices)
-	setReflex(c)
-	earList := detectEars(c)
-
-	ears := make([]Point, earList.Len())
-	for i := 0; i < earList.Len(); i++ {
-		ears[i] = earList.elements[i].Point
-	}
-
-	expectedEars := []Point{vertices[3], vertices[4], vertices[6], vertices[9]}
-	checkPointArray(t, ears, expectedEars)
-}
-
-func BenchmarkDetectEars(b *testing.B) {
-	b.StopTimer()
-	c := NewFromArray(vertices)
-	setReflex(c)
-	b.StartTimer()
-
-	for i := 0; i < b.N; i++ {
-		detectEars(c)
-	}
-}
-
-func TestEliminateHoles(t *testing.T) {
-	polygon := []Point{{0, 30}, {20, 0}, {80, 0}, {90, 40}, {30, 70}}
-	holes := [][]Point{
-		{{20, 10}, {20, 40}, {50, 40}},
-		{{60, 30}, {70, 20}, {50, 10}},
-	}
-
-	polygonWithEliminatedHoles := []Point{
-		{0, 30}, {20, 0}, {80, 0},
-		{90, 40}, {70, 20}, {50, 10},
-		{60, 30}, {70, 20}, {90, 40},
-		{50, 40}, {20, 10}, {20, 40},
-		{50, 40}, {90, 40}, {30, 70},
-	}
-
-	eliminated, err := eliminateHoles(polygon, holes)
-
-	if err != nil {
-		t.Errorf("EliminateHoles: %s", err)
-	}
-
-	checkPointArray(t, eliminated, polygonWithEliminatedHoles)
-}
-
-func TestEliminateHolesWithNoDirectlyVisible(t *testing.T) {
-	// TODO
-}
-
-func TestEliminateHolesWithNoPossibleVisibleVertex(t *testing.T) {
-	// TODO
-}
+// func TestEliminateHoles(t *testing.T) {
+// 	polygon := []Point{{0, 30}, {20, 0}, {80, 0}, {90, 40}, {30, 70}}
+// 	holes := [][]Point{
+// 		{{20, 10}, {20, 40}, {50, 40}},
+// 		{{60, 30}, {70, 20}, {50, 10}},
+// 	}
+//
+// 	polygonWithEliminatedHoles := []Point{
+// 		{0, 30}, {20, 0}, {80, 0},
+// 		{90, 40}, {70, 20}, {50, 10},
+// 		{60, 30}, {70, 20}, {90, 40},
+// 		{50, 40}, {20, 10}, {20, 40},
+// 		{50, 40}, {90, 40}, {30, 70},
+// 	}
+//
+// 	eliminated, err := eliminateHoles(polygon, holes)
+//
+// 	if err != nil {
+// 		t.Errorf("EliminateHoles: %s", err)
+// 	}
+//
+// 	checkPointArray(t, eliminated, polygonWithEliminatedHoles)
+// }
 
 func TestEarCut(t *testing.T) {
-	result, err := EarCut(vertices, [][]Point{})
-	expected := []float64{240, 115, 320, 65, 395, 170, 240, 115, 395, 170, 305, 160, 305, 160, 265, 240, 190, 100, 95, 125, 100, 215, 50, 110, 240, 115, 305, 160, 190, 100, 190, 100, 95, 125, 50, 110, 150, 30, 240, 115, 190, 100, 50, 110, 150, 30, 190, 100}
-
-	if err != nil {
-		t.Errorf("EarCut: %s", err)
-	}
-
-	t.Log(deviation(vertices, expected))
-	checkFloat64Array(t, result, expected)
-}
-
-func TestEarCutSimpleShapes(t *testing.T) {
 	type TestInfo struct {
 		Name  string
 		Shape []Point
@@ -262,13 +163,13 @@ func TestEarCutSimpleShapes(t *testing.T) {
 		{"c letter", []Point{{0, 0}, {4, 0}, {4, 2}, {2, 2}, {2, 4}, {4, 4}, {4, 6}, {0, 6}}},
 		{"t letter", []Point{{0, 0}, {6, 0}, {6, 2}, {4, 2}, {4, 6}, {2, 6}, {2, 2}, {0, 2}}},
 		{"double t", []Point{{0, 0}, {6, 0}, {6, 2}, {4, 2}, {4, 4}, {6, 4}, {6, 6}, {0, 6}, {0, 4}, {2, 4}, {2, 2}, {0, 2}}},
-		{"part of the bulding #0", []Point{{1, 0}, {7, 0}, {7, 1}, {6, 1}, {6, 10}, {7, 10}, {7, 11}, {1, 11}, {1, 10}, {2, 10}, {2, 1}, {1, 1}}},
 		{"building", []Point{{1, 0}, {7, 0}, {7, 1}, {6, 1}, {6, 10}, {7, 10}, {7, 11}, {1, 11}, {1, 10}, {2, 10}, {2, 7}, {0, 7}, {0, 4}, {2, 4}, {2, 1}, {1, 1}}},
+		{"from the paper", []Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}},
 	}
 
 	for _, s := range shapes {
 		t.Run(fmt.Sprintf("%s", s.Name), func(t *testing.T) {
-			res, err := EarCut(s.Shape, [][]Point{})
+			res, err := EarCut(s.Shape)
 			if err != nil {
 				t.Error(err)
 			}
@@ -285,13 +186,13 @@ func TestEarCutSimpleShapes(t *testing.T) {
 
 func BenchmarkEarCut(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		EarCut(vertices, [][]Point{})
+		EarCut([]Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}})
 	}
 }
 
 func TestIncorrectEarCut(t *testing.T) {
 	var err error
-	_, err = EarCut([]Point{{0, 0}}, [][]Point{})
+	_, err = EarCut([]Point{{0, 0}})
 	if err == nil {
 		t.Errorf("The code did not return error on incorrect input")
 	}
@@ -303,8 +204,8 @@ func TestSortingByXMax(t *testing.T) {
 }
 
 func TestSingleTriangleTriangulation(t *testing.T) {
-	result, _ := EarCut([]Point{{0, 0}, {3, 0}, {4, 4}}, [][]Point{})
-	expected := []float64{0, 0, 3, 0, 4, 4}
+	result, _ := EarCut([]Point{{0, 0}, {3, 0}, {4, 4}})
+	expected := []float64{4, 4, 0, 0, 3, 0}
 
 	t.Log(result)
 	t.Log(expected)
@@ -320,26 +221,30 @@ func TestAghA0(t *testing.T) {
 		}
 	}
 
-	result, err := EarCut(agh[0], [][]Point{}) // agh[1:]
+	result, err := EarCut(agh[0]) // agh[1:]
 
 	if err != nil {
 		t.Errorf("AghA0: %s", err)
 	}
 
 	real, actual, deviation := deviation(agh[0], result)
-	if deviation != 0 {
+	if deviation > 1e-10 {
 		t.Errorf("real area: %f; result: %f", real, actual)
 	}
 }
 
 // **WARNING**
-// Runs much longer than others (several orders of magnitude longer, can last minutes)
+// Runs much longer than others (around half a minute)
 func TestLakeSuperior(t *testing.T) {
 	t.Log("Skipping long test")
 	return
 
 	// lakeSuperior, _ := loadPointsFromFile("assets/lake_superior")
-	// result, _ := EarCut(lakeSuperior[0], [][]Point{}) // lakeSuperior[1:]
+	// result, err := EarCut(lakeSuperior[0]) // lakeSuperior[1:]
+	//
+	// if err != nil {
+	// 	t.Errorf("LakeSuperior: %s", err)
+	// }
 	//
 	// t.Log(result)
 }
