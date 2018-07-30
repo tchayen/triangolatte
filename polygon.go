@@ -284,10 +284,12 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 		next = ear.Next
 
 		if isEar(ear) {
-			t[i+0], t[i+1] = prev.Point.X, prev.Point.Y
-			t[i+2], t[i+3] = ear.Point.X, ear.Point.Y
-			t[i+4], t[i+5] = next.Point.X, next.Point.Y
-			i += 6
+			if polygonArea([]Point{prev.Point, ear.Point, next.Point}) > 0 {
+				t[i+0], t[i+1] = prev.Point.X, prev.Point.Y
+				t[i+2], t[i+3] = ear.Point.X, ear.Point.Y
+				t[i+4], t[i+5] = next.Point.X, next.Point.Y
+				i += 6
+			}
 
 			ear.Remove()
 			ear = ear.Next
@@ -302,5 +304,5 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 		}
 	}
 
-	return t, nil
+	return t[0:i], nil
 }
