@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -32,10 +34,26 @@ func DownloadFile(filePath string, url string) error {
 }
 
 func main() {
-	url := "https://overpass-api.de/api/interpreter?data=[out:json];(way[building](50.0,19.85,50.105,20.13);relation[building](50.0,19.85,50.105,20.13););out body;>;out skel qt;"
+	data, err := ioutil.ReadFile("assets/cracow_tmp")
 
-	err := DownloadFile("cracow_tmp", url)
 	if err != nil {
-		log.Fatal("Error downloading file")
+		log.Fatal("Could not read file")
 	}
+
+	type Geometry struct {
+		coordinates [][][]float64
+	}
+
+	type Feature struct {
+		geometry Geometry
+	}
+
+	type FeatureCollection struct {
+		features []Feature
+	}
+
+	obj := FeatureCollection{}
+	parsed := json.Unmarshal([]byte(data), &obj)
+
+	log.Println(parsed)
 }
