@@ -26,9 +26,13 @@ func trianglesArea(t []float64) float64 {
 }
 
 // deviation calculates difference between real area and the one from triangulation.
-func deviation(data []Point, t []float64) (real, triangles, deviation float64) {
+func deviation(data []Point, holes [][]Point, t []float64) (real, triangles, deviation float64) {
 	triangles = trianglesArea(t)
 	real = polygonArea(data)
+	for _, h := range holes {
+		real -= polygonArea(h)
+	}
+
 	deviation = math.Abs(triangles - real)
 	return
 }

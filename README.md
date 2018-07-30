@@ -148,7 +148,7 @@ Now you can open newly generated `torch.svg` in your web browser.
 
 ### Optimizations
 
-- rewrite point list to operate on static array.
+- rewrite point list to operate on static array
 - use z-ordering for early returning in ear detection
 
 ### Making the library production grade

@@ -20,7 +20,7 @@ func TestDeviation(t *testing.T) {
 	data := []Point{{0, 4}, {3, 1}, {8, 2}, {9, 5}, {4, 6}}
 	triangles := []float64{4, 6, 0, 4, 3, 1, 4, 6, 3, 1, 8, 2, 8, 2, 9, 5, 4, 6}
 
-	real, actual, deviation := deviation(data, triangles)
+	real, actual, deviation := deviation(data, [][]Point{}, triangles)
 	if deviation > 0 {
 		t.Errorf("real: %f, actual: %f", real, actual)
 	}
@@ -124,6 +124,35 @@ func BenchmarkIsInsideTriangle(b *testing.B) {
 	}
 }
 
+func TestEliminateHoles(t *testing.T) {
+	t.Run("square in square", func(t *testing.T) {
+		points := []Point{{0,0}, {4, 0}, {4, 4}, {0, 4}}
+		holes := [][]Point{{{1, 1}, {1, 3}, {3, 3}, {3, 1}}}
+		expected := []Point{{0, 0}, {4, 0}, {4, 4}, {3, 3}, {3, 1}, {1, 1}, {1, 3}, {3, 3}, {4, 4}, {0, 4}}
+		result, err := eliminateHoles(points, holes)
+
+		if err != nil {
+			t.Errorf("eliminateHoles: %s", err)
+		}
+
+		t.Log(result)
+		t.Log(expected)
+
+		checkPointArray(t, result, expected)
+
+		triangles, err := EarCut(points, holes)
+
+		if err != nil {
+			t.Errorf("eliminateHoles: %s", err)
+		}
+
+		real, actual, deviation := deviation(points, holes, triangles)
+		if deviation > 0 {
+			t.Errorf("real: %f, actual: %f", real, actual)
+		}
+	})
+}
+
 // func TestEliminateHoles(t *testing.T) {
 // 	polygon := []Point{{0, 30}, {20, 0}, {80, 0}, {90, 40}, {30, 70}}
 // 	holes := [][]Point{
@@ -169,12 +198,12 @@ func TestEarCut(t *testing.T) {
 
 	for _, s := range shapes {
 		t.Run(fmt.Sprintf("%s", s.Name), func(t *testing.T) {
-			res, err := EarCut(s.Shape)
+			res, err := EarCut(s.Shape, [][]Point{})
 			if err != nil {
 				t.Error(err)
 			}
 
-			real, actual, dif := deviation(s.Shape, res)
+			real, actual, dif := deviation(s.Shape, [][]Point{}, res)
 
 			if dif != 0 {
 				t.Errorf("#%s: real area: %f; result: %f", s.Name, real, actual)
@@ -186,13 +215,13 @@ func TestEarCut(t *testing.T) {
 
 func BenchmarkEarCut(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		EarCut([]Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}})
+		EarCut([]Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}, [][]Point{})
 	}
 }
 
 func TestIncorrectEarCut(t *testing.T) {
 	var err error
-	_, err = EarCut([]Point{{0, 0}})
+	_, err = EarCut([]Point{{0, 0}}, [][]Point{})
 	if err == nil {
 		t.Errorf("The code did not return error on incorrect input")
 	}
@@ -204,7 +233,7 @@ func TestSortingByXMax(t *testing.T) {
 }
 
 func TestSingleTriangleTriangulation(t *testing.T) {
-	result, _ := EarCut([]Point{{0, 0}, {3, 0}, {4, 4}})
+	result, _ := EarCut([]Point{{0, 0}, {3, 0}, {4, 4}}, [][]Point{})
 	expected := []float64{4, 4, 0, 0, 3, 0}
 
 	t.Log(result)
@@ -221,13 +250,13 @@ func TestAghA0(t *testing.T) {
 		}
 	}
 
-	result, err := EarCut(agh[0]) // agh[1:]
+	result, err := EarCut(agh[0], [][]Point{}) // agh[1:]
 
 	if err != nil {
 		t.Errorf("AghA0: %s", err)
 	}
 
-	real, actual, deviation := deviation(agh[0], result)
+	real, actual, deviation := deviation(agh[0], [][]Point{}, result)
 	if deviation > 1e-10 {
 		t.Errorf("real area: %f; result: %f", real, actual)
 	}
@@ -236,17 +265,25 @@ func TestAghA0(t *testing.T) {
 // **WARNING**
 // Runs much longer than others (around half a minute)
 func TestLakeSuperior(t *testing.T) {
-	t.Log("Skipping long test")
-	return
+	// t.Log("Skipping long test")
+	// return
 
-	// lakeSuperior, _ := loadPointsFromFile("assets/lake_superior")
-	// result, err := EarCut(lakeSuperior[0]) // lakeSuperior[1:]
-	//
-	// if err != nil {
-	// 	t.Errorf("LakeSuperior: %s", err)
-	// }
-	//
-	// t.Log(result)
+	lakeSuperior, _ := loadPointsFromFile("assets/lake_superior")
+
+	for i := range lakeSuperior {
+		for j := range lakeSuperior[i] {
+			p := degreesToMeters(lakeSuperior[i][j])
+			lakeSuperior[i][j] = Point{math.Abs(p.X), math.Abs(p.Y)}
+		}
+	}
+
+	result, err := EarCut(lakeSuperior[0], [][]Point{}) // lakeSuperior[1:]
+
+	if err != nil {
+		t.Errorf("LakeSuperior: %s", err)
+	}
+
+	t.Log(result)
 }
 
 func TestFromFile(t *testing.T) {
@@ -256,14 +293,23 @@ func TestFromFile(t *testing.T) {
 		t.Errorf("FromFile: %s", err)
 	}
 
-	res, err := EarCut(points[0])
+	for i := range points {
+		for j := range points[i] {
+			p := degreesToMeters(points[i][j])
+			points[i][j] = p
+		}
+	}
+
+	res, err := EarCut(points[0], [][]Point{})
 
 	if err != nil {
 		t.Errorf("FromFile: %s", err)
 	}
 
-	real, actual, deviation := deviation(points[0], res)
+	real, actual, deviation := deviation(points[0], [][]Point{}, res)
 	if deviation > 1e-10 {
 		t.Errorf("real area: %f; result: %f", real, actual)
 	}
+
+	t.Log(res)
 }
