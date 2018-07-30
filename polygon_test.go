@@ -125,32 +125,45 @@ func BenchmarkIsInsideTriangle(b *testing.B) {
 }
 
 func TestEliminateHoles(t *testing.T) {
-	t.Run("square in square", func(t *testing.T) {
-		points := []Point{{0,0}, {4, 0}, {4, 4}, {0, 4}}
-		holes := [][]Point{{{1, 1}, {1, 3}, {3, 3}, {3, 1}}}
-		expected := []Point{{0, 0}, {4, 0}, {4, 4}, {3, 3}, {3, 1}, {1, 1}, {1, 3}, {3, 3}, {4, 4}, {0, 4}}
-		result, err := eliminateHoles(points, holes)
+	type TestInfo struct {
+		Name     string
+		Points   []Point
+		Holes    [][]Point
+		Expected []Point
+	}
 
-		if err != nil {
-			t.Errorf("eliminateHoles: %s", err)
-		}
+	testInfo := []TestInfo{{
+		"square in square",
+		[]Point{{0, 0}, {4, 0}, {4, 4}, {0, 4}},
+		[][]Point{{{1, 1}, {1, 3}, {3, 3}, {3, 1}}},
+		[]Point{{0, 0}, {4, 0}, {4, 4}, {3, 3}, {3, 1}, {1, 1}, {1, 3}, {3, 3}, {4, 4}, {0, 4}},
+	}}
 
-		t.Log(result)
-		t.Log(expected)
+	for _, test := range testInfo {
+		t.Run(test.Name, func(t *testing.T) {
+			result, err := eliminateHoles(test.Points, test.Holes)
 
-		checkPointArray(t, result, expected)
+			if err != nil {
+				t.Errorf("eliminateHoles: %s", err)
+			}
 
-		triangles, err := EarCut(points, holes)
+			t.Log(result)
+			t.Log(test.Expected)
 
-		if err != nil {
-			t.Errorf("eliminateHoles: %s", err)
-		}
+			checkPointArray(t, result, test.Expected)
 
-		real, actual, deviation := deviation(points, holes, triangles)
-		if deviation > 0 {
-			t.Errorf("real: %f, actual: %f", real, actual)
-		}
-	})
+			triangles, err := EarCut(test.Points, test.Holes)
+
+			if err != nil {
+				t.Errorf("eliminateHoles: %s", err)
+			}
+
+			real, actual, deviation := deviation(test.Points, test.Holes, triangles)
+			if deviation > 0 {
+				t.Errorf("real: %f, actual: %f", real, actual)
+			}
+		})
+	}
 }
 
 // func TestEliminateHoles(t *testing.T) {

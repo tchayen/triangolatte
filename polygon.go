@@ -9,31 +9,6 @@ import (
 // Set of int values.
 type Set map[int]bool
 
-type Element struct {
-	Prev, Next *Element
-	Point      Point
-}
-
-func Insert(p Point, e *Element) *Element {
-	new := Element{Point: p}
-
-	if e != nil {
-		new.Next = e.Next
-		new.Prev = e
-		e.Next.Prev = &new
-		e.Next = &new
-	} else {
-		new.Prev = &new
-		new.Next = &new
-	}
-	return &new
-}
-
-func (e *Element) Remove() {
-	e.Next.Prev = e.Prev
-	e.Prev.Next = e.Next
-}
-
 func cyclic(i, n int) int {
 	return (i%n + n) % n
 }
@@ -266,15 +241,15 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 		}
 	}
 
-	var last *Element
-	for i := 0; i < n; i++ {
+	var last = Insert(points[0], nil)
+	for i := 1; i < n; i++ {
 		last = Insert(points[i], last)
 	}
 
 	ear := last.Next
 
 	// Any triangulation of simple polygon has `n-2` triangles.
-	i, t := 0, make([]float64, (n - 2) * 6)
+	i, t := 0, make([]float64, (n-2)*6)
 
 	stop := ear
 	var prev, next *Element
