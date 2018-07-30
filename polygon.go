@@ -241,12 +241,21 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 		}
 	}
 
-	var last = Insert(points[0], nil)
-	for i := 1; i < n; i++ {
-		last = Insert(points[i], last)
+	// Allocate more things at once.
+	elements := make([]Element, n)
+	elements[0].Prev = &elements[n-1]
+	elements[0].Next = &elements[1]
+	elements[0].Point = points[0]
+	for i := 1; i < n-1; i++ {
+		elements[i].Prev = &elements[i-1]
+		elements[i].Next = &elements[i+1]
+		elements[i].Point = points[i]
 	}
+	elements[n-1].Prev = &elements[n-2]
+	elements[n-1].Next = &elements[0]
+	elements[n-1].Point = points[n-1]
 
-	ear := last.Next
+	ear := &elements[0]
 
 	// Any triangulation of simple polygon has `n-2` triangles.
 	i, t := 0, make([]float64, (n-2)*6)

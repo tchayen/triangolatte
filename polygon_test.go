@@ -278,8 +278,8 @@ func TestAghA0(t *testing.T) {
 // **WARNING**
 // Runs much longer than others (around half a minute)
 func TestLakeSuperior(t *testing.T) {
-	t.Log("Skipping long test")
-	return
+	// t.Log("Skipping long test")
+	// return
 
 	lakeSuperior, _ := loadPointsFromFile("assets/lake_superior")
 

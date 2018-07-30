@@ -24,7 +24,7 @@ func TestElement_Remove(t *testing.T) {
 	t.Run("removal", func(t *testing.T) {
 		e1 := Insert(Point{1, 1}, nil)
 		e2 := Insert(Point{2, 2}, e1)
-		e3 := Insert(Point{ 3, 3}, e2)
+		e3 := Insert(Point{3, 3}, e2)
 
 		if e1.Next != e2 || e2.Next != e3 {
 			t.Error("Wrong insert")
@@ -44,7 +44,7 @@ func TestElement_Remove(t *testing.T) {
 	t.Run("remove edge", func(t *testing.T) {
 		e1 := Insert(Point{1, 1}, nil)
 		e2 := Insert(Point{2, 2}, e1)
-		e3 := Insert(Point{ 3, 3}, e2)
+		e3 := Insert(Point{3, 3}, e2)
 
 		e3.Remove()
 

@@ -24,4 +24,3 @@ func (e *Element) Remove() {
 	e.Next.Prev = e.Prev
 	e.Prev.Next = e.Next
 }
-
