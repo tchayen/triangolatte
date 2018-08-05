@@ -13,7 +13,7 @@ func main() {
 	// 	log.Fatal("Could not read file")
 	// }
 
-	data := []byte("{features:[{geometry:{coordinates:[[[0,100],[100,100]]]}}]")
+	data := []byte("{\"features\":[{\"geometry\":{\"coordinates\":[[[0,100],[100,100]]]}}]}")
 	type Geometry struct {
 		coordinates [][][]float64
 	}

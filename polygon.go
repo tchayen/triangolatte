@@ -163,11 +163,10 @@ func combinePolygons(outer, inner []Point) ([]Point, error) {
 		return nil, errors.New("could not find visible vertex")
 	}
 
-	n := len(inner)
 	result := make([]Point, 0, len(outer)+len(inner)+2)
 	result = append(result, outer[:visibleIndex+1]...)
-	for i := 0; i < n; i++ {
-		result = append(result, inner[cyclic(mIndex+i, n)])
+	for i := 0; i < len(inner); i++ {
+		result = append(result, inner[cyclic(mIndex+i, len(inner))])
 	}
 	result = append(result, inner[mIndex], outer[visibleIndex])
 	result = append(result, outer[visibleIndex+1:]...)
@@ -199,45 +198,39 @@ func (polygons byMaxX) Less(i, j int) bool {
 			return false
 		}
 	}
+
 	return true
 }
 
-func eliminateHoles(outer []Point, inners [][]Point) ([]Point, error) {
-	sort.Sort(byMaxX(inners))
+// EliminateHoles removes holes, joining them with the rest of the polygon.
+// Provides preprocessing for EarCut. First element of the points array is the
+//outer polygon, the rest of them are considered as holes to be removed.
+func EliminateHoles(points [][]Point) ([]Point, error) {
+	sort.Sort(byMaxX(points[1:]))
 
-	var inner []Point
-	for len(inners) > 0 {
-		inner, inners = inners[0], inners[1:]
-		var err error
-		outer, err = combinePolygons(outer, inner)
+	current := points[0]
+	var err error
+
+	for i := 1; i < len(points); i++ {
+		current, err = combinePolygons(current, points[i])
+
 		if err != nil {
 			return nil, err
 		}
 	}
-	return outer, nil
+
+	return current, nil
 }
 
 // EarCut triangulates given CCW polygon using ear clipping algorithm (takes
 // O(n^2) time). Produces array of two-coordinate, CCW triangles, put one after
 // another. Returns empty array and error when triangulation did not complete
 // properly.
-func EarCut(points []Point, holes [][]Point) ([]float64, error) {
+func EarCut(points []Point) ([]float64, error) {
 	n := len(points)
-	for _, h := range holes {
-		n += len(h)
-	}
 
 	if n < 3 {
 		return nil, errors.New("cannot triangulate less than three points")
-	}
-
-	if len(holes) > 0 {
-		var err error
-		points, err = eliminateHoles(points, holes)
-
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	// Allocate memory for all needed elements and initialize them by hand.

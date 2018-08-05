@@ -22,13 +22,20 @@ points) to the language of GPUs.
 Features normal and miter joint line triangulation. Handles polygons using ear
 clipping algorithm ~~with hole elimination included~~ (**WIP**).
 
-## Usage
+## Table of contents
 
-#### Basic example
-```go
-vertices := []Point{{10, 20}, {30, 40}, {50, 60}}
-t, err = triangolatte.EarCut(vertices, [][]Point)
-```
+- [Installation](#installation)
+- [Usage](#usage)
+- [Examples](#examples)
+- [Features](#features)
+  - [API](#api)
+  - [Helpers](#helpers)
+  - [Types](#types)
+- [Tests](#tests)
+  - [Flame Graphs](#flame-graphs)
+- [Future plans](#future-plans)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Installation
 
@@ -37,17 +44,19 @@ Nothing surprising
 go get github.com/Tchayen/triangolatte
 ```
 
+## Usage
+
+#### Basic example
+```go
+vertices := []Point{{10, 20}, {30, 40}, {50, 60}}
+t, err = triangolatte.EarCut(vertices, [][]Point)
+```
+
 ## Examples
 
 For rendering examples, go to `examples/webgl` directory.
 
 You will find instructions for running the code there.
-
-## Docs
-[![GoDoc](https://godoc.org/github.com/Tchayen/triangolatte?status.svg)](https://godoc.org/github.com/Tchayen/triangolatte)
-
-Visit [godoc](https://godoc.org/github.com/Tchayen/triangolatte) for complete
-documentation of the project.
 
 ## Features
 
@@ -59,9 +68,15 @@ phase_
 
 #### `EarCut(points []Point, holes [][]Point) ([]float64, error)`
 
+Takes array of points and produces array of triangle coordinates.
+
 Based on the following [paper](https://www.geometrictools.com/Documentation/TriangulationByEarClipping.pdf).
 
-Removes holes, joining them with the rest of the polygon.
+#### `EliminateHoles(points [][]Point) ([]Point, error)`
+
+Removes holes, joining them with the rest of the polygon. Provides preprocessing
+for `EarCut`. First element of the points array is the outer polygon, the rest
+of them are considered as holes to be removed.
 
 #### `Normal(points []Point, width int) (triangles []float64)`
 
@@ -95,7 +110,7 @@ need if you are not sure.
 ### Types
 
 For calculations using points.
-```
+```go
 type Point struct {
   X, Y float64
 }
@@ -103,13 +118,13 @@ type Point struct {
 
 ## Tests
 
-Code is (more or less) covered in tests. You can run them:
+Code is (more or less) covered in tests. You can run them like this:
 
 ```bash
 go test -v
 ```
 
-You can for example benchmark speed of checking if point is inside triangle:
+You can also run benchmarks for selected functions (refer to the `*_test.go` files for availability). For example:
 
 ```bash
 go test -run NONE -bench IsInsideTriangle
@@ -135,12 +150,17 @@ described above._
 #### Generating flame graph
 
 Install [go-torch](https://github.com/uber/go-torch) and [FlameGraph](https://github.com/brendangregg/FlameGraph)
-if you haven't done it before
+if you haven't done it before.
 
 ```bash
 go get github.com/uber/go-torch
+
+# In any directory, $HOME for example.
 git clone https://github.com/brendangregg/FlameGraph
-export PATH=$PATH:$(pwd)/FlameGraph # You might want to add this to your .bashrc or other equivalent
+
+# You might want to add this to your .bashrc or other equivalent.
+# NOTE: replace the path with the one you chose for your FlameGraph installation.
+export PATH=$PATH:$HOME/FlameGraph
 ```
 
 From now on, every time you want to generate a flame graph, simply run the
@@ -177,13 +197,13 @@ One of the core plans for this library's development is creating, as soon as it
 becomes possible, some kind of [WebAssembly](https://webassembly.org/) module
 for use in JS.
 
-## License
-
-MIT License (refer to the [LICENSE](LICENSE) file).
-
 ## Contributing
 
 You are welcome to create an issue or pull request if you've got an idea what to do.
 
 Don't have one, but still want to contribute? Get in touch with me and we can
 brainstorm some ideas.
+
+## License
+
+MIT License (refer to the [LICENSE](LICENSE) file).
