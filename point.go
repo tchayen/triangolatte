@@ -2,6 +2,8 @@ package triangolatte
 
 import "math"
 
+// Point is a pair of two coordinates. Used as mostly as a point on euclidean
+// planes or a vector.
 type Point struct {
 	X, Y float64
 }

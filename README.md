@@ -27,7 +27,7 @@ clipping algorithm ~~with hole elimination included~~ (**WIP**).
 #### Basic example
 ```go
 vertices := []Point{{10, 20}, {30, 40}, {50, 60}}
-t, err = triangolatte.EarCut(vertices)
+t, err = triangolatte.EarCut(vertices, [][]Point)
 ```
 
 ## Installation
@@ -76,6 +76,21 @@ angles can potentially explode to infinity.
 
 Refer to this [forum post](https://forum.libcinder.org/topic/smooth-thick-lines-using-geometry-shader)
 for sketches, code examples and ideas.
+
+### Helpers
+
+#### `Deviation(data []Point, holes [][]Point, t []float64) (real, triangles, deviation float64)`
+
+Given original points, holes and triangles calculated by the `EarCut(...)`, can
+be used to determine how much obtained polygon area differs from the real one.
+Might have false positives when areas of the triangles sum up to a correct value,
+while their positions make no sense.
+
+#### `DegreesToMeters(point Point) Point`
+
+Converts degrees from formats like `*.geojson` to meters using Web Mercator
+projection the one used by all internet maps and almost for sure the one you
+need if you are not sure.
 
 ### Types
 

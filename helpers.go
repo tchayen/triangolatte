@@ -25,8 +25,8 @@ func trianglesArea(t []float64) float64 {
 	return trianglesArea
 }
 
-// deviation calculates difference between real area and the one from triangulation.
-func deviation(data []Point, holes [][]Point, t []float64) (real, triangles, deviation float64) {
+// Deviation calculates difference between real area and the one from triangulation.
+func Deviation(data []Point, holes [][]Point, t []float64) (real, triangles, deviation float64) {
 	triangles = trianglesArea(t)
 	real = polygonArea(data)
 	for _, h := range holes {
@@ -60,13 +60,14 @@ func loadPointsFromFile(fileName string) ([][]Point, error) {
 // Origin shift comes from the circumference of the Earth in meters (6378137).
 const originShift = 2.0 * math.Pi * 6378137 / 2.0
 
-// Converts longitude and latitude using WGS84 Geodetic Datum to meters with
-// Spherical Mercator projection, known officially under EPSG:3857 codename.
+// DegreesToMeters converts longitude and latitude using WGS84 Geodetic Datum to
+// meters with Spherical Mercator projection, known officially under EPSG:3857
+// codename.
 //
 // X is longitude, Y is latitude.
 //
 // Bounds: `[-180.0, -85.06, 180.0, 85.06]`.
-func degreesToMeters(point Point) Point {
+func DegreesToMeters(point Point) Point {
 	return Point{
 		point.X * originShift / 180.0,
 		math.Log(math.Tan((90.0+point.Y)*math.Pi/360.0)) / (math.Pi / 180.0) * originShift / 180.0,

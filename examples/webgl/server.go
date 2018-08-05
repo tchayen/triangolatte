@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/Tchayen/triangolatte"
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"github.com/Tchayen/triangolatte"
 )
 
 func main() {

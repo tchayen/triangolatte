@@ -2,44 +2,18 @@ package main
 
 import (
 	"encoding/json"
-	"io"
-	"io/ioutil"
+	"fmt"
 	"log"
-	"net/http"
-	"os"
 )
 
-func DownloadFile(filePath string, url string) error {
-	// Create the file.
-	out, err := os.Create(filePath)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	// Get the data.
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	// Write the body to file.
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func main() {
-	data, err := ioutil.ReadFile("assets/cracow_tmp")
+	// data, err := ioutil.ReadFile("assets/cracow_tmp")
 
-	if err != nil {
-		log.Fatal("Could not read file")
-	}
+	// if err != nil {
+	// 	log.Fatal("Could not read file")
+	// }
 
+	data := []byte("{features:[{geometry:{coordinates:[[[0,100],[100,100]]]}}]")
 	type Geometry struct {
 		coordinates [][][]float64
 	}
@@ -52,8 +26,11 @@ func main() {
 		features []Feature
 	}
 
-	obj := FeatureCollection{}
-	parsed := json.Unmarshal([]byte(data), &obj)
+	d := FeatureCollection{[]Feature{{Geometry{[][][]float64{}}}}}
+	a, _ := json.Marshal(&d)
+	fmt.Println(string(a))
 
+	obj := FeatureCollection{}
+	parsed := json.Unmarshal(data, &obj)
 	log.Println(parsed)
 }

@@ -138,7 +138,8 @@ func combinePolygons(outer, inner []Point) ([]Point, error) {
 		n := len(outer)
 		for i := 0; i < n; i++ {
 			notInside := !isInsideTriangle(m, k, outer[pIndex], outer[i])
-			notReflex := !isReflex(outer[cyclic(i-1, n)], outer[i], outer[cyclic(i+1, n)])
+			prev, next := cyclic(i-1, n), cyclic(i+1, n)
+			notReflex := !isReflex(outer[prev], outer[i], outer[next])
 			if notInside || notReflex {
 				continue
 			}
@@ -217,11 +218,9 @@ func eliminateHoles(outer []Point, inners [][]Point) ([]Point, error) {
 }
 
 // EarCut triangulates given CCW polygon using ear clipping algorithm (takes
-// O(n^2) time).
-//
-// Produces  array of two-coordinate, CCW triangles, put one after another.
-//
-// Returns empty array and error when triangulation did not complete properly.
+// O(n^2) time). Produces array of two-coordinate, CCW triangles, put one after
+// another. Returns empty array and error when triangulation did not complete
+// properly.
 func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 	n := len(points)
 	for _, h := range holes {
@@ -241,23 +240,21 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 		}
 	}
 
-	// Allocate more things at once.
+	// Allocate memory for all needed elements and initialize them by hand.
 	elements := make([]Element, n)
-	elements[0].Prev = &elements[n-1]
-	elements[0].Next = &elements[1]
+	elements[0].Prev, elements[0].Next = &elements[n-1], &elements[1]
 	elements[0].Point = points[0]
 	for i := 1; i < n-1; i++ {
-		elements[i].Prev = &elements[i-1]
-		elements[i].Next = &elements[i+1]
+		elements[i].Prev, elements[i].Next = &elements[i-1], &elements[i+1]
 		elements[i].Point = points[i]
 	}
-	elements[n-1].Prev = &elements[n-2]
-	elements[n-1].Next = &elements[0]
+	elements[n-1].Prev, elements[n-1].Next = &elements[n-2], &elements[0]
 	elements[n-1].Point = points[n-1]
 
 	ear := &elements[0]
 
-	// Any triangulation of simple polygon has `n-2` triangles.
+	// Any triangulation of simple polygon has n-2 triangles. Triangle has 3
+	// two-dimensional coordinates.
 	i, t := 0, make([]float64, (n-2)*6)
 
 	stop := ear
@@ -288,5 +285,8 @@ func EarCut(points []Point, holes [][]Point) ([]float64, error) {
 		}
 	}
 
+	// Return array slice of size consisting only of the elements actually took by
+	// the triangulation (sometimes the number of triangles is lower than n-2 and
+	// zeroes are filling the rest of the array).
 	return t[0:i], nil
 }

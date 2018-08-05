@@ -20,7 +20,7 @@ func TestDeviation(t *testing.T) {
 	data := []Point{{0, 4}, {3, 1}, {8, 2}, {9, 5}, {4, 6}}
 	triangles := []float64{4, 6, 0, 4, 3, 1, 4, 6, 3, 1, 8, 2, 8, 2, 9, 5, 4, 6}
 
-	real, actual, deviation := deviation(data, [][]Point{}, triangles)
+	real, actual, deviation := Deviation(data, [][]Point{}, triangles)
 	if deviation > 0 {
 		t.Errorf("real: %f, actual: %f", real, actual)
 	}
@@ -158,7 +158,7 @@ func TestEliminateHoles(t *testing.T) {
 				t.Errorf("eliminateHoles: %s", err)
 			}
 
-			real, actual, deviation := deviation(test.Points, test.Holes, triangles)
+			real, actual, deviation := Deviation(test.Points, test.Holes, triangles)
 			if deviation > 0 {
 				t.Errorf("real: %f, actual: %f", real, actual)
 			}
@@ -216,7 +216,7 @@ func TestEarCut(t *testing.T) {
 				t.Error(err)
 			}
 
-			real, actual, dif := deviation(s.Shape, [][]Point{}, res)
+			real, actual, dif := Deviation(s.Shape, [][]Point{}, res)
 
 			if dif != 0 {
 				t.Errorf("#%s: real area: %f; result: %f", s.Name, real, actual)
@@ -258,7 +258,7 @@ func TestAghA0(t *testing.T) {
 	agh, _ := loadPointsFromFile("assets/agh_a0")
 	for i := range agh {
 		for j := range agh[i] {
-			p := degreesToMeters(agh[i][j])
+			p := DegreesToMeters(agh[i][j])
 			agh[i][j] = Point{3 * (p.X - 2217750), 3 * (p.Y - 6457350)}
 		}
 	}
@@ -269,7 +269,7 @@ func TestAghA0(t *testing.T) {
 		t.Errorf("AghA0: %s", err)
 	}
 
-	real, actual, deviation := deviation(agh[0], [][]Point{}, result)
+	real, actual, deviation := Deviation(agh[0], [][]Point{}, result)
 	if deviation > 1e-10 {
 		t.Errorf("real area: %f; result: %f", real, actual)
 	}
@@ -285,7 +285,7 @@ func TestLakeSuperior(t *testing.T) {
 
 	for i := range lakeSuperior {
 		for j := range lakeSuperior[i] {
-			p := degreesToMeters(lakeSuperior[i][j])
+			p := DegreesToMeters(lakeSuperior[i][j])
 			lakeSuperior[i][j] = Point{math.Abs(p.X), math.Abs(p.Y)}
 		}
 	}
@@ -308,7 +308,7 @@ func TestFromFile(t *testing.T) {
 
 	for i := range points {
 		for j := range points[i] {
-			p := degreesToMeters(points[i][j])
+			p := DegreesToMeters(points[i][j])
 			points[i][j] = p
 		}
 	}
@@ -319,7 +319,7 @@ func TestFromFile(t *testing.T) {
 		t.Errorf("FromFile: %s", err)
 	}
 
-	real, actual, deviation := deviation(points[0], [][]Point{}, res)
+	real, actual, deviation := Deviation(points[0], [][]Point{}, res)
 	if deviation > 1e-10 {
 		t.Errorf("real area: %f; result: %f", real, actual)
 	}
