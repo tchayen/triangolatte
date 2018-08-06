@@ -126,7 +126,7 @@ func TestEliminateHoles(t *testing.T) {
 	}, {
 		"triangle touching edge",
 		[][]Point{{{0, 0}, {4, 0}, {4, 4}, {0, 4}}, {{1, 1}, {1, 3}, {4, 2}}},
-		[]Point{{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},
+		[]Point{{0, 0}, {4, 2}, {1, 1}, {1, 3}, {4, 2}, {0, 0}, {4, 0}, {4, 4}, {0, 4}},
 	}}
 
 	for _, test := range testInfo {
@@ -136,6 +136,8 @@ func TestEliminateHoles(t *testing.T) {
 			if err != nil {
 				t.Errorf("eliminateHoles: %s", err)
 			}
+
+			t.Log(result)
 
 			checkPointArray(t, result, test.Expected)
 
