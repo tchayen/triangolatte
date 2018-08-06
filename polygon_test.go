@@ -115,28 +115,27 @@ func BenchmarkIsInsideTriangle(b *testing.B) {
 func TestEliminateHoles(t *testing.T) {
 	type TestInfo struct {
 		Name     string
-		Points   []Point
-		Holes    [][]Point
+		Points   [][]Point
 		Expected []Point
 	}
 
 	testInfo := []TestInfo{{
 		"square in square",
-		[]Point{{0, 0}, {4, 0}, {4, 4}, {0, 4}},
-		[][]Point{{{1, 1}, {1, 3}, {3, 3}, {3, 1}}},
+		[][]Point{{{0, 0}, {4, 0}, {4, 4}, {0, 4}}, {{1, 1}, {1, 3}, {3, 3}, {3, 1}}},
 		[]Point{{0, 0}, {4, 0}, {4, 4}, {3, 3}, {3, 1}, {1, 1}, {1, 3}, {3, 3}, {4, 4}, {0, 4}},
+	}, {
+		"triangle touching edge",
+		[][]Point{{{0, 0}, {4, 0}, {4, 4}, {0, 4}}, {{1, 1}, {1, 3}, {4, 2}}},
+		[]Point{{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}},
 	}}
 
 	for _, test := range testInfo {
 		t.Run(test.Name, func(t *testing.T) {
-			result, err := EliminateHoles(test.Points, test.Holes)
+			result, err := EliminateHoles(test.Points)
 
 			if err != nil {
 				t.Errorf("eliminateHoles: %s", err)
 			}
-
-			t.Log("result  ", result)
-			t.Log("expected", test.Expected)
 
 			checkPointArray(t, result, test.Expected)
 
@@ -146,7 +145,9 @@ func TestEliminateHoles(t *testing.T) {
 				t.Errorf("eliminateHoles: %s", err)
 			}
 
-			actual, calculated, deviation := Deviation(test.Points, test.Holes, triangles)
+			t.Log(triangles)
+
+			actual, calculated, deviation := Deviation(test.Points[0], test.Points[1:], triangles)
 			if deviation > 0 {
 				t.Errorf("real: %f, actual: %f", actual, calculated)
 			}

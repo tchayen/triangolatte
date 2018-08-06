@@ -49,7 +49,7 @@ go get github.com/Tchayen/triangolatte
 #### Basic example
 ```go
 vertices := []Point{{10, 20}, {30, 40}, {50, 60}}
-t, err = triangolatte.EarCut(vertices, [][]Point)
+t, err = triangolatte.EarCut(vertices)
 ```
 
 ## Examples
@@ -62,7 +62,7 @@ You will find instructions for running the code there.
 
 > **NOTE**: _this library is developed mostly with map data triangulation in
 mind and it will be its main performance target once it reaches benchmarking
-phase_
+phase._
 
 ### API
 
