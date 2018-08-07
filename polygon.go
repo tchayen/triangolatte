@@ -206,6 +206,14 @@ func (polygons byMaxX) Less(i, j int) bool {
 // Provides preprocessing for EarCut. First element of the points array is the
 //outer polygon, the rest of them are considered as holes to be removed.
 func EliminateHoles(points [][]Point) ([]Point, error) {
+	if len(points) == 0 {
+		return nil, errors.New("cannot process empty points array")
+	}
+
+	if len(points) == 1 {
+		return points[0], nil
+	}
+
 	sort.Sort(byMaxX(points[1:]))
 
 	current := points[0]

@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math"
 	"triangolatte"
 )
 
 func main() {
-	type Point triangolatte.Point
-
 	// Load data
 	data, err := ioutil.ReadFile("assets/cracow_tmp")
 
@@ -21,66 +20,102 @@ func main() {
 	var m map[string]interface{}
 	json.Unmarshal(data, &m)
 
-	buildings := make([][][]Point, 0)
+	// This part is really ugly, but gets the job done with converting
+	// unstructured JSON to GO.
+
+	maxX, maxY := 0.0, 0.0
+	minX, minY := math.MaxFloat64, math.MaxFloat64
+
+	buildings := make([][][]triangolatte.Point, 0)
 	for i, f := range m["features"].([]interface{}) {
-		buildings = append(buildings, [][]Point{})
+		buildings = append(buildings, [][]triangolatte.Point{})
 		geometry := f.(map[string]interface{})["geometry"].(map[string]interface{})
 		switch geometry["type"] {
 		case "Polygon":
 			for j, polygon := range geometry["coordinates"].([]interface{}) {
-				buildings[i] = append(buildings[i], []Point{})
+				buildings[i] = append(buildings[i], []triangolatte.Point{})
 				for _, p := range polygon.([]interface{}) {
-					buildings[i][j]
-					point := p.([]float64)
-					Point{point[0], point[1]}
+					pointArray := p.([]interface{})
+					point := triangolatte.Point{
+						X: pointArray[0].(float64),
+						Y: pointArray[1].(float64),
+					}
+
+					pointInMeters := triangolatte.DegreesToMeters(point)
+
+					if pointInMeters.X < minX {
+						minX = pointInMeters.X
+					}
+
+					if pointInMeters.X > maxX {
+						maxX = pointInMeters.X
+					}
+
+					if pointInMeters.Y < minY {
+						minY = pointInMeters.Y
+					}
+
+					if pointInMeters.Y > maxY {
+						maxY = pointInMeters.Y
+					}
+
+					buildings[i][j] = append(buildings[i][j], pointInMeters)
 				}
-				//append(buildings, )
 			}
 		case "LineString":
 		case "Point":
 		}
 	}
 
-	// fmt.Println(m)
+	for i, p2 := range buildings {
+		for j, p1 := range p2 {
+			for k, p := range p1 {
+				buildings[i][j][k] = triangolatte.Point{X: p.X - minX, Y: p.Y - minY}
+			}
+		}
+	}
 
-	// // Define types
-	// type Geometry struct {
-	// 	Type        string        `json:"type"`
-	// 	Coordinates [][][]float64 `json:"coordinates"`
-	// }
+	totalSuccesses, totalErrors := 0, 0
+	for _, b := range buildings {
+		if len(b) == 0 {
+			continue
+		}
 
-	// type Feature struct {
-	// 	Geometry Geometry `json:"geometry"`
-	// }
+		errored := false
+		cleaned, err := triangolatte.EliminateHoles(b)
 
-	// type FeatureCollection struct {
-	// 	Features []Feature `json:"features"`
-	// }
+		if err != nil {
+			fmt.Printf("Error in hole removal: %s\n", err)
+			errored = true
+		}
 
-	// type Point triangolatte.Point
+		triangles, err := triangolatte.EarCut(cleaned)
 
-	// // Parse
-	// var parsed FeatureCollection
-	// json.Unmarshal(data, &parsed)
+		if err != nil {
+			fmt.Printf("Error in triangulation: %s\n", err)
+			errored = true
+		}
 
-	// // Translate to our data format
-	// var points [][][]Point
+		var holes [][]triangolatte.Point
+		if len(b) > 1 {
+			holes = b[1:]
+		} else {
+			holes = [][]triangolatte.Point{}
+		}
+		_, _, deviation := triangolatte.Deviation(b[0], holes, triangles)
 
-	// points = make([][][]Point, len(parsed.Features))
+		if deviation > 1e-10 {
+			fmt.Printf("Error detected in deviation\n")
+			errored = true
+		}
 
-	// // Buildings
-	// for i := 0; i < len(parsed.Features); i++ {
-	// 	coords := parsed.Features[i].Geometry.Coordinates
-	// 	points[i] = make([][]Point, len(coords))
+		if errored {
+			totalErrors += 1
+		} else {
+			totalSuccesses += 1
+			fmt.Printf("%#v\n", triangles)
+		}
+	}
 
-	// 	// Features (shape and holes)
-	// 	for j := 0; j < len(coords); j++ {
-	// 		points[i][j] = make([]Point, len(coords[j]))
-	// 		for k := 0; k < len(coords[j]); k++ {
-	// 			points[i][j][k] = Point{coords[j][k][0], coords[j][k][1]}
-	// 		}
-	// 	}
-	// }
-	//
-	// fmt.Println(points)
+	fmt.Printf("success: %d failure: %d", totalSuccesses, totalErrors)
 }
