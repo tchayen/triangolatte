@@ -104,7 +104,7 @@ func main() {
 		}
 		_, _, deviation := triangolatte.Deviation(b[0], holes, triangles)
 
-		if deviation > 1e-10 {
+		if deviation > 1e-6 {
 			fmt.Printf("Error detected in deviation\n")
 			errored = true
 		}
