@@ -17,3 +17,6 @@ out skel qt;
 ```
 [out:json];(way[building](50.0,19.85,50.105,20.13);relation[building](50.0,19.85,50.105,20.13););out body;>;out skel qt;
 ```
+
+The data was later exported from _Overpass-turbo_ to `*.geojson` format and
+saved to `assets/cracow_tmp`.
