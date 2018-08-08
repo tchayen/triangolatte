@@ -67,7 +67,7 @@ func parseData(m map[string]interface{}) (buildings []Building) {
 }
 
 func normalizeCoordinates(buildings []Building) {
-
+	// TODO: normalize coordinates of the buildings in range [0.0, 1.0].
 }
 
 func triangulate(buildings []Building) (triangles [][]float64, totalSuccesses, totalErrors int) {
@@ -136,5 +136,6 @@ func main() {
 	// Check out what went right and what wrong.
 	_, successes, errors := triangulate(buildings)
 
+	// Brag about success (or admit to poor performance, who knows...).
 	fmt.Printf("success: %d failure: %d", successes, errors)
 }
