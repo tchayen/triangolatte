@@ -9,7 +9,7 @@ import (
 )
 
 type Building struct {
-	Name string
+	Properties map[string]string
 	Points [][]triangolatte.Point
 }
 
@@ -22,7 +22,16 @@ func parseData(m map[string]interface{}) (buildings []Building) {
 		feature := f.(map[string]interface{})
 
 		// Initialize new building.
-		b := Building{Name: feature["properties"].(map[string]interface{})["name"].(string)}
+		b := Building{Properties: map[string]string{}}
+
+		// Rewrite properties.
+		for k, v := range feature["properties"].(map[string]interface{}) {
+			switch value := v.(type) {
+			case string:
+				b.Properties[k] = value
+			}
+		}
+
 		buildings = append(buildings, b)
 
 		// Extract 'geometry'.
@@ -57,8 +66,14 @@ func parseData(m map[string]interface{}) (buildings []Building) {
 	return
 }
 
-func calculateStats(buildings []Building) (totalSuccesses, totalErrors int) {
-	for _, b := range buildings {
+func normalizeCoordinates(buildings []Building) {
+
+}
+
+func triangulate(buildings []Building) (triangles [][]float64, totalSuccesses, totalErrors int) {
+	triangles = make([][]float64, len(buildings))
+
+	for i, b := range buildings {
 		if len(b.Points) == 0 {
 			continue
 		}
@@ -67,27 +82,27 @@ func calculateStats(buildings []Building) (totalSuccesses, totalErrors int) {
 		cleaned, err := triangolatte.EliminateHoles(b.Points)
 
 		if err != nil {
-			fmt.Printf("Error in hole removal: %s\n", err)
 			error = true
 		}
 
-		triangles, err := triangolatte.EarCut(cleaned)
+		t, err := triangolatte.EarCut(cleaned)
 
 		if err != nil {
-			fmt.Printf("Error in triangulation: %s\n", err)
 			error = true
 		}
 
-		var holes [][]triangolatte.Point
+		var h [][]triangolatte.Point
 		if len(b.Points) > 1 {
-			holes = b.Points[1:]
+			h = b.Points[1:]
 		} else {
-			holes = [][]triangolatte.Point{}
+			h = [][]triangolatte.Point{}
 		}
-		_, _, deviation := triangolatte.Deviation(b.Points[0], holes, triangles)
+		_, _, deviation := triangolatte.Deviation(b.Points[0], h, t)
 
+		triangles[i] = t
+		// 1e-6 was chosen arbitrarily as a frontier between low and high error
+		// rate.
 		if deviation > 1e-6 {
-			fmt.Printf("Error detected in deviation\n")
 			error = true
 		}
 
@@ -95,24 +110,31 @@ func calculateStats(buildings []Building) (totalSuccesses, totalErrors int) {
 			totalErrors += 1
 		} else {
 			totalSuccesses += 1
-			fmt.Printf("%#v\n", triangles)
 		}
 	}
 	return
 }
 
 func main() {
-	// Load data
+	// Load data from file.
 	data, err := ioutil.ReadFile("assets/cracow_tmp")
 
 	if err != nil {
 		log.Fatal("Could not read file")
 	}
 
+	// Parse JSON.
 	var m map[string]interface{}
 	json.Unmarshal(data, &m)
 
+	// Translate data to a more handy format.
 	buildings := parseData(m)
-	totalSuccesses, totalErrors := calculateStats(buildings)
-	fmt.Printf("success: %d failure: %d", totalSuccesses, totalErrors)
+
+	// Normalize coordinates.
+	normalizeCoordinates(buildings)
+
+	// Check out what went right and what wrong.
+	_, successes, errors := triangulate(buildings)
+
+	fmt.Printf("success: %d failure: %d", successes, errors)
 }
