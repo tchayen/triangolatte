@@ -157,30 +157,6 @@ func TestEliminateHoles(t *testing.T) {
 	}
 }
 
-// func TestEliminateHoles(t *testing.T) {
-// 	polygon := []Point{{0, 30}, {20, 0}, {80, 0}, {90, 40}, {30, 70}}
-// 	holes := [][]Point{
-// 		{{20, 10}, {20, 40}, {50, 40}},
-// 		{{60, 30}, {70, 20}, {50, 10}},
-// 	}
-//
-// 	polygonWithEliminatedHoles := []Point{
-// 		{0, 30}, {20, 0}, {80, 0},
-// 		{90, 40}, {70, 20}, {50, 10},
-// 		{60, 30}, {70, 20}, {90, 40},
-// 		{50, 40}, {20, 10}, {20, 40},
-// 		{50, 40}, {90, 40}, {30, 70},
-// 	}
-//
-// 	eliminated, err := eliminateHoles(polygon, holes)
-//
-// 	if err != nil {
-// 		t.Errorf("EliminateHoles: %s", err)
-// 	}
-//
-// 	checkPointArray(t, eliminated, polygonWithEliminatedHoles)
-// }
-
 func TestEarCut(t *testing.T) {
 	type TestInfo struct {
 		Name  string

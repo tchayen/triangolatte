@@ -6,13 +6,14 @@
 
 ---
 
-_Should I use it?_ **Not yet**
+## 🚧 **under construction** 🚧
 
-_The algorithm is generally working and should be quite optimal. The tests are
-quite rich now and cover many aspects and things that can go wrong. However, I
-am at a stage at which I keep finding bugs and not working cases. Come back in
-two weeks and you should see vastly improved (and even faster) version,
-hopefully ready for a real world usage._
+_The algorithm is working, has adequate computational complexity to its kind –
+O(n^2). Tests are rich and reach much further than simple code coverage._
+
+_I am currently under the process of providing an example which triangulates all
+buildings in a city and calculating its effectiveness for a good measure of real
+life usage usefulness._
 
 ---
 

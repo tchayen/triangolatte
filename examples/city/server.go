@@ -8,11 +8,14 @@ import (
 	"triangolatte"
 )
 
+// Building collects meta data about building and its points.
 type Building struct {
 	Properties map[string]string
-	Points [][]triangolatte.Point
+	Points     [][]triangolatte.Point
 }
 
+// parseData takes JSON naively to map[string]interface{} and returns more
+// organized []Building array.
 func parseData(m map[string]interface{}) (buildings []Building) {
 	// This part is really ugly, but gets the job done with converting
 	// unstructured JSON to GO.
@@ -66,10 +69,13 @@ func parseData(m map[string]interface{}) (buildings []Building) {
 	return
 }
 
+// normalizeCoordinates takes building coordinates and changes them to fit in
+// range [0.0, 1.0].
 func normalizeCoordinates(buildings []Building) {
-	// TODO: normalize coordinates of the buildings in range [0.0, 1.0].
 }
 
+// triangulate takes building coordinates and triangulates them resulting in
+// array of floats and sums of total errors and successes as a side effect.
 func triangulate(buildings []Building) (triangles [][]float64, totalSuccesses, totalErrors int) {
 	triangles = make([][]float64, len(buildings))
 
@@ -78,17 +84,17 @@ func triangulate(buildings []Building) (triangles [][]float64, totalSuccesses, t
 			continue
 		}
 
-		error := false
+		errorHappened := false
 		cleaned, err := triangolatte.EliminateHoles(b.Points)
 
 		if err != nil {
-			error = true
+			errorHappened = true
 		}
 
 		t, err := triangolatte.EarCut(cleaned)
 
 		if err != nil {
-			error = true
+			errorHappened = true
 		}
 
 		var h [][]triangolatte.Point
@@ -100,16 +106,15 @@ func triangulate(buildings []Building) (triangles [][]float64, totalSuccesses, t
 		_, _, deviation := triangolatte.Deviation(b.Points[0], h, t)
 
 		triangles[i] = t
-		// 1e-6 was chosen arbitrarily as a frontier between low and high error
-		// rate.
+		// 1e-6 chosen arbitrarily as a frontier between low and high error rate.
 		if deviation > 1e-6 {
-			error = true
+			errorHappened = true
 		}
 
-		if error {
-			totalErrors += 1
+		if errorHappened {
+			totalErrors++
 		} else {
-			totalSuccesses += 1
+			totalSuccesses++
 		}
 	}
 	return
@@ -136,6 +141,6 @@ func main() {
 	// Check out what went right and what wrong.
 	_, successes, errors := triangulate(buildings)
 
-	// Brag about success (or admit to poor performance, who knows...).
+	// Brag about success (or admit to poor performance, who knows...)
 	fmt.Printf("success: %d failure: %d", successes, errors)
 }
