@@ -21,7 +21,7 @@ life usage usefulness._
 points) to the language of GPUs.
 
 Features normal and miter joint line triangulation. Handles polygons using ear
-clipping algorithm ~~with hole elimination included~~ (**WIP**).
+clipping algorithm with hole elimination included.
 
 ## Table of contents
 
