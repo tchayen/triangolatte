@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math"
 	"triangolatte"
 )
 
@@ -69,9 +70,47 @@ func parseData(m map[string]interface{}) (buildings []Building) {
 	return
 }
 
+func findMinMax(points []Point) (xMin, yMin, xMax, yMax float64) {
+	xMin, yMin, xMax, yMax = math.MaxFloat64, math.MaxFloat64, 0.0, 0.0
+	for _, p := range points {
+		if p.X < xMin {
+			xMin = p.X
+		}
+
+		if p.X > xMax {
+			xMax = p.X
+		}
+
+		if p.Y < yMin {
+			yMin = p.Y
+		}
+
+		if p.Y > yMax {
+			yMax = p.Y
+		}
+	}
+	return
+}
+
 // normalizeCoordinates takes building coordinates and changes them to fit in
 // range [0.0, 1.0].
 func normalizeCoordinates(buildings []Building) {
+	for _, b := range buildings {
+		if len(b.Points) == 0 {
+			continue
+		}
+
+		xMin, yMin, xMax, yMax := findMinMax(b.Points[0])
+		for i := range b.Points {
+			for j := range b.Points[i] {
+				v := b.Points[i][j]
+				b.Points[i][j] = triangolatte.Point{
+					X: (v.X - xMin) / (xMax - xMin),
+					Y: (v.Y - yMin) / (yMax - yMin),
+				}
+			}
+		}
+	}
 }
 
 // triangulate takes building coordinates and triangulates them resulting in
