@@ -70,7 +70,8 @@ func parseData(m map[string]interface{}) (buildings []Building) {
 	return
 }
 
-func findMinMax(points []Point) (xMin, yMin, xMax, yMax float64) {
+// findMinMax takes array of points and finds min and max coordinates.
+func findMinMax(points []triangolatte.Point) (xMin, yMin, xMax, yMax float64) {
 	xMin, yMin, xMax, yMax = math.MaxFloat64, math.MaxFloat64, 0.0, 0.0
 	for _, p := range points {
 		if p.X < xMin {
@@ -115,7 +116,11 @@ func normalizeCoordinates(buildings []Building) {
 
 // triangulate takes building coordinates and triangulates them resulting in
 // array of floats and sums of total errors and successes as a side effect.
-func triangulate(buildings []Building) (triangles [][]float64, totalSuccesses, totalErrors int) {
+func triangulate(buildings []Building) (
+	triangles [][]float64,
+	totalSuccesses int,
+	totalErrors int,
+) {
 	triangles = make([][]float64, len(buildings))
 
 	for i, b := range buildings {
@@ -145,6 +150,7 @@ func triangulate(buildings []Building) (triangles [][]float64, totalSuccesses, t
 		_, _, deviation := triangolatte.Deviation(b.Points[0], h, t)
 
 		triangles[i] = t
+
 		// 1e-6 chosen arbitrarily as a frontier between low and high error rate.
 		if deviation > 1e-6 {
 			errorHappened = true
