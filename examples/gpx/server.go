@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"triangolatte"
+	. "triangolatte"
 )
 
 // GPX is the root element in the XML file.
@@ -44,17 +44,17 @@ func XMLToGPX(data []byte) (gpx GPX, err error) {
 
 // GPXToPoints takes parsed GPX data and returns array of arrays of points
 // (divided into segments as in GPX source).
-func GPXToPoints(gpx GPX) (segmentPoints [][]triangolatte.Point) {
-	segmentPoints = make([][]triangolatte.Point, len(gpx.Trk.Trkseg))
+func GPXToPoints(gpx GPX) (segmentPoints [][]Point) {
+	segmentPoints = make([][]Point, len(gpx.Trk.Trkseg))
 	for i := range gpx.Trk.Trkseg {
-		segmentPoints[i] = make([]triangolatte.Point, len(gpx.Trk.Trkseg[i].Trkpt))
+		segmentPoints[i] = make([]Point, len(gpx.Trk.Trkseg[i].Trkpt))
 
 		for j := range gpx.Trk.Trkseg[i].Trkpt {
 			trackPoint := gpx.Trk.Trkseg[i].Trkpt[j]
 			lon, lat := trackPoint.Longitude, trackPoint.Latitude
-			point := triangolatte.Point{X: lon, Y: lat}
+			point := Point{X: lon, Y: lat}
 
-			segmentPoints[i][j] = triangolatte.DegreesToMeters(point)
+			segmentPoints[i][j] = DegreesToMeters(point)
 		}
 	}
 	return
@@ -75,5 +75,7 @@ func main() {
 		log.Fatal("Failed to parse GPX file")
 	}
 
-	fmt.Println(gpx)
+	segmentPoints := GPXToPoints(gpx)
+
+	fmt.Println(segmentPoints)
 }

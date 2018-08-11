@@ -6,13 +6,13 @@ import (
 	"io/ioutil"
 	"log"
 	"math"
-	"triangolatte"
+	. "triangolatte"
 )
 
 // Building collects meta data about building and its points.
 type Building struct {
 	Properties map[string]string
-	Points     [][]triangolatte.Point
+	Points     [][]Point
 }
 
 // parseData takes JSON naively to map[string]interface{} and returns more
@@ -47,19 +47,19 @@ func parseData(m map[string]interface{}) (buildings []Building) {
 		case "Polygon":
 			for j, polygon := range geometry["coordinates"].([]interface{}) {
 				// Initialize points array in the building.
-				buildings[i].Points = append(buildings[i].Points, []triangolatte.Point{})
+				buildings[i].Points = append(buildings[i].Points, []Point{})
 
 				for _, p := range polygon.([]interface{}) {
 					// Cast from interface{} to []interface{}.
 					pointArray := p.([]interface{})
 
-					point := triangolatte.Point{
+					point := Point{
 						X: pointArray[0].(float64),
 						Y: pointArray[1].(float64),
 					}
 
 					// Convert coordinates.
-					pointInMeters := triangolatte.DegreesToMeters(point)
+					pointInMeters := DegreesToMeters(point)
 					buildings[i].Points[j] = append(buildings[i].Points[j], pointInMeters)
 				}
 			}
@@ -71,7 +71,7 @@ func parseData(m map[string]interface{}) (buildings []Building) {
 }
 
 // findMinMax takes array of points and finds min and max coordinates.
-func findMinMax(points []triangolatte.Point) (xMin, yMin, xMax, yMax float64) {
+func findMinMax(points []Point) (xMin, yMin, xMax, yMax float64) {
 	xMin, yMin, xMax, yMax = math.MaxFloat64, math.MaxFloat64, 0.0, 0.0
 	for _, p := range points {
 		if p.X < xMin {
@@ -105,7 +105,7 @@ func normalizeCoordinates(buildings []Building) {
 		for i := range b.Points {
 			for j := range b.Points[i] {
 				v := b.Points[i][j]
-				b.Points[i][j] = triangolatte.Point{
+				b.Points[i][j] = Point{
 					X: (v.X - xMin) / (xMax - xMin),
 					Y: (v.Y - yMin) / (yMax - yMin),
 				}
@@ -129,25 +129,25 @@ func triangulate(buildings []Building) (
 		}
 
 		errorHappened := false
-		cleaned, err := triangolatte.EliminateHoles(b.Points)
+		cleaned, err := EliminateHoles(b.Points)
 
 		if err != nil {
 			errorHappened = true
 		}
 
-		t, err := triangolatte.EarCut(cleaned)
+		t, err := EarCut(cleaned)
 
 		if err != nil {
 			errorHappened = true
 		}
 
-		var h [][]triangolatte.Point
+		var h [][]Point
 		if len(b.Points) > 1 {
 			h = b.Points[1:]
 		} else {
-			h = [][]triangolatte.Point{}
+			h = [][]Point{}
 		}
-		_, _, deviation := triangolatte.Deviation(b.Points[0], h, t)
+		_, _, deviation := Deviation(b.Points[0], h, t)
 
 		triangles[i] = t
 

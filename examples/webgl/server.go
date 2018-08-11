@@ -5,14 +5,13 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-
-	"github.com/Tchayen/triangolatte"
+	. "triangolatte"
 )
 
 func main() {
 	// Triangulate data
-	v := []triangolatte.Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
-	triangulated, err := triangolatte.EarCut(v)
+	v := []Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
+	triangulated, err := EarCut(v)
 	if err != nil {
 		log.Fatal("Failed to triangulate polygon")
 	}
