@@ -52,8 +52,7 @@ const drawScene = (gl, program, objects, constants) => {
 
         gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height)
 
-        const m = matrix.calculateSRTP(
-            [gl.canvas.clientWidth, gl.canvas.clientHeight], [0, 0], [1, 1], 0)
+        const m = matrix.calculateSRTP([gl.canvas.clientWidth, gl.canvas.clientHeight], [0, 0], [1, 1], 0)
 
         gl.uniformMatrix3fv(matrixLocation, false, m)
 
@@ -115,10 +114,10 @@ const fragmentShader = webgl.createShader(
 const program = webgl.createProgram(gl, vertexShader, fragmentShader)
 
 ;(async () => {
-    const response = await fetch('http://localhost:3000/polygon_tmp')
+    const response = await fetch('http://localhost:3000/json_tmp')
     const data = await response.json()
-
-    const objects = setupScene(gl, program, [new Float32Array(data)])
+    const triangles = data[1][0]
+    const objects = setupScene(gl, program, [new Float32Array(triangles)])
 
     drawScene(gl, program, objects, constants)
 })()

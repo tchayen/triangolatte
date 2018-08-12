@@ -151,8 +151,8 @@ func triangulate(buildings []Building) (
 
 		triangles[i] = t
 
-		// 1e-6 chosen arbitrarily as a frontier between low and high error rate.
-		if deviation > 1e-6 {
+		// Chosen arbitrarily as a frontier between low and high error rate.
+		if deviation > 1e-15 {
 			errorHappened = true
 		}
 
@@ -166,26 +166,28 @@ func triangulate(buildings []Building) (
 }
 
 func main() {
-	// Load data from file.
 	data, err := ioutil.ReadFile("assets/cracow_tmp")
 
 	if err != nil {
 		log.Fatal("Could not read file")
 	}
 
-	// Parse JSON.
 	var m map[string]interface{}
 	json.Unmarshal(data, &m)
-
-	// Translate data to a more handy format.
 	buildings := parseData(m)
-
-	// Normalize coordinates.
 	normalizeCoordinates(buildings)
+	triangulated, successes, errors := triangulate(buildings)
+	json, err := json.Marshal(triangulated)
 
-	// Check out what went right and what wrong.
-	_, successes, errors := triangulate(buildings)
+	if err != nil {
+		log.Fatalf("Could not marshal to JSON: %s", err)
+	}
 
-	// Brag about success (or admit to poor performance, who knows...)
+	err = ioutil.WriteFile("assets/json_tmp", json, 0644)
+
+	if err != nil {
+		log.Fatalf("Could not save file: %s", err)
+	}
+
 	fmt.Printf("success: %d failure: %d", successes, errors)
 }
