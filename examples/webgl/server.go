@@ -8,7 +8,7 @@ import (
 )
 
 func dataHandler(w http.ResponseWriter, r *http.Request) {
-	data, err := ioutil.ReadFile("assets/json_tmp")
+	data, err := ioutil.ReadFile("../../assets/json_tmp")
 
 	if err != nil {
 		log.Fatal(err)
@@ -36,7 +36,7 @@ func serveFile(fileName string, w http.ResponseWriter) {
 }
 
 func staticHandler(w http.ResponseWriter, r *http.Request) {
-	index, err := ioutil.ReadFile("examples/webgl/index.html")
+	index, err := ioutil.ReadFile("./index.html")
 
 	if err != nil {
 		log.Fatal(err)
@@ -47,7 +47,7 @@ func staticHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	serveFile(fmt.Sprintf("./examples/webgl/%s", r.RequestURI[1:]), w)
+	serveFile(fmt.Sprintf("./%s", r.RequestURI[1:]), w)
 }
 
 func main() {

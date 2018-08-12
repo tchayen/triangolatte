@@ -4,13 +4,12 @@ import * as matrix from './matrix'
  * A bunch of initialization commands. It's not a real setup, you know...
  * @param {Object} gl WebGL context
  * @param {Object} program linked shaders
- * @param {Object[]} objects objects (flat arrays of vertices) to draw
- * @returns {Object[]} objects containing WebGL buffers and matching vertex arrays
  */
 
 let positionLocation, resolutionLocation, matrixLocation
 
-const setup = (gl, program, objects) => {
+const setup = (gl, program) => {
+  console.log('setup', gl)
   positionLocation = gl.getAttribLocation(program, 'a_position')
 
   // Set uniforms.
@@ -18,6 +17,16 @@ const setup = (gl, program, objects) => {
   matrixLocation     = gl.getUniformLocation(program, "u_matrix")
 
   // Set up data in buffers.
+  gl.clearColor(0, 0, 0, 0)
+}
+
+/**
+ * Sets data in GL buffers.
+ * @param {Object} gl
+ * @param {Object[]} objects objects (flat arrays of vertices) to draw
+ * @returns {Object[]} objects containing WebGL buffers and matching vertex arrays
+ */
+const setBuffers = (gl, objects) => {
   const resultObjects = []
   objects.forEach(object => {
     const buffer = gl.createBuffer()
@@ -29,7 +38,6 @@ const setup = (gl, program, objects) => {
     })
   })
 
-  gl.clearColor(0, 0, 0, 0)
   return resultObjects
 }
 
@@ -76,5 +84,6 @@ const draw = (gl, program, objects, constants) => {
 
 export {
   setup,
+  setBuffers,
   draw,
 }

@@ -3,23 +3,23 @@ import React, { Component } from 'react'
 import * as webgl from './webgl'
 import * as scene from './scene'
 
-let width, height, scalingFactor, canvas, gl, constants, vertexShader, fragmentShader, program
+let gl = null // It doesn't hurt to make it a bit global.
 
 class Preview extends Component {
   constructor(props) {
+    console.log('Preview_constructor')
     super(props)
-  }
 
-  componentDidMount() {
-    width = window.innerWidth
-    height = window.innerHeight
-    scalingFactor = window.devicePixelRatio || 1
-    canvas = webgl.setUpCanvas(width, height, scalingFactor)
-    gl = canvas.getContext('webgl')
+    this.width = window.innerWidth
+    this.height = window.innerHeight
+    this.scalingFactor = window.devicePixelRatio || 1
 
-    if (!gl) throw 'WebGL is not supported'
+    if (!gl) {
+      const canvas = webgl.setUpCanvas(this.width, this.height, this.scalingFactor)
+      gl = canvas.getContext('webgl')
+    }
 
-    constants = {
+    this.constants = {
       type: gl.FLOAT,
       // Normalization means translating value in any type to [-1.0, 1.0] range
       // based on the range this given type has.
@@ -35,32 +35,41 @@ class Preview extends Component {
       arrayOffset: 0,
       primitiveType: gl.TRIANGLES,
     }
+  }
 
-    vertexShader = webgl.createShader(
+  componentDidMount() {
+    if (this.state.initialized) return
+
+    console.log('gl_componentDidMount')
+
+    const vertexShader = webgl.createShader(
       gl, gl.VERTEX_SHADER,
       require('./shaders/vertex.glsl')
     )
 
-    fragmentShader = webgl.createShader(
+    const fragmentShader = webgl.createShader(
       gl, gl.FRAGMENT_SHADER,
       require('./shaders/fragment.glsl')
     )
 
-    program = webgl.createProgram(gl, vertexShader, fragmentShader)
+    this.program = webgl.createProgram(gl, vertexShader, fragmentShader)
 
     // Normalize data.
-    for (let b = 0; b < this.props.triangleData.buildings; b++) {
-      for (let i = 0; i < this.props.triangleData.buildings[b]; i += 2) {
-        this.props.triangleData.buildings[b][i] *= width * 0.8
-        this.props.triangleData.buildings[b][i + 1] *= height * 0.8
+    for (let b = 0; b < this.props.triangleData.buildings.length; b++) {
+      if (this.props.triangleData.buildings[b] === null) continue
+
+      for (let i = 0; i < this.props.triangleData.buildings[b].length; i += 2) {
+        this.props.triangleData.buildings[b][i] *= this.width * 0.8
+        this.props.triangleData.buildings[b][i + 1] *= this.height * 0.8
       }
     }
 
-    objects = scene.setup(gl, program, [new Float32Array(triangles)])
-    scene.draw(gl, program, objects, constants)
+    scene.setup(gl, this.program)
+    this.setState({ initialized: true })
   }
 
   shouldComponentUpdate(nextProps) {
+    console.log('Preview_shouldComponentUpdate')
     const next = nextProps.triangleData.selected
     const current = this.props.triangleData.selected
 
@@ -69,10 +78,12 @@ class Preview extends Component {
   }
 
   render() {
-    const { triangleData } = this.props
-    return (
+    console.log('Preview_render')
+    const { selected, buildings } = this.props.triangleData
+    const objects = scene.setBuffers(gl, [new Float32Array(buildings[selected])])
+    scene.draw(gl, this.program, objects, this.constants)
 
-    )
+    return <div></div>
   }
 }
 

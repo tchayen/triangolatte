@@ -26,7 +26,8 @@ class App extends Component {
     const task = () => {
       fetch('http://localhost:3000/data')
         .then(response => response.json())
-        .then(data => postMessage(data))
+        .then(data => postMessage({ buildings: data }))
+        .catch(error => postMessage({ error }))
     }
 
     // Encode the function in a URL since Workers accept only them.
@@ -38,12 +39,18 @@ class App extends Component {
     // Create worker with callback to send parsed data.
     const worker = new Worker(workerBlob)
     worker.onmessage = event => {
-      this.setState({
-        triangleData: {
-          selected: 0,
-          buildings: event.data,
-        }
-      })
+      if (event.data.error) {
+        this.setState({
+          error: 'Data download failed. Make sure the server is up.',
+        })
+      } else {
+        this.setState({
+          triangleData: {
+            selected: 0,
+            buildings: event.data.buildings,
+          }
+        })
+      }
     }
 
     // Clean up.
@@ -73,15 +80,23 @@ class App extends Component {
       )}
     </div>
 
-  renderApp = () =>
-    <div>
-      <Panel />
-      <Preview triangleData={this.state.triangleData} />
-    </div>
+  renderError = () => <div className="loading">{this.state.error}</div>
+
+  renderApp = () => {
+    console.log(this.state)
+    return (
+      <div>
+        <Panel />
+        <Preview triangleData={this.state.triangleData} />
+      </div>
+    )
+  }
 
   render() {
     return this.state.loading
-      ? this.renderLoading()
+      ? this.state.error
+        ? this.renderError()
+        : this.renderLoading()
       : this.renderApp()
   }
 }
