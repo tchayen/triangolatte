@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto+Mono');
+
 @mixin font-stack() {
   font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantrell, "Helvetica Neue", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
@@ -24,7 +26,7 @@ body {
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 20px 0 44px;
+  padding: 20px 0;
 
   .buttons {
     display: flex;
@@ -124,6 +126,14 @@ body {
     color: #666;
     transition: 0.15s color;
   }
+}
+
+.label {
+  font-size: 14px;
+  font-family: 'Roboto Mono', 'monospaced';
+  color: #888;
+  max-width: 70vw;
+  padding-bottom: 20px;
 }
 
 .spinner {

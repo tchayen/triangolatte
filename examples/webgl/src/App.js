@@ -14,7 +14,8 @@ class App extends Component {
     loading: true,
     waiting: false,
     triangleData: {
-      selected: 0,
+      selected: null,
+      currentId: '',
       buildings: [],
     },
   }
@@ -25,9 +26,23 @@ class App extends Component {
 
     // Create function for background task.
     const task = () => {
-      fetch('http://localhost:3000/data')
+      fetch('http://localhost:3000/api/data')
         .then(response => response.json())
-        .then(data => postMessage({ buildings: data }))
+        .then(data => {
+          const shuffle = a => {
+            var j, x, i;
+            for (i = a.length - 1; i > 0; i--) {
+                j = Math.floor(Math.random() * (i + 1))
+                x = a[i]
+                a[i] = a[j]
+                a[j] = x
+            }
+            return a
+          }
+
+          const buildings = shuffle(data)
+          postMessage({ buildings })
+        })
         .catch(error => postMessage({ error }))
     }
 
@@ -45,10 +60,15 @@ class App extends Component {
           error: 'Data download failed. Make sure the server is up.',
         })
       } else {
+        const buildings = event.data
+          .buildings
+          .filter(b => b.triangles !== null && b.triangles.length > 0)
+
         this.setState({
           triangleData: {
             selected: 0,
-            buildings: event.data.buildings.filter(b => b !== null && b.length > 0),
+            currentId: buildings[0].properties['@id'],
+            buildings,
           }
         })
       }
@@ -58,28 +78,41 @@ class App extends Component {
     URL.revokeObjectURL(workerBlob)
   }
 
+  respond = async status => {
+    const { currentId } = this.state.triangleData
+    await fetch('http://localhost:3000/api/report', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: currentId,
+        status,
+      })
+    })
+  }
+
   acceptAction = async () => {
     this.setState({ waiting: true })
-    fetch('http://localhost:3000/report/', {
-      method: 'POST',
-    })
+    this.respond('accepted')
   }
 
   passAction = async () => {
     this.setState({ waiting: true })
+    this.respond('uncertain')
   }
 
   rejectAction = async () => {
     this.setState({ waiting: true })
+    this.respond('rejected')
   }
 
   next = () => {
-    const { selected, ...rest } = this.state.triangleData
+    const { selected, buildings } = this.state.triangleData
+    console.log(buildings[selected].properties)
     this.setState({
       waiting: false,
       triangleData: {
         selected: selected + 1,
-        ...rest,
+        currentId: buildings[selected + 1].properties['@id'],
+        buildings,
       },
     })
   }
@@ -109,6 +142,16 @@ class App extends Component {
 
   renderError = () => <div className="loading">{this.state.error}</div>
 
+  renderLabel = () => {
+    const { buildings, selected } = this.state.triangleData
+    const building = buildings[selected]
+    return (
+      <pre className="label">
+        {JSON.stringify(building.properties, null, 4)}
+      </pre>
+    )
+  }
+
   buttons = [{
     label: 'Incorrect',
     classes: ['incorrect'],
@@ -124,7 +167,7 @@ class App extends Component {
   }]
 
   renderApp = () =>
-    <div>
+    <div className="layout">
       <Panel
         buttons={this.buttons.map(button => ({
           ...button,
@@ -133,6 +176,7 @@ class App extends Component {
         }))}
       />
       <Preview triangleData={this.state.triangleData} />
+      {this.renderLabel()}
     </div>
 
   render() {

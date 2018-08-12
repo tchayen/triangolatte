@@ -54,7 +54,7 @@ const draw = (gl, program, objects, constants) => {
   gl.useProgram(program)
 
   objects.forEach(object => {
-    const { buffer } = object
+    const { buffer, triangles } = object
 
     gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height)
 
@@ -76,7 +76,7 @@ const draw = (gl, program, objects, constants) => {
     gl.drawArrays(
       constants.primitiveType,
       constants.arrayOffset,
-      object.triangles.length / 2,
+      triangles.length / 2,
     )
   })
 }

@@ -16,8 +16,8 @@ type Building struct {
 }
 
 type Triangulated struct {
-	Properties map[string]string
-	Triangles []float64
+	Properties map[string]string `json:"properties"`
+	Triangles []float64 `json:"triangles"`
 }
 
 // parseData takes JSON naively to map[string]interface{} and returns more

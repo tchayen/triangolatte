@@ -13,8 +13,8 @@ import (
 func apiHandler(w http.ResponseWriter, r *http.Request) {
 	pathSegments := strings.Split(r.RequestURI, "/")
 
-	// Any path shorter than /api/data must be incorrect.
-	if len(pathSegments) < 2 {
+	// Any path shorter than [<empty>, "api", "data"] must be incorrect.
+	if len(pathSegments) < 3 {
 		http.Error(w, "Wrong path", 500)
 		return
 	}
@@ -22,7 +22,7 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	switch pathSegments[1] {
+	switch pathSegments[2] {
 	case "data":
 		data, err := ioutil.ReadFile("../../assets/json_tmp")
 
@@ -35,8 +35,8 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 
 	case "report":
 		type Body struct {
-			Id string `json:"@id"`
-			State string `json:"state"`
+			ID     string `json:"id"`
+			Status string `json:"status"`
 		}
 		data, err := ioutil.ReadAll(r.Body)
 		defer r.Body.Close()
@@ -54,7 +54,7 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Printf("@id: %s, state: %s", body.Id, body.State)
+		log.Printf("id: %s, status: %s", body.ID, body.Status)
 
 	default:
 		w.Write([]byte("Error: wrong API path"))
@@ -93,7 +93,7 @@ func staticHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/", staticHandler)
-	http.HandleFunc("/api/data", apiHandler)
+	http.HandleFunc("/api/", apiHandler)
 
 	port := 3000
 	log.Printf("Listening on :%d...\n", port)

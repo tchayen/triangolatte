@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 
-const noop = () => {
-  console.log('noop')
-}
+const noop = () => {}
 
 class Button extends Component {
   constructor(props) {
@@ -15,10 +13,11 @@ class Button extends Component {
     this.setState({ waiting: true })
     await action()
 
+    // Artificial timeout to show loading animation.
     setTimeout(() => {
       this.setState({ waiting: false })
       postAction()
-    }, 3000)
+    }, 300)
   }
 
   renderSpinner = () => <div className="spinner"><div></div><div></div><div></div><div></div></div>

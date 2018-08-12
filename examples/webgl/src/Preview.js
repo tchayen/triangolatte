@@ -14,7 +14,7 @@ class Preview extends Component {
     this.scalingFactor = window.devicePixelRatio || 1
 
     if (!gl) {
-      const buttons = 100 // Top offset.
+      const buttons = 120 // Top offset.
       const canvas = webgl.setUpCanvas(
         this.width / 2.0,
         this.height - buttons,
@@ -58,9 +58,9 @@ class Preview extends Component {
     for (let b = 0; b < buildings.length; b++) {
       if (buildings[b] === null) continue
 
-      for (let i = 0; i < buildings[b].length; i += 2) {
-        buildings[b][i] *= this.width / 2.0
-        buildings[b][i + 1] *= this.height / 2.0
+      for (let i = 0; i < buildings[b].triangles.length; i += 2) {
+        buildings[b].triangles[i] *= this.width / 2.0
+        buildings[b].triangles[i + 1] *= this.height / 2.0
       }
     }
 
@@ -78,8 +78,10 @@ class Preview extends Component {
 
   render() {
     const { selected, buildings } = this.props.triangleData
-    const triangles = new Float32Array(buildings[selected])
+
+    const triangles = new Float32Array(buildings[selected].triangles)
     const objects = scene.setBuffers(gl, [triangles])
+
     scene.draw(gl, this.program, objects, this.constants)
 
     return null
