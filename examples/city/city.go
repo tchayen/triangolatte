@@ -15,6 +15,11 @@ type Building struct {
 	Points     [][]Point
 }
 
+type Triangulated struct {
+	Properties map[string]string
+	Triangles []float64
+}
+
 // parseData takes JSON naively to map[string]interface{} and returns more
 // organized []Building array.
 func parseData(m map[string]interface{}) (buildings []Building) {
@@ -117,11 +122,11 @@ func normalizeCoordinates(buildings []Building) {
 // triangulate takes building coordinates and triangulates them resulting in
 // array of floats and sums of total errors and successes as a side effect.
 func triangulate(buildings []Building) (
-	triangles [][]float64,
+	triangulated []Triangulated,
 	totalSuccesses int,
 	totalErrors int,
 ) {
-	triangles = make([][]float64, len(buildings))
+	triangulated = make([]Triangulated, len(buildings))
 
 	for i, b := range buildings {
 		if len(b.Points) == 0 {
@@ -149,7 +154,7 @@ func triangulate(buildings []Building) (
 		}
 		_, _, deviation := Deviation(b.Points[0], h, t)
 
-		triangles[i] = t
+		triangulated[i] = Triangulated{b.Properties, t}
 
 		// Chosen arbitrarily as a frontier between low and high error rate.
 		if deviation > 1e-15 {
@@ -177,13 +182,13 @@ func main() {
 	buildings := parseData(m)
 	normalizeCoordinates(buildings)
 	triangulated, successes, errors := triangulate(buildings)
-	json, err := json.Marshal(triangulated)
+	converted, err := json.Marshal(triangulated)
 
 	if err != nil {
 		log.Fatalf("Could not marshal to JSON: %s", err)
 	}
 
-	err = ioutil.WriteFile("assets/json_tmp", json, 0644)
+	err = ioutil.WriteFile("assets/json_tmp", converted, 0644)
 
 	if err != nil {
 		log.Fatalf("Could not save file: %s", err)
