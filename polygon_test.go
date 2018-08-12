@@ -121,11 +121,17 @@ func TestEliminateHoles(t *testing.T) {
 
 	testInfo := []TestInfo{{
 		"square in square",
-		[][]Point{{{0, 0}, {4, 0}, {4, 4}, {0, 4}}, {{1, 1}, {1, 3}, {3, 3}, {3, 1}}},
+		[][]Point{
+			{{0, 0}, {4, 0}, {4, 4}, {0, 4}},
+			{{1, 1}, {1, 3}, {3, 3}, {3, 1}},
+		},
 		[]Point{{0, 0}, {4, 0}, {4, 4}, {3, 3}, {3, 1}, {1, 1}, {1, 3}, {3, 3}, {4, 4}, {0, 4}},
 	}, {
 		"triangle touching edge",
-		[][]Point{{{0, 0}, {4, 0}, {4, 4}, {0, 4}}, {{1, 1}, {1, 3}, {4, 2}}},
+		[][]Point{
+			{{0, 0}, {4, 0}, {4, 4}, {0, 4}},
+			{{1, 1}, {1, 3}, {4, 2}},
+		},
 		[]Point{{0, 0}, {4, 2}, {1, 1}, {1, 3}, {4, 2}, {0, 0}, {4, 0}, {4, 4}, {0, 4}},
 	}}
 
@@ -155,6 +161,25 @@ func TestEliminateHoles(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("empty", func(t *testing.T) {
+		_, err := EliminateHoles([][]Point{})
+
+		if err == nil {
+			t.Error("EliminateHoles: empty does not cause error")
+		}
+	})
+
+	t.Run("only outer", func(t *testing.T) {
+		points := []Point{{0.0, 0.0}, {1.0, 1.0}}
+		result, err := EliminateHoles([][]Point{points})
+
+		if err != nil {
+			t.Errorf("EliminateHoles: %s", err)
+		}
+
+		checkPointArray(t, result, points)
+	})
 }
 
 func TestEarCut(t *testing.T) {
@@ -222,7 +247,7 @@ func TestSingleTriangleTriangulation(t *testing.T) {
 }
 
 func TestAghA0(t *testing.T) {
-	agh, _ := loadPointsFromFile("assets/agh_a0")
+	agh, _ := LoadPointsFromFile("assets/agh_a0")
 	for i := range agh {
 		for j := range agh[i] {
 			p := DegreesToMeters(agh[i][j])
@@ -242,54 +267,50 @@ func TestAghA0(t *testing.T) {
 	}
 }
 
-// **WARNING**
 // Runs much longer than others (around half a minute)
-func TestLakeSuperior(t *testing.T) {
-	// t.Log("Skipping long test")
-	// return
-
-	lakeSuperior, _ := loadPointsFromFile("assets/lake_superior")
-
-	for i := range lakeSuperior {
-		for j := range lakeSuperior[i] {
-			p := DegreesToMeters(lakeSuperior[i][j])
-			lakeSuperior[i][j] = Point{math.Abs(p.X), math.Abs(p.Y)}
-		}
-	}
-
-	result, err := EarCut(lakeSuperior[0]) // lakeSuperior[1:]
-
-	if err != nil {
-		t.Errorf("LakeSuperior: %s", err)
-	}
-
-	t.Log(result)
-}
-
-func TestFromFile(t *testing.T) {
-	points, err := loadPointsFromFile("assets/lake")
-
-	if err != nil {
-		t.Errorf("FromFile: %s", err)
-	}
-
-	for i := range points {
-		for j := range points[i] {
-			p := DegreesToMeters(points[i][j])
-			points[i][j] = p
-		}
-	}
-
-	res, err := EarCut(points[0])
-
-	if err != nil {
-		t.Errorf("FromFile: %s", err)
-	}
-
-	actual, calculated, deviation := Deviation(points[0], [][]Point{}, res)
-	if deviation > 1e-10 {
-		t.Errorf("real area: %f; result: %f", actual, calculated)
-	}
-
-	t.Log(res)
-}
+// func TestLakeSuperior(t *testing.T) {
+// 	lakeSuperior, _ := LoadPointsFromFile("assets/lake_superior")
+//
+// 	for i := range lakeSuperior {
+// 		for j := range lakeSuperior[i] {
+// 			p := DegreesToMeters(lakeSuperior[i][j])
+// 			lakeSuperior[i][j] = Point{math.Abs(p.X), math.Abs(p.Y)}
+// 		}
+// 	}
+//
+// 	result, err := EarCut(lakeSuperior[0]) // lakeSuperior[1:]
+//
+// 	if err != nil {
+// 		t.Errorf("LakeSuperior: %s", err)
+// 	}
+//
+// 	t.Log(result)
+// }
+//
+// func TestFromFile(t *testing.T) {
+// 	points, err := LoadPointsFromFile("assets/lake")
+//
+// 	if err != nil {
+// 		t.Errorf("FromFile: %s", err)
+// 	}
+//
+// 	for i := range points {
+// 		for j := range points[i] {
+// 			p := DegreesToMeters(points[i][j])
+// 			points[i][j] = p
+// 		}
+// 	}
+//
+// 	res, err := EarCut(points[0])
+//
+// 	if err != nil {
+// 		t.Errorf("FromFile: %s", err)
+// 	}
+//
+// 	actual, calculated, deviation := Deviation(points[0], [][]Point{}, res)
+// 	if deviation > 1e-10 {
+// 		t.Errorf("real area: %f; result: %f", actual, calculated)
+// 	}
+//
+// 	t.Log(res)
+// }

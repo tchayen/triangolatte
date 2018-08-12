@@ -37,8 +37,8 @@ func Deviation(data []Point, holes [][]Point, t []float64) (actual, calculated, 
 	return
 }
 
-// loadPointsFromFile takes file name and returns array of points.
-func loadPointsFromFile(fileName string) ([][]Point, error) {
+// LoadPointsFromFile takes file name and returns array of points.
+func LoadPointsFromFile(fileName string) ([][]Point, error) {
 	data, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		return nil, err
