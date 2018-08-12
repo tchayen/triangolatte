@@ -1,12 +1,13 @@
-# city
+# City example
 
-What is it for (i.e. goals):
+What it does:
 
-- fetch all buildings in a city
-- normalize their coordinates
-- triangulate them
-- calculate errors
-- find out correctness %
+- loads all buildings in a city from file
+- normalizes their coordinates
+- triangulates them
+- calculates errors
+- saves triangles data to `assets/json_tmp`
+- finds out correctness %
 
 ## Fetching data
 
@@ -32,3 +33,5 @@ _(shortened)_
 
 The data is later exported to `*.geojson` format and
 saved in `assets/cracow_tmp`.
+
+> **TODO:** _Include data fetching in the program (requires OSM to GeoJSON conversion)._

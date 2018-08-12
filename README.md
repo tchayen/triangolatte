@@ -100,6 +100,10 @@ for sketches, code examples and ideas.
 
 ### Helpers
 
+#### `LoadPointsFromFile(fileName string) ([][]Point, error)`
+
+Takes file name and returns array of arrays of points.
+
 #### `Deviation(data []Point, holes [][]Point, t []float64) (real, triangles, deviation float64)`
 
 Given original points, holes and triangles calculated by the `EarCut(...)`, can

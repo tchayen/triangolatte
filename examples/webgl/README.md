@@ -1,12 +1,12 @@
 # WebGL example
 
-![screenshot](../../assets/screenshot.png)
+Starts http server serving data loaded from `assets/json_tmp` on
+`localhost:3000/data` (refer to `examples/city`).
 
-Those are the points visible in the screenshot above:
+`localhost:3000` returns JS app rendering data downloaded from
+`localhost:3000/data`.
 
-```
-{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}}
-```
+## Running
 
 Run the Go server with
 
@@ -18,4 +18,5 @@ then, watch JS files in separate terminal
 ```bash
 yarn start
 ```
-and finally, visit `http://localhost:3000/examples/webgl`.
+
+and finally, visit `http://localhost:3000` to see results.

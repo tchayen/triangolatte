@@ -25,8 +25,13 @@ func trianglesArea(t []float64) float64 {
 	return trianglesArea
 }
 
-// Deviation calculates difference between real area and the one from triangulation.
-func Deviation(data []Point, holes [][]Point, t []float64) (actual, calculated, deviation float64) {
+// Deviation calculates difference between real area and the one from
+// triangulation.
+func Deviation(data []Point, holes [][]Point, t []float64) (
+	actual,
+	calculated,
+	deviation float64,
+) {
 	calculated = trianglesArea(t)
 	actual = polygonArea(data)
 	for _, h := range holes {
@@ -37,7 +42,7 @@ func Deviation(data []Point, holes [][]Point, t []float64) (actual, calculated, 
 	return
 }
 
-// LoadPointsFromFile takes file name and returns array of points.
+// LoadPointsFromFile takes file name and returns array of arrays of points.
 func LoadPointsFromFile(fileName string) ([][]Point, error) {
 	data, err := ioutil.ReadFile(fileName)
 	if err != nil {
