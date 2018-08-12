@@ -26,7 +26,7 @@ class App extends Component {
 
     // Create function for background task.
     const task = () => {
-      fetch('http://localhost:3000/api/data')
+      fetch(`${__SERVER__}/api/data`)
         .then(response => response.json())
         .then(data => {
           const shuffle = a => {
@@ -43,7 +43,12 @@ class App extends Component {
           const buildings = shuffle(data)
           postMessage({ buildings })
         })
-        .catch(error => postMessage({ error }))
+        .catch(error => {
+          console.log(error)
+          postMessage({
+            error: 'Data download failed. Make sure the server is up.'
+          })
+        })
     }
 
     // Encode the function in a URL since Workers accept only them.
@@ -56,13 +61,19 @@ class App extends Component {
     const worker = new Worker(workerBlob)
     worker.onmessage = event => {
       if (event.data.error) {
-        this.setState({
-          error: 'Data download failed. Make sure the server is up.',
-        })
+        this.setState({ error: event.data.error })
       } else {
         const buildings = event.data
           .buildings
-          .filter(b => b.triangles !== null && b.triangles.length > 0)
+          .filter(b =>
+            // Has some triangles at all.
+            b.triangles !== null && b.triangles.length > 0 &&
+            // Has more description than generic @id and "building": "yes".
+            Object.values(b.properties).length > 2 &&
+            // More complicated than rectangle.
+            b.triangles.length > 12
+          )
+          // .filter(b => b.properties['addr:housename'] === 'D17')
 
         this.setState({
           triangleData: {
@@ -80,7 +91,7 @@ class App extends Component {
 
   respond = async status => {
     const { currentId } = this.state.triangleData
-    await fetch('http://localhost:3000/api/report', {
+    await fetch(`${__SERVER__}/api/report`, {
       method: 'POST',
       body: JSON.stringify({
         id: currentId,
@@ -106,12 +117,16 @@ class App extends Component {
 
   next = () => {
     const { selected, buildings } = this.state.triangleData
-    console.log(buildings[selected].properties)
+
+    console.log(buildings[selected].properties, buildings[selected].triangles.length)
+
+    const newSelected = (selected + 1) % buildings.length
+
     this.setState({
       waiting: false,
       triangleData: {
-        selected: selected + 1,
-        currentId: buildings[selected + 1].properties['@id'],
+        selected: newSelected,
+        currentId: buildings[newSelected].properties['@id'],
         buildings,
       },
     })

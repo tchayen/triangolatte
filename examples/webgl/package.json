@@ -9,6 +9,7 @@
   "license": "MIT",
   "scripts": {
     "start": "NODE_ENV=development webpack --hide-modules --watch --mode development",
+    "build": "NODE_ENV=production webpack --hide-modules --mode production",
     "test": "jest"
   },
   "dependencies": {

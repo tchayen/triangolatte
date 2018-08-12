@@ -3,10 +3,9 @@
 ![screenshot](../../assets/webgl_screenshot.png)
 
 Starts http server serving data loaded from `assets/json_tmp` on
-`localhost:3000/data` (refer to `examples/city`).
+`localhost:3000/api/data` (refer to `examples/city` for `json_tmp` creation or provide any valid `*.geojson` file).
 
-`localhost:3000` returns JS app rendering data downloaded from
-`localhost:3000/data`.
+`localhost:3000` returns JS app rendering data downloaded from server with ability to grade buildings triangulation.
 
 ## Running
 

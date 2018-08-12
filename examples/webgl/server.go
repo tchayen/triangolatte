@@ -11,6 +11,7 @@ import (
 
 // apiHandler tries to respond with matching API route.
 func apiHandler(w http.ResponseWriter, r *http.Request) {
+	log.Printf("-> %s", r.RequestURI)
 	pathSegments := strings.Split(r.RequestURI, "/")
 
 	// Any path shorter than [<empty>, "api", "data"] must be incorrect.
