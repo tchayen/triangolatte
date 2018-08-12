@@ -55,7 +55,7 @@ t, err = triangolatte.EarCut(vertices)
 
 ## Examples
 
-In `/examples` can find examples of:
+In `/examples` you can find examples of:
 - City parsing, where whole city downloaded from Open Street Map is triangulated
 - WebGL rendering
 - GPX format parsing and triangulation of its data
