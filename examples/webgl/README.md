@@ -1,5 +1,7 @@
 # WebGL example
 
+![screenshot](../../assets/webgl_screenshot.png)
+
 Starts http server serving data loaded from `assets/json_tmp` on
 `localhost:3000/data` (refer to `examples/city`).
 
