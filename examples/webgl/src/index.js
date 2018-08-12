@@ -1,7 +1,18 @@
 import * as webgl from './webgl'
 import * as scene from './scene'
 
+// Setup React
+import React from 'react'
+import ReactDOM from 'react-dom'
+import App from './App'
 
+const div = document.createElement('div')
+div.setAttribute('id', 'app')
+document.body.appendChild(div)
+
+ReactDOM.render(<App />, div)
+
+// Setup WebGL
 const width = window.innerWidth
 const height = window.innerHeight
 const scalingFactor = window.devicePixelRatio || 1
@@ -21,7 +32,7 @@ const constants = {
   // a {x, y, z, w} vector we provide only {x, y}, z
   // and w will default to 0 and 1 respectively.
   size: 2,
-  // 0 = move forward size * sizeof(type) each iteration to get the next position
+  // move forward size * sizeof(type) each iteration to get the next position
   stride: 0,
   arrayOffset: 0,
   primitiveType: gl.TRIANGLES,
@@ -39,19 +50,19 @@ const fragmentShader = webgl.createShader(
 
 const program = webgl.createProgram(gl, vertexShader, fragmentShader)
 
-;(async () => {
-  const response = await fetch('http://localhost:3000/data')
-  const data = await response.json()
-
-  const triangles = data[1]
-
-  console.log(triangles)
-
-  for (let i = 0; i < triangles.length; i += 2) {
-    triangles[i] *= width * 0.8
-    triangles[i + 1] *= height * 0.8
-  }
-
-  const objects = scene.setup(gl, program, [new Float32Array(triangles)])
-  scene.draw(gl, program, objects, constants)
-})()
+// ;(async () => {
+//   const response = await fetch('http://localhost:3000/data')
+//   const data = await response.json()
+//
+//   const triangles = data[1]
+//
+//   console.log(triangles)
+//
+//   for (let i = 0; i < triangles.length; i += 2) {
+//     triangles[i] *= width * 0.8
+//     triangles[i + 1] *= height * 0.8
+//   }
+//
+//   const objects = scene.setup(gl, program, [new Float32Array(triangles)])
+//   scene.draw(gl, program, objects, constants)
+// })()

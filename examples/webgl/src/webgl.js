@@ -7,8 +7,8 @@
  */
 const setUpCanvas = (width, height, scalingFactor) => {
   const canvas = document.createElement('canvas')
-  canvas.setAttribute('width', scalingFactor * width)
-  canvas.setAttribute('height', scalingFactor * height)
+  canvas.setAttribute('width', `${scalingFactor * width}`)
+  canvas.setAttribute('height', `${scalingFactor * height}`)
   canvas.setAttribute('style', `width: ${width}px; height: ${height}px`)
   document.body.appendChild(canvas)
 

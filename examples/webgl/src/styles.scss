@@ -1,0 +1,88 @@
+@mixin font-stack() {
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantrell, "Helvetica Neue", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  @include font-stack();
+}
+
+.loading {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.panel {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+
+  .buttons {
+    display: flex;
+
+    .button {
+      width: 130px;
+      height: 36px;
+      line-height: 36px;
+      padding: 0 15px;
+      border-radius: 18px;
+      background-color: rgb(254, 239, 179);
+      text-align: center;
+      text-transform: uppercase;
+      cursor: pointer;
+      color: #9F6000;
+      font-size: 13px;
+      font-weight: 700;
+      transition: 0.15s all;
+      margin-right: 20px;
+
+      &:hover {
+        box-shadow: 0 4px 16px rgba(254, 239, 179, 0.6);
+      }
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+    }
+    .correct {
+      color: #4F8A10;
+      background-color: rgb(223, 242, 191);
+
+      &:hover {
+        box-shadow: 0 4px 16px rgba(223, 242, 191, 0.6)
+      }
+    }
+
+    .incorrect {
+      color: #D8000C;
+      background-color: rgb(255, 186, 186);
+
+      &:hover {
+        box-shadow: 0 4px 16px rgba(255, 186, 186, 0.6)
+      }
+    }
+  }
+}
+
+.dot {
+  line-height: 32px;
+  padding-bottom: 80px;
+  color: #ccc;
+  font-size: 128px;
+  transition: 0.15s color;
+}
+
+.selected {
+  color: #666;
+  transition: 0.15s color;
+}
+
+* {
+  box-sizing: border-box;
+}

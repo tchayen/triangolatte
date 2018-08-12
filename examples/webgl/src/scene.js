@@ -30,7 +30,6 @@ const setup = (gl, program, objects) => {
   })
 
   gl.clearColor(0, 0, 0, 0)
-
   return resultObjects
 }
 
