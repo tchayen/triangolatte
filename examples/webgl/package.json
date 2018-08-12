@@ -8,8 +8,13 @@
   },
   "license": "MIT",
   "scripts": {
-    "start": "webpack --hide-modules --watch --mode development",
+    "start": "NODE_ENV=development webpack --hide-modules --watch --mode development",
     "test": "jest"
+  },
+  "dependencies": {
+    "babel-preset-react-app": "^3.1.2",
+    "react": "^16.4.2",
+    "react-dom": "^16.4.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
