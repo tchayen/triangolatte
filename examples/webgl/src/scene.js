@@ -9,7 +9,6 @@ import * as matrix from './matrix'
 let positionLocation, resolutionLocation, matrixLocation
 
 const setup = (gl, program) => {
-  console.log('setup', gl)
   positionLocation = gl.getAttribLocation(program, 'a_position')
 
   // Set uniforms.

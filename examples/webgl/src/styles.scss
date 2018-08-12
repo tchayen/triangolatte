@@ -35,15 +35,15 @@ body {
       line-height: 36px;
       padding: 0 15px;
       border-radius: 18px;
-      background-color: rgb(254, 239, 179);
-      text-align: center;
       text-transform: uppercase;
       cursor: pointer;
-      color: #9F6000;
       font-size: 13px;
       font-weight: 700;
       transition: 0.15s all;
       margin-right: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       @include no-select();
 
       &:hover {
@@ -59,17 +59,46 @@ body {
       color: #4F8A10;
       background-color: rgb(223, 242, 191);
 
+      .spinner div {
+        border-color: #4F8A10 transparent transparent transparent;
+      }
+
       &:hover {
-        box-shadow: 0 4px 16px rgba(223, 242, 191, 0.6)
+        box-shadow: 0 4px 16px rgba(223, 242, 191, 0.6);
+      }
+    }
+
+    .not-sure {
+      color: #9f6000;
+      background-color: rgb(254, 239, 179);
+
+      .spinner div {
+        border-color: #9f6000 transparent transparent transparent;
+      }
+
+      &:hover {
+        box-shadow: 0 4px 16px rgba(254, 239, 179, 0.6);
       }
     }
 
     .incorrect {
-      color: #D8000C;
+      color: #d8000c;
       background-color: rgb(255, 186, 186);
 
+      .spinner div {
+        border-color: #d8000c transparent transparent transparent;
+      }
+
       &:hover {
-        box-shadow: 0 4px 16px rgba(255, 186, 186, 0.6)
+        box-shadow: 0 4px 16px rgba(255, 186, 186, 0.6);
+      }
+    }
+
+    .waiting {
+      cursor: default;
+
+      &:hover {
+        box-shadow: none;
       }
     }
   }
@@ -94,6 +123,47 @@ body {
   .selected {
     color: #666;
     transition: 0.15s color;
+  }
+}
+
+.spinner {
+  display: inline-block;
+  position: relative;
+  width: 28px;
+  height: 28px;
+}
+
+.spinner div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 23px;
+  height: 23px;
+  margin: 2px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  animation: spinner 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: #fff transparent transparent transparent;
+}
+
+.spinner div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+
+.spinner div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+
+.spinner div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }
 

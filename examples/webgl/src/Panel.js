@@ -1,24 +1,20 @@
 import React, { Component } from 'react'
+import Button from './Button'
 
 class Panel extends Component {
   constructor(props) {
     super(props)
   }
 
-  renderButton = (label, classes, action, index) =>
-    <div
-      className={`${['button', ...classes].join(' ')}`}
-      onClick={action}
-      key={`button-${index}`}
-    >
-      {label}
-    </div>
-
   render() {
     return (
       <div className="panel">
         <div className="buttons">
-          {this.props.buttons.map((b, i) => this.renderButton(...b, i))}
+          {this.props.buttons.map((props, i) =>
+            <Button
+              {...props}
+              key={`button-${i}`}
+            />)}
         </div>
       </div>
     )

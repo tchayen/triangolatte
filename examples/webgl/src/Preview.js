@@ -77,7 +77,6 @@ class Preview extends Component {
   }
 
   render() {
-    console.log('render')
     const { selected, buildings } = this.props.triangleData
     const triangles = new Float32Array(buildings[selected])
     const objects = scene.setBuffers(gl, [triangles])

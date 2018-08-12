@@ -1,33 +1,73 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 )
 
-func dataHandler(w http.ResponseWriter, r *http.Request) {
-	data, err := ioutil.ReadFile("../../assets/json_tmp")
+// apiHandler tries to respond with matching API route.
+func apiHandler(w http.ResponseWriter, r *http.Request) {
+	pathSegments := strings.Split(r.RequestURI, "/")
 
-	if err != nil {
-		log.Fatal(err)
+	// Any path shorter than /api/data must be incorrect.
+	if len(pathSegments) < 2 {
+		http.Error(w, "Wrong path", 500)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(data)
+
+	switch pathSegments[1] {
+	case "data":
+		data, err := ioutil.ReadFile("../../assets/json_tmp")
+
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+		w.Write(data)
+
+	case "report":
+		type Body struct {
+			Id string `json:"@id"`
+			State string `json:"state"`
+		}
+		data, err := ioutil.ReadAll(r.Body)
+		defer r.Body.Close()
+
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+		var body Body
+		err = json.Unmarshal(data, &body)
+
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+		log.Printf("@id: %s, state: %s", body.Id, body.State)
+
+	default:
+		w.Write([]byte("Error: wrong API path"))
+	}
 }
 
+// Directly open file based on URL.
 func serveFile(fileName string, w http.ResponseWriter) {
 	data, err := ioutil.ReadFile(fileName)
 
 	if err != nil {
 		log.Printf("%s", err)
-
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("File not found"))
+		http.Error(w, "Not found", 404)
 		return
 	}
 
@@ -35,24 +75,25 @@ func serveFile(fileName string, w http.ResponseWriter) {
 	w.Write(data)
 }
 
+// staticHandler aims to return static file based on request URL.
 func staticHandler(w http.ResponseWriter, r *http.Request) {
-	index, err := ioutil.ReadFile("./index.html")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	if r.RequestURI == "/" {
+		index, err := ioutil.ReadFile("./index.html")
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		w.Write(index)
 		return
 	}
 
-	serveFile(fmt.Sprintf("./%s", r.RequestURI[1:]), w)
+	serveFile(r.RequestURI[1:], w)
 }
 
 func main() {
 	http.HandleFunc("/", staticHandler)
-	http.HandleFunc("/data", dataHandler)
+	http.HandleFunc("/api/data", apiHandler)
 
 	port := 3000
 	log.Printf("Listening on :%d...\n", port)

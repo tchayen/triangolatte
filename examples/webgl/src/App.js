@@ -12,6 +12,7 @@ class App extends Component {
   state = {
     dot: 0,
     loading: true,
+    waiting: false,
     triangleData: {
       selected: 0,
       buildings: [],
@@ -57,21 +58,30 @@ class App extends Component {
     URL.revokeObjectURL(workerBlob)
   }
 
-  acceptAction = () => {
-    this.next()
+  acceptAction = async () => {
+    this.setState({ waiting: true })
+    fetch('http://localhost:3000/report/', {
+      method: 'POST',
+    })
   }
 
-  passAction = () => {
-    this.next()
+  passAction = async () => {
+    this.setState({ waiting: true })
   }
 
-  rejectAction = () => {
-    this.next()
+  rejectAction = async () => {
+    this.setState({ waiting: true })
   }
 
   next = () => {
     const { selected, ...rest } = this.state.triangleData
-    this.setState({ triangleData: { selected: selected + 1, ...rest }})
+    this.setState({
+      waiting: false,
+      triangleData: {
+        selected: selected + 1,
+        ...rest,
+      },
+    })
   }
 
   animation = () => {
@@ -99,14 +109,28 @@ class App extends Component {
 
   renderError = () => <div className="loading">{this.state.error}</div>
 
+  buttons = [{
+    label: 'Incorrect',
+    classes: ['incorrect'],
+    action: this.rejectAction,
+  }, {
+    label: 'Not sure',
+    classes: ['not-sure'],
+    action: this.passAction,
+  }, {
+    label: 'Correct',
+    classes: ['correct'],
+    action: this.acceptAction,
+  }]
+
   renderApp = () =>
     <div>
       <Panel
-        buttons={[
-          ['Incorrect', ['incorrect'], this.rejectAction],
-          ['Not sure', [], this.passAction],
-          ['Correct', ['correct'], this.acceptAction],
-        ]}
+        buttons={this.buttons.map(button => ({
+          ...button,
+          postAction: this.next,
+          waiting: this.state.waiting,
+        }))}
       />
       <Preview triangleData={this.state.triangleData} />
     </div>
