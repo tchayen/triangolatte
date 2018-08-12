@@ -5,8 +5,12 @@ class Panel extends Component {
     super(props)
   }
 
-  button = (label = '', classes = [], action = () => {}) =>
-    <div className={`${['button', ...classes].join(' ')}`}>
+  renderButton = (label, classes, action, index) =>
+    <div
+      className={`${['button', ...classes].join(' ')}`}
+      onClick={action}
+      key={`button-${index}`}
+    >
       {label}
     </div>
 
@@ -14,9 +18,7 @@ class Panel extends Component {
     return (
       <div className="panel">
         <div className="buttons">
-          {this.button('Correct', ['correct'])}
-          {this.button('Not sure')}
-          {this.button('Incorrect', ['incorrect'])}
+          {this.props.buttons.map((b, i) => this.renderButton(...b, i))}
         </div>
       </div>
     )

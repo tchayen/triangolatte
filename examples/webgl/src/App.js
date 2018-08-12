@@ -47,7 +47,7 @@ class App extends Component {
         this.setState({
           triangleData: {
             selected: 0,
-            buildings: event.data.buildings,
+            buildings: event.data.buildings.filter(b => b !== null && b.length > 0),
           }
         })
       }
@@ -57,6 +57,23 @@ class App extends Component {
     URL.revokeObjectURL(workerBlob)
   }
 
+  acceptAction = () => {
+    this.next()
+  }
+
+  passAction = () => {
+    this.next()
+  }
+
+  rejectAction = () => {
+    this.next()
+  }
+
+  next = () => {
+    const { selected, ...rest } = this.state.triangleData
+    this.setState({ triangleData: { selected: selected + 1, ...rest }})
+  }
+
   animation = () => {
     const { dot, loading, triangleData } = this.state
 
@@ -64,7 +81,7 @@ class App extends Component {
     // not yet here.
     if (dot <= 5 || triangleData.buildings.length === 0) {
       this.setState({ dot: dot + 1 })
-      setTimeout(this.animation, 500)
+      setTimeout(this.animation, 300)
     } else {
       this.setState({ loading: false })
     }
@@ -82,15 +99,17 @@ class App extends Component {
 
   renderError = () => <div className="loading">{this.state.error}</div>
 
-  renderApp = () => {
-    console.log(this.state)
-    return (
-      <div>
-        <Panel />
-        <Preview triangleData={this.state.triangleData} />
-      </div>
-    )
-  }
+  renderApp = () =>
+    <div>
+      <Panel
+        buttons={[
+          ['Incorrect', ['incorrect'], this.rejectAction],
+          ['Not sure', [], this.passAction],
+          ['Correct', ['correct'], this.acceptAction],
+        ]}
+      />
+      <Preview triangleData={this.state.triangleData} />
+    </div>
 
   render() {
     return this.state.loading
