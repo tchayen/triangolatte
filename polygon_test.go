@@ -112,7 +112,7 @@ func BenchmarkIsInsideTriangle(b *testing.B) {
 	}
 }
 
-func TestEliminateHoles(t *testing.T) {
+func TestJoinHoles(t *testing.T) {
 	type TestInfo struct {
 		Name     string
 		Points   [][]Point
@@ -155,10 +155,10 @@ func TestEliminateHoles(t *testing.T) {
 
 	for _, test := range testInfo {
 		t.Run(test.Name, func(t *testing.T) {
-			result, err := EliminateHoles(test.Points)
+			result, err := JoinHoles(test.Points)
 
 			if err != nil {
-				t.Errorf("eliminateHoles: %s", err)
+				t.Errorf("JoinHoles: %s", err)
 			}
 
 			t.Log(result)
@@ -168,7 +168,7 @@ func TestEliminateHoles(t *testing.T) {
 			triangles, err := EarCut(result)
 
 			if err != nil {
-				t.Errorf("eliminateHoles: %s", err)
+				t.Errorf("JoinHoles: %s", err)
 			}
 
 			t.Log(triangles)
@@ -181,19 +181,19 @@ func TestEliminateHoles(t *testing.T) {
 	}
 
 	t.Run("empty", func(t *testing.T) {
-		_, err := EliminateHoles([][]Point{})
+		_, err := JoinHoles([][]Point{})
 
 		if err == nil {
-			t.Error("EliminateHoles: empty does not cause error")
+			t.Error("JoinHoles: empty does not cause error")
 		}
 	})
 
 	t.Run("only outer", func(t *testing.T) {
 		points := []Point{{0.0, 0.0}, {1.0, 1.0}}
-		result, err := EliminateHoles([][]Point{points})
+		result, err := JoinHoles([][]Point{points})
 
 		if err != nil {
-			t.Errorf("EliminateHoles: %s", err)
+			t.Errorf("JoinHoles: %s", err)
 		}
 
 		checkPointArray(t, result, points)

@@ -9,6 +9,12 @@ What it does:
 - saves triangles data to `assets/json_tmp`
 - finds out correctness %
 
+## Running
+
+```bash
+go run city.go
+```
+
 ## Fetching data
 
 Data comes from **OpenStreetMap**. You can use the [Overpass-turbo](https://overpass-turbo.eu/) query listed below, for fetching all buildings in

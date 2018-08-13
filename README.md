@@ -55,8 +55,7 @@ You will find instructions for running the code there.
 ## Features
 
 > **NOTE**: _this library is developed mostly with map data triangulation in
-mind and it will be its main performance target once it reaches benchmarking
-phase._
+mind and it will be its main performance target._
 
 ### API
 
@@ -66,7 +65,7 @@ Takes array of points and produces array of triangle coordinates.
 
 Based on the following [paper](https://www.geometrictools.com/Documentation/TriangulationByEarClipping.pdf).
 
-#### `EliminateHoles(points [][]Point) ([]Point, error)`
+#### `JoinHoles(points [][]Point) ([]Point, error)`
 
 Removes holes, joining them with the rest of the polygon. Provides preprocessing
 for `EarCut`. First element of the points array is the outer polygon, the rest

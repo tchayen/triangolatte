@@ -202,10 +202,10 @@ func (polygons byMaxX) Less(i, j int) bool {
 	return true
 }
 
-// EliminateHoles removes holes, joining them with the rest of the polygon.
+// JoinHoles removes holes, joining them with the rest of the polygon.
 // Provides pre-processing for EarCut. First element of the points array is the
 // outer polygon, the rest of them are considered as holes to be removed.
-func EliminateHoles(points [][]Point) ([]Point, error) {
+func JoinHoles(points [][]Point) ([]Point, error) {
 	if len(points) == 0 {
 		return nil, errors.New("cannot process empty points array")
 	}
