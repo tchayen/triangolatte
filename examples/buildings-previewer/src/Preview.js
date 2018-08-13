@@ -17,7 +17,7 @@ class Preview extends Component {
       const buttons = 120 // Top offset.
       const canvas = webgl.setUpCanvas(
         this.width / 2.0,
-        this.height - buttons,
+        this.width / 2.0,
         this.scalingFactor,
       )
       gl = canvas.getContext('webgl')
@@ -60,7 +60,7 @@ class Preview extends Component {
 
       for (let i = 0; i < buildings[b].triangles.length; i += 2) {
         buildings[b].triangles[i] *= this.width / 2.0
-        buildings[b].triangles[i + 1] *= this.height / 2.0
+        buildings[b].triangles[i + 1] *= this.width / 2.0
       }
     }
 

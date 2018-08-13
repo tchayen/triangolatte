@@ -62,7 +62,7 @@ const rotation = (angleInRadians) => {
  * @param {Number} width pixels
  * @param {Number} height pixels
  */
-const projection = (width, height) => [2 / width, 0, 0, 0, -2 / height, 0, -1, 1, 1]
+const projection = (width, height) => [2 / width, 0, 0, 0, 2 / height, 0, -1, -1, 1]
 
 /**
  * Calculate matrix of scale-rotation-translation-projection.

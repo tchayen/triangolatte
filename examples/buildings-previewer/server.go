@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -33,29 +32,6 @@ func apiHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Write(data)
-
-	case "report":
-		type Body struct {
-			ID     string `json:"id"`
-			Status string `json:"status"`
-		}
-		data, err := ioutil.ReadAll(r.Body)
-		defer r.Body.Close()
-
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
-		}
-
-		var body Body
-		err = json.Unmarshal(data, &body)
-
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-			return
-		}
-
-		log.Printf("id: %s, status: %s", body.ID, body.Status)
 
 	default:
 		w.Write([]byte("Error: wrong API path"))

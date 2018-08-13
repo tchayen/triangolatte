@@ -22,21 +22,30 @@ body {
   @include font-stack();
 }
 
+h1 {
+  font-size: 24px;
+  font-weight: 400;
+  margin: 0;
+  color: #345;
+}
+
 .panel {
-  width: 100%;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   padding: 20px 0;
 
   .buttons {
     display: flex;
+    justify-content: space-between;
+    width: 100%;
 
     .button {
       width: 130px;
       height: 36px;
       line-height: 36px;
       padding: 0 15px;
-      border-radius: 18px;
+      border-radius: 6px;
       text-transform: uppercase;
       cursor: pointer;
       font-size: 13px;
@@ -46,10 +55,16 @@ body {
       display: flex;
       justify-content: center;
       align-items: center;
+      color: #345;
+      background-color: rgb(136, 153, 170);
       @include no-select();
 
+      .spinner div {
+        border-color: #345 transparent transparent transparent;
+      }
+
       &:hover {
-        box-shadow: 0 4px 16px rgba(254, 239, 179, 0.6);
+        box-shadow: 0 4px 16px rgba(136, 153, 170, 0.6);
       }
 
       &:last-child {
@@ -118,13 +133,13 @@ body {
   .dot {
     line-height: 32px;
     padding-bottom: 80px;
-    color: #ccc;
+    color: rgba(136, 153, 170, 0.15);
     font-size: 128px;
     transition: 0.15s color;
   }
 
   .selected {
-    color: #666;
+    color: rgb(136, 153, 170);
     transition: 0.15s color;
   }
 }
@@ -133,8 +148,13 @@ body {
   font-size: 14px;
   font-family: 'Roboto Mono', 'monospaced';
   color: #888;
-  max-width: 70vw;
-  padding-bottom: 20px;
+  width: 100%;
+  height: 200px;
+  border-radius: 8px;
+  padding: 24px;
+  overflow: scroll;
+  margin: 0 0 30px;
+  background-color: rgba(136, 153, 170, 0.15);
 }
 
 .spinner {

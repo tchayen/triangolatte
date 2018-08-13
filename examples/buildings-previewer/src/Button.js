@@ -9,30 +9,27 @@ class Button extends Component {
 
   state = { waiting: false }
 
-  handleAction = async (action, postAction) => {
+  handleAction = async action => {
     this.setState({ waiting: true })
-    await action()
-
     // Artificial timeout to show loading animation.
     setTimeout(() => {
       this.setState({ waiting: false })
-      postAction()
+      action()
     }, 300)
   }
 
   renderSpinner = () => <div className="spinner"><div></div><div></div><div></div><div></div></div>
 
   render() {
-    const { label, classes, action, postAction, waiting } = this.props
+    const { label, action, waiting } = this.props
 
-    const applyClasses = ['button', ...classes]
-    if (waiting) applyClasses.push('waiting')
+    const classes = waiting ? ['waiting', 'button'] : ['button']
 
     return (
       <div
-        className={`${applyClasses.join(' ')}`}
+        className={`${classes.join(' ')}`}
         onClick={!waiting
-          ? () => this.handleAction(action, postAction)
+          ? () => this.handleAction(action)
           : noop
         }
       >

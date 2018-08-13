@@ -73,7 +73,6 @@ class App extends Component {
             // More complicated than rectangle.
             b.triangles.length > 12
           )
-          // .filter(b => b.properties['addr:housename'] === 'D17')
 
         this.setState({
           triangleData: {
@@ -118,9 +117,23 @@ class App extends Component {
   next = () => {
     const { selected, buildings } = this.state.triangleData
 
-    console.log(buildings[selected].properties, buildings[selected].triangles.length)
-
     const newSelected = (selected + 1) % buildings.length
+
+    this.setState({
+      waiting: false,
+      triangleData: {
+        selected: newSelected,
+        currentId: buildings[newSelected].properties['@id'],
+        buildings,
+      },
+    })
+  }
+
+  previous = () => {
+    const { selected, buildings } = this.state.triangleData
+    const n = buildings.length
+    const i = selected - 1
+    const newSelected = (i % n + n) % n
 
     this.setState({
       waiting: false,
@@ -167,28 +180,12 @@ class App extends Component {
     )
   }
 
-  buttons = [{
-    label: 'Incorrect',
-    classes: ['incorrect'],
-    action: this.rejectAction,
-  }, {
-    label: 'Not sure',
-    classes: ['not-sure'],
-    action: this.passAction,
-  }, {
-    label: 'Correct',
-    classes: ['correct'],
-    action: this.acceptAction,
-  }]
-
   renderApp = () =>
     <div className="layout">
       <Panel
-        buttons={this.buttons.map(button => ({
-          ...button,
-          postAction: this.next,
-          waiting: this.state.waiting,
-        }))}
+        previous={this.previous}
+        next={this.next}
+        waiting={this.state.waiting}
       />
       <Preview triangleData={this.state.triangleData} />
       {this.renderLabel()}
