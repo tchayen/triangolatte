@@ -171,7 +171,7 @@ func triangulate(buildings []Building) (
 }
 
 func main() {
-	data, err := ioutil.ReadFile("assets/cracow_tmp")
+	data, err := ioutil.ReadFile("../../assets/cracow_tmp")
 
 	if err != nil {
 		log.Fatal("Could not read file")
@@ -188,7 +188,7 @@ func main() {
 		log.Fatalf("Could not marshal to JSON: %s", err)
 	}
 
-	err = ioutil.WriteFile("assets/json_tmp", converted, 0644)
+	err = ioutil.WriteFile("../../assets/json_tmp", converted, 0644)
 
 	if err != nil {
 		log.Fatalf("Could not save file: %s", err)

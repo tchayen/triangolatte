@@ -1,4 +1,4 @@
-# City example
+# city
 
 What it does:
 

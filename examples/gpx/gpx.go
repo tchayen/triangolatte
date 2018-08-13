@@ -71,7 +71,7 @@ func TriangulatePoints(points [][]Point) [][]float64 {
 
 func main() {
 	// Load data from file.
-	data, err := ioutil.ReadFile("assets/gpx_tmp")
+	data, err := ioutil.ReadFile("../../assets/gpx_tmp")
 
 	if err != nil {
 		log.Fatal("Could not read file")

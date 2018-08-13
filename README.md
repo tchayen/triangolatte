@@ -4,24 +4,14 @@
 [![Coverage Status](https://coveralls.io/repos/github/Tchayen/triangolatte/badge.svg?branch=master)](https://coveralls.io/github/Tchayen/triangolatte?branch=master)
 [![GoDoc](https://godoc.org/github.com/Tchayen/triangolatte?status.svg)](https://godoc.org/github.com/Tchayen/triangolatte)
 
----
-
-## 🚧 **under construction** 🚧
-
-_The algorithm is working, has adequate computational complexity to its kind –
-O(n^2). Tests are rich and reach much further than simple code coverage._
-
-_I am currently under the process of providing an example which triangulates all
-buildings in a city and calculating its effectiveness for a good measure of real
-life usage usefulness._
-
----
-
 2D triangulation library. Allows translating lines and polygons (both based on
 points) to the language of GPUs.
 
 Features normal and miter joint line triangulation. Handles polygons using ear
 clipping algorithm with hole elimination included.
+
+> **For reference:** _triangulation of polygons currently works for 99.76% of
+buildings in Cracow._
 
 ## Table of contents
 
@@ -191,13 +181,13 @@ Now you can open newly generated `torch.svg` in your web browser.
 
 ### Optimizations
 
-- rewrite point list to operate on static array
-- use z-ordering for early returning in ear detection
+- allow reusing point array for massive allocation reduction
+- test z-ordering for early returning in ear detection
 
-### Making the library production grade
+### Making the library more professional
 
-By providing more examples, real benchmarks with comparison to other languages,
-libraries. Testing behavior on huge, unusual real life examples.
+By providing more examples, real benchmarks with comparison to libraries in
+other languages.
 
 ### WebAssembly
 
