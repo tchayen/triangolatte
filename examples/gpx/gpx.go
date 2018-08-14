@@ -65,7 +65,7 @@ func GPXToPoints(gpx GPX) [][]Point {
 func TriangulatePoints(points [][]Point) [][]float64 {
 	triangles := make([][]float64, len(points))
 	for i := range points {
-		triangles[i] = Miter(points[i], 2)
+		triangles[i], _ = Line(Miter, points[i], 2)
 	}
 	return triangles
 }
