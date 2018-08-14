@@ -1,10 +1,22 @@
-# triangolatte
+<h1 align="center">
+  <img src="assets/logo.png"><br />
+  triangolatte
+</h1>
 
-[![Build Status](https://travis-ci.org/tchayen/triangolatte.svg?branch=master)](https://travis-ci.org/tchayen/triangolatte)
-[![Coverage Status](https://coveralls.io/repos/github/tchayen/triangolatte/badge.svg?branch=master)](https://coveralls.io/github/tchayen/triangolatte?branch=master)
-[![GoDoc](https://godoc.org/github.com/tchayen/triangolatte?status.svg)](https://godoc.org/github.com/tchayen/triangolatte) [![Join the chat at https://gitter.im/triangolatte/Lobby](https://badges.gitter.im/triangolatte/Lobby.svg)](https://gitter.im/triangolatte/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-![logo](assets/logo.png)
+<p align="center">
+  <a href="https://travis-ci.org/tchayen/triangolatte">
+    <img src="https://travis-ci.org/tchayen/triangolatte.svg?branch=master" alt="Travis status">
+  </a>
+  <a href="https://coveralls.io/github/tchayen/triangolatte?branch=master">
+    <img src="https://coveralls.io/repos/github/tchayen/triangolatte/badge.svg?branch=master" alt="Coveralls status">
+  </a>
+  <a href="https://godoc.org/github.com/tchayen/triangolatte">
+    <img src="https://godoc.org/github.com/tchayen/triangolatte?status.svg" alt="Godoc reference">
+  </a>
+  <a href="https://gitter.im/triangolatte/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge">
+    <img src="https://badges.gitter.im/triangolatte/Lobby.svg" alt="Join the chat at https://gitter.im/triangolatte/Lobby">
+  </a>
+</p>
 
 2D triangulation library. Allows translating lines and polygons (both based on
 points) to the language of GPUs.
