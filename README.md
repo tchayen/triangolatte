@@ -68,16 +68,13 @@ You will find instructions for running the code there.
 
 ## Features
 
-> **NOTE**: _this library is developed mostly with map data triangulation in
-mind and it will be its main performance target._
-
 ### API
 
 #### `Polygon(points []Point, holes [][]Point) ([]float64, error)`
 
 Takes array of points and produces array of triangle coordinates.
 
-Based on the following [paper](https://www.geometrictools.com/Documentation/TriangulationByEarClipping.pdf).
+Based on the following [paper](https://www.geometrictools.com/Documentation/TriangulationByEarClipping.pdf) and inspired by [EarCut](https://github.com/mapbox/earcut).
 
 #### `JoinHoles(points [][]Point) ([]Point, error)`
 
@@ -193,6 +190,9 @@ Triangulation of 74 thousand buildings runs in `3.43s`.
 ## Future plans
 
 ### Optimizations
+
+> **NOTE**: _this library is developed mostly with map data triangulation in
+mind and it will be its main performance target._
 
 - allow reusing point array for massive allocation reduction
 - test z-ordering for early returning in ear detection
