@@ -11,6 +11,8 @@ What it does:
 
 ## Running
 
+> **NOTE:** _get data from Overpass-turbo using the instructions below_
+
 ```bash
 go run city.go
 ```
@@ -37,7 +39,7 @@ _(shortened)_
 [out:json];(way[building](50.0,19.85,50.105,20.13);relation[building](50.0,19.85,50.105,20.13););out body;>;out skel qt;
 ```
 
-The data is later exported to `*.geojson` format and
-saved in `assets/cracow_tmp`.
+Then look for an option to export data in `*.geojson` format and
+save it in `assets/cracow_tmp`.
 
 > **TODO:** _Include data fetching in the program (requires OSM to GeoJSON conversion)._

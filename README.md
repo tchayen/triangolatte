@@ -10,8 +10,8 @@ points) to the language of GPUs.
 Features normal and miter joint line triangulation. Handles polygons using ear
 clipping algorithm with hole elimination included.
 
-> **For reference:** _triangulation of polygons currently works for 99.76% of
-buildings in Cracow._
+> **For reference:** _triangulation of all buildings in Cracow works for 99.76%
+of cases and takes 3.43s._
 
 ## Table of contents
 
@@ -24,6 +24,7 @@ buildings in Cracow._
   - [Types](#types)
 - [Tests](#tests)
   - [Flame Graphs](#flame-graphs)
+- [Benchmarks](#benchmarks)
 - [Future plans](#future-plans)
 - [Contributing](#contributing)
 - [License](#license)
@@ -176,6 +177,14 @@ go-torch triangolatte.test prof.cpu
 
 Now you can open newly generated `torch.svg` in your web browser.
 
+## Benchmarks
+
+> **NOTE:** _This section contains work in progress._
+
+`EarCut()` on shape with 10 vertices takes `754ns`.
+
+Triangulation of 74 thousand buildings runs in `3.43s`.
+
 ## Future plans
 
 ### Optimizations
@@ -203,4 +212,4 @@ brainstorm some ideas.
 
 ## License
 
-MIT License (refer to the [LICENSE](LICENSE) file).
+MIT License – refer to the [LICENSE](LICENSE) file.

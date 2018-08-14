@@ -17,7 +17,7 @@ type Building struct {
 
 type Triangulated struct {
 	Properties map[string]string `json:"properties"`
-	Triangles []float64 `json:"triangles"`
+	Triangles  []float64         `json:"triangles"`
 }
 
 // parseData takes JSON naively to map[string]interface{} and returns more
@@ -134,7 +134,7 @@ func triangulate(buildings []Building) (
 		}
 
 		errorHappened := false
-		cleaned, err := EliminateHoles(b.Points)
+		cleaned, err := JoinHoles(b.Points)
 
 		if err != nil {
 			errorHappened = true
