@@ -141,7 +141,7 @@ func triangulate(buildings []Building) (
 			errorHappened = true
 		}
 
-		t, err := EarCut(cleaned)
+		t, err := Polygon(cleaned)
 
 		if err != nil {
 			errorHappened = true

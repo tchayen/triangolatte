@@ -1,12 +1,34 @@
 package triangolatte
 
-// Normal triangulates given array of points with no joint correction, according
-// to provided width in O(n) time.
-//
-// Returns array of two-coordinate CCW triangles one after another.
-func Normal(points []Point, width int) (triangles []float64) {
+import "errors"
+
+// Joint is a type of connection happening when lines joining two points meet.
+type Joint int
+
+const (
+	// Normal triangulates with no joint correction.
+	Normal Joint = 0
+	// Miter triangulates producing miter joints, i.e. extending the lines until
+	// they meet at some point.
+	Miter Joint = 1
+)
+
+// Line takes array of points and triangulates them to resemble a line of given
+// width. Returns array of two-coordinate CCW triangles one after another.
+func Line(joint Joint, points []Point, width int) ([]float64, error) {
+	switch joint {
+	case Normal:
+		return normal(points, width), nil
+	case Miter:
+		return miter(points, width), nil
+	default:
+		return nil, errors.New("Unrecognized joint type")
+	}
+}
+
+func normal(points []Point, width int) []float64 {
 	width /= 2.0
-	triangles = make([]float64, 0, len(points)*12)
+	triangles := make([]float64, 0, len(points)*12)
 	for i := 0; i <= len(points)-2; i++ {
 		dx := points[i+1].X - points[i].X
 		dy := points[i+1].Y - points[i].Y
@@ -33,14 +55,9 @@ func calculateNormals(x, y float64) [2]Point {
 	}
 }
 
-// Miter triangulates given array of points in O(n) time, using provided width
-// and producing miter joints, i.e. extending the lines until they meet at some
-// point.
-//
-// Returns array of two-coordinate CCW triangles one after another.
-func Miter(points []Point, width int) (triangles []float64) {
+func miter(points []Point, width int) []float64 {
 	width /= 2.0
-	triangles = make([]float64, 0, len(points)*12)
+	triangles := make([]float64, 0, len(points)*12)
 	var dx, dy float64
 	var miter1, miter2 Point
 	var n1, n2 [2]Point

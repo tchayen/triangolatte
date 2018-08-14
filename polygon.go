@@ -203,7 +203,7 @@ func (polygons byMaxX) Less(i, j int) bool {
 }
 
 // JoinHoles removes holes, joining them with the rest of the polygon.
-// Provides pre-processing for EarCut. First element of the points array is the
+// Provides pre-processing for Polygon. First element of the points array is the
 // outer polygon, the rest of them are considered as holes to be removed.
 func JoinHoles(points [][]Point) ([]Point, error) {
 	if len(points) == 0 {
@@ -230,11 +230,11 @@ func JoinHoles(points [][]Point) ([]Point, error) {
 	return current, nil
 }
 
-// EarCut triangulates given CCW polygon using ear clipping algorithm (takes
+// Polygon triangulates given CCW polygon using ear clipping algorithm (takes
 // O(n^2) time). Produces array of two-coordinate, CCW triangles, put one after
 // another. Returns empty array and error when triangulation did not complete
 // properly.
-func EarCut(points []Point) ([]float64, error) {
+func Polygon(points []Point) ([]float64, error) {
 	n := len(points)
 
 	if n < 3 {

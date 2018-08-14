@@ -1,8 +1,8 @@
 # triangolatte
 
-[![Build Status](https://travis-ci.org/Tchayen/triangolatte.svg?branch=master)](https://travis-ci.org/Tchayen/triangolatte)
-[![Coverage Status](https://coveralls.io/repos/github/Tchayen/triangolatte/badge.svg?branch=master)](https://coveralls.io/github/Tchayen/triangolatte?branch=master)
-[![GoDoc](https://godoc.org/github.com/Tchayen/triangolatte?status.svg)](https://godoc.org/github.com/Tchayen/triangolatte)
+[![Build Status](https://travis-ci.org/tchayen/triangolatte.svg?branch=master)](https://travis-ci.org/tchayen/triangolatte)
+[![Coverage Status](https://coveralls.io/repos/github/tchayen/triangolatte/badge.svg?branch=master)](https://coveralls.io/github/tchayen/triangolatte?branch=master)
+[![GoDoc](https://godoc.org/github.com/tchayen/triangolatte?status.svg)](https://godoc.org/github.com/tchayen/triangolatte)
 
 ![logo](assets/logo.png)
 
@@ -35,7 +35,7 @@ of cases and takes 3.43s._
 
 Nothing surprising
 ```bash
-go get github.com/Tchayen/triangolatte
+go get github.com/tchayen/triangolatte
 ```
 
 ## Usage
@@ -43,7 +43,7 @@ go get github.com/Tchayen/triangolatte
 #### Basic example
 ```go
 vertices := []Point{{10, 20}, {30, 40}, {50, 60}}
-t, err = triangolatte.EarCut(vertices)
+t, err = triangolatte.Polygon(vertices)
 ```
 
 ## Examples
@@ -62,7 +62,7 @@ mind and it will be its main performance target._
 
 ### API
 
-#### `EarCut(points []Point, holes [][]Point) ([]float64, error)`
+#### `Polygon(points []Point, holes [][]Point) ([]float64, error)`
 
 Takes array of points and produces array of triangle coordinates.
 
@@ -71,22 +71,13 @@ Based on the following [paper](https://www.geometrictools.com/Documentation/Tria
 #### `JoinHoles(points [][]Point) ([]Point, error)`
 
 Removes holes, joining them with the rest of the polygon. Provides preprocessing
-for `EarCut`. First element of the points array is the outer polygon, the rest
+for `Polygon`. First element of the points array is the outer polygon, the rest
 of them are considered as holes to be removed.
 
-#### `Normal(points []Point, width int) (triangles []float64)`
+#### `Line(joint Joint, points []Point, width int) ([]float64, error)`
 
-Normal triangulation. Produces joints that are ugly in zoom, but fast to compute
-and sometimes acceptable.
-
-#### `Miter(points []Point, width int) (triangles []float64)`
-
-Triangulates lines using miter joint. With little computational overhead,
-produces no more vertices than normal one. Comes with one drawback: very sharp
-angles can potentially explode to infinity.
-
-Refer to this [forum post](https://forum.libcinder.org/topic/smooth-thick-lines-using-geometry-shader)
-for sketches, code examples and ideas.
+Takes array of points and triangulates them to resemble a line of given
+width. Returns array of two-coordinate CCW triangles one after another.
 
 ### Helpers
 
@@ -96,7 +87,7 @@ Takes file name and returns array of arrays of points.
 
 #### `Deviation(data []Point, holes [][]Point, t []float64) (real, triangles, deviation float64)`
 
-Given original points, holes and triangles calculated by the `EarCut(...)`, can
+Given original points, holes and triangles calculated by the `Polygon(...)`, can
 be used to determine how much obtained polygon area differs from the real one.
 Might have false positives when areas of the triangles sum up to a correct value,
 while their positions make no sense.
@@ -114,6 +105,18 @@ For calculations using points.
 type Point struct {
   X, Y float64
 }
+```
+
+```go
+type Joint int
+
+const (
+	// Normal triangulates with no joint correction.
+	Normal Joint = 0
+	// Miter triangulates producing miter joints, i.e. extending the lines until
+	// they meet at some point.
+	Miter Joint = 1
+)
 ```
 
 ## Tests
@@ -142,7 +145,7 @@ It also supports hovering while still being a regular, valid `*.svg` file.
 
 ![assets/torch.svg](assets/torch.svg)
 
-You can view an example of `EarCut` benchmark flame graph in [assets/torch.svg](assets/torch.svg).
+You can view an example of `Polygon` benchmark flame graph in [assets/torch.svg](assets/torch.svg).
 
 > **NOTE:** _you must display the image file directly to use cool features
 described above._
@@ -166,13 +169,13 @@ export PATH=$PATH:$HOME/FlameGraph
 From now on, every time you want to generate a flame graph, simply run the
 commands below:
 
-> You can replace `EarCut` with any function name from `*_test.go` file, with
+> You can replace `Polygon` with any function name from `*_test.go` file, with
 > name starting with `Benchmark*`, stripping the prefix.
 >
-> For example, `func BenchmarkEarCut(...)` became `EarCut`.
+> For example, `func BenchmarkPolygon(...)` became `Polygon`.
 
 ```bash
-go test -run NONE -bench EarCut -cpuprofile prof.cpu
+go test -run NONE -bench Polygon -cpuprofile prof.cpu
 go tool pprof triangolatte.test prof.cpu
 go-torch triangolatte.test prof.cpu
 ```
@@ -183,7 +186,7 @@ Now you can open newly generated `torch.svg` in your web browser.
 
 > **NOTE:** _This section contains work in progress._
 
-`EarCut()` on shape with 10 vertices takes `754ns`.
+`Polygon()` on shape with 10 vertices takes `754ns`.
 
 Triangulation of 74 thousand buildings runs in `3.43s`.
 

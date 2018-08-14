@@ -4,6 +4,6 @@
 // Features normal and miter joint line triangulation. Handles polygons using
 // ear clipping algorithm with hole elimination included.
 //
-// Visit https://github.com/Tchayen/triangolatte for complete README with
+// Visit https://github.com/tchayen/triangolatte for complete README with
 // additional info and examples.
 package triangolatte

@@ -1,10 +1,10 @@
 {
-  "name": "triangolatte-example-webgl",
+  "name": "triangolatte-example-buildings",
   "version": "0.0.1",
   "main": "index.js",
   "author": {
     "name": "Tomasz Czajęcki",
-    "url": "https://github.com/Tchayen"
+    "url": "https://github.com/tchayen"
   },
   "license": "MIT",
   "scripts": {

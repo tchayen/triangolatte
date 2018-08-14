@@ -133,24 +133,6 @@ func TestJoinHoles(t *testing.T) {
 			{{1, 1}, {1, 3}, {4, 2}},
 		},
 		[]Point{{0, 0}, {4, 2}, {1, 1}, {1, 3}, {4, 2}, {0, 0}, {4, 0}, {4, 4}, {0, 4}},
-	}, {
-		"increasing X ordered holes",
-		[][]Point{
-			{{0, 0}, {7, 0}, {7, 3}, {0, 3}},
-			{{1, 1}, {2, 1}, {2, 2}, {1, 2}},
-			{{3, 1}, {4, 1}, {4, 2}, {3, 2}},
-			{{5, 1}, {6, 1}, {6, 2}, {5, 2}},
-		},
-		[]Point{{}},
-	}, {
-		"decreasing X ordered holes",
-		[][]Point{
-			{{0, 0}, {7, 0}, {7, 3}, {0, 3}},
-			{{5, 1}, {6, 1}, {6, 2}, {5, 2}},
-			{{3, 1}, {4, 1}, {4, 2}, {3, 2}},
-			{{1, 1}, {2, 1}, {2, 2}, {1, 2}},
-		},
-		[]Point{{}},
 	}}
 
 	for _, test := range testInfo {
@@ -165,7 +147,7 @@ func TestJoinHoles(t *testing.T) {
 
 			checkPointArray(t, result, test.Expected)
 
-			triangles, err := EarCut(result)
+			triangles, err := Polygon(result)
 
 			if err != nil {
 				t.Errorf("JoinHoles: %s", err)
@@ -200,7 +182,7 @@ func TestJoinHoles(t *testing.T) {
 	})
 }
 
-func TestEarCut(t *testing.T) {
+func TestPolygon(t *testing.T) {
 	type TestInfo struct {
 		Name  string
 		Shape []Point
@@ -221,7 +203,7 @@ func TestEarCut(t *testing.T) {
 
 	for _, s := range shapes {
 		t.Run(fmt.Sprintf("%s", s.Name), func(t *testing.T) {
-			res, err := EarCut(s.Shape)
+			res, err := Polygon(s.Shape)
 			if err != nil {
 				t.Error(err)
 			}
@@ -236,15 +218,15 @@ func TestEarCut(t *testing.T) {
 	}
 }
 
-func BenchmarkEarCut(b *testing.B) {
+func BenchmarkPolygon(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		EarCut([]Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}})
+		Polygon([]Point{{50, 110}, {150, 30}, {240, 115}, {320, 65}, {395, 170}, {305, 160}, {265, 240}, {190, 100}, {95, 125}, {100, 215}})
 	}
 }
 
-func TestIncorrectEarCut(t *testing.T) {
+func TestIncorrectPolygon(t *testing.T) {
 	var err error
-	_, err = EarCut([]Point{{0, 0}})
+	_, err = Polygon([]Point{{0, 0}})
 	if err == nil {
 		t.Errorf("The code did not return error on incorrect input")
 	}
@@ -256,7 +238,7 @@ func TestSortingByXMax(t *testing.T) {
 }
 
 func TestSingleTriangleTriangulation(t *testing.T) {
-	result, _ := EarCut([]Point{{0, 0}, {3, 0}, {4, 4}})
+	result, _ := Polygon([]Point{{0, 0}, {3, 0}, {4, 4}})
 	expected := []float64{4, 4, 0, 0, 3, 0}
 
 	t.Log(result)
@@ -273,7 +255,7 @@ func TestAghA0(t *testing.T) {
 		}
 	}
 
-	result, err := EarCut(agh[0]) // agh[1:]
+	result, err := Polygon(agh[0]) // agh[1:]
 
 	if err != nil {
 		t.Errorf("AghA0: %s", err)
@@ -296,7 +278,7 @@ func TestAghA0(t *testing.T) {
 // 		}
 // 	}
 //
-// 	result, err := EarCut(lakeSuperior[0]) // lakeSuperior[1:]
+// 	result, err := Polygon(lakeSuperior[0]) // lakeSuperior[1:]
 //
 // 	if err != nil {
 // 		t.Errorf("LakeSuperior: %s", err)
@@ -319,7 +301,7 @@ func TestAghA0(t *testing.T) {
 // 		}
 // 	}
 //
-// 	res, err := EarCut(points[0])
+// 	res, err := Polygon(points[0])
 //
 // 	if err != nil {
 // 		t.Errorf("FromFile: %s", err)
