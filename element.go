@@ -1,6 +1,6 @@
 package triangolatte
 
-// Element type is a wrapper for Point to be used in cyclic list.
+// Element type is a wrapper for Point used in cyclic list.
 type Element struct {
 	Prev, Next *Element
 	Point      Point

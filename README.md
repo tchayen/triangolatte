@@ -34,7 +34,6 @@ average MacBook._
 - [Examples](#examples)
 - [Features](#features)
   - [API](#api)
-  - [Helpers](#helpers)
   - [Types](#types)
 - [Tests](#tests)
   - [Flame Graphs](#flame-graphs)
@@ -93,13 +92,7 @@ width. Returns array of two-coordinate CCW triangles one after another.
 
 ### Types
 
-For calculations using points.
-```go
-type Point struct {
-  X, Y float64
-}
-```
-
+To select method of joining line segments.
 ```go
 type Joint int
 
@@ -109,6 +102,21 @@ const (
 	// Producing miter joints, i.e. extending the lines until they meet at some point.
 	Miter Joint = 1
 )
+```
+
+For calculations using points.
+```go
+type Point struct {
+  X, Y float64
+}
+```
+
+A wrapper for Point used in cyclic list.
+```go
+type Element struct {
+	Prev, Next *Element
+	Point      Point
+}
 ```
 
 ## Tests
