@@ -24,8 +24,8 @@ points) to the language of GPUs.
 Features normal and miter joint line triangulation. Handles polygons using ear
 clipping algorithm with hole elimination included.
 
-> **For reference:** _triangulation of all buildings in Cracow works for 99.76%
-of cases and takes 3.43s._
+> **For reference:** _triangulates 99.76% of buildings in Cracow under 3.43s on
+average MacBook._
 
 ## Table of contents
 
@@ -91,25 +91,6 @@ of them are considered as holes to be removed.
 Takes array of points and triangulates them to resemble a line of given
 width. Returns array of two-coordinate CCW triangles one after another.
 
-### Helpers
-
-#### `LoadPointsFromFile(fileName string) ([][]Point, error)`
-
-Takes file name and returns array of arrays of points.
-
-#### `Deviation(data []Point, holes [][]Point, t []float64) (real, triangles, deviation float64)`
-
-Given original points, holes and triangles calculated by the `Polygon(...)`, can
-be used to determine how much obtained polygon area differs from the real one.
-Might have false positives when areas of the triangles sum up to a correct value,
-while their positions make no sense.
-
-#### `DegreesToMeters(point Point) Point`
-
-Converts degrees from formats like `*.geojson` to meters using Web Mercator
-projection the one used by all internet maps and almost for sure the one you
-need if you are not sure.
-
 ### Types
 
 For calculations using points.
@@ -123,10 +104,9 @@ type Point struct {
 type Joint int
 
 const (
-	// Normal triangulates with no joint correction.
+	// No joint correction.
 	Normal Joint = 0
-	// Miter triangulates producing miter joints, i.e. extending the lines until
-	// they meet at some point.
+	// Producing miter joints, i.e. extending the lines until they meet at some point.
 	Miter Joint = 1
 )
 ```

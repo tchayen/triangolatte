@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math"
 
 	. "github.com/tchayen/triangolatte"
 )
@@ -37,6 +38,21 @@ type Trkpt struct {
 	Time      string  `xml:"time"`
 }
 
+// Origin shift comes from the circumference of the Earth in meters (6378137).
+const originShift = 2.0 * math.Pi * 6378137 / 2.0
+
+// degreesToMeters converts longitude and latitude using WGS84 Geodetic Datum to
+// meters with Spherical Mercator projection, known officially under EPSG:3857
+// codename.
+//
+// X is longitude, Y is latitude.
+func degreesToMeters(point Point) Point {
+	return Point{
+		X: point.X * originShift / 180.0,
+		Y: math.Log(math.Tan((90.0+point.Y)*math.Pi/360.0)) / (math.Pi / 180.0) * originShift / 180.0,
+	}
+}
+
 // XMLToGPX takes byte array from *.xml file and returns parsed GPX.
 func XMLToGPX(data []byte) (gpx GPX, err error) {
 	err = xml.Unmarshal(data, &gpx)
@@ -55,14 +71,14 @@ func GPXToPoints(gpx GPX) [][]Point {
 			lon, lat := trackPoint.Longitude, trackPoint.Latitude
 			point := Point{X: lon, Y: lat}
 
-			segmentPoints[i][j] = DegreesToMeters(point)
+			segmentPoints[i][j] = degreesToMeters(point)
 		}
 	}
 	return segmentPoints
 }
 
-// TriangulatePoints takes array of arrays of points and triangulates them.
-func TriangulatePoints(points [][]Point) [][]float64 {
+// triangulatePoints takes array of arrays of points and triangulates them.
+func triangulatePoints(points [][]Point) [][]float64 {
 	triangles := make([][]float64, len(points))
 	for i := range points {
 		triangles[i], _ = Line(Miter, points[i], 2)
@@ -85,7 +101,7 @@ func main() {
 	}
 
 	segmentPoints := GPXToPoints(gpx)
-	triangles := TriangulatePoints(segmentPoints)
+	triangles := triangulatePoints(segmentPoints)
 
 	fmt.Println(triangles)
 }

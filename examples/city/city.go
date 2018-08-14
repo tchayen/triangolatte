@@ -16,9 +16,61 @@ type Building struct {
 	Points     [][]Point
 }
 
+// Triangulated is a variation of building containing triangulated points.
 type Triangulated struct {
 	Properties map[string]string `json:"properties"`
 	Triangles  []float64         `json:"triangles"`
+}
+
+// Origin shift comes from the circumference of the Earth in meters (6378137).
+const originShift = 2.0 * math.Pi * 6378137 / 2.0
+
+// degreesToMeters converts longitude and latitude using WGS84 Geodetic Datum to
+// meters with Spherical Mercator projection, known officially under EPSG:3857
+// codename.
+//
+// X is longitude, Y is latitude.
+func degreesToMeters(point Point) Point {
+	return Point{
+		X: point.X * originShift / 180.0,
+		Y: math.Log(math.Tan((90.0+point.Y)*math.Pi/360.0)) / (math.Pi / 180.0) * originShift / 180.0,
+	}
+}
+
+// polygonArea calculates real area of the polygon.
+func polygonArea(data []Point) float64 {
+	area := 0.0
+	for i, j := 0, len(data)-1; i < len(data); i++ {
+		area += data[i].X*data[j].Y - data[i].Y*data[j].X
+		j = i
+	}
+	return math.Abs(area / 2)
+}
+
+// trianglesArea calculates summed area of all triangles.
+func trianglesArea(t []float64) float64 {
+	trianglesArea := 0.0
+	for i := 0; i < len(t); i += 6 {
+		trianglesArea += math.Abs((t[i]*(t[i+3]-t[i+5]) + t[i+2]*(t[i+5]-t[i+1]) + t[i+4]*(t[i+1]-t[i+3])) / 2)
+	}
+	return trianglesArea
+}
+
+// deviation calculates difference between real area and the one from
+// triangulation. Used as a helper function.
+func deviation(data []Point, holes [][]Point, t []float64) (
+	actual,
+	calculated,
+	deviation float64,
+) {
+	calculated = trianglesArea(t)
+	actual = polygonArea(data)
+	for _, h := range holes {
+		actual -= polygonArea(h)
+	}
+
+	deviation = math.Abs(calculated - actual)
+	return
 }
 
 // parseData takes JSON naively to map[string]interface{} and returns more
@@ -65,7 +117,7 @@ func parseData(m map[string]interface{}) (buildings []Building) {
 					}
 
 					// Convert coordinates.
-					pointInMeters := DegreesToMeters(point)
+					pointInMeters := degreesToMeters(point)
 					buildings[i].Points[j] = append(buildings[i].Points[j], pointInMeters)
 				}
 			}
@@ -153,7 +205,7 @@ func triangulate(buildings []Building) (
 		} else {
 			h = [][]Point{}
 		}
-		_, _, deviation := Deviation(b.Points[0], h, t)
+		_, _, deviation := deviation(b.Points[0], h, t)
 
 		triangulated[i] = Triangulated{b.Properties, t}
 

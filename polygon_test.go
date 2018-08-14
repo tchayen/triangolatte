@@ -20,8 +20,8 @@ func TestDeviation(t *testing.T) {
 	data := []Point{{0, 4}, {3, 1}, {8, 2}, {9, 5}, {4, 6}}
 	triangles := []float64{4, 6, 0, 4, 3, 1, 4, 6, 3, 1, 8, 2, 8, 2, 9, 5, 4, 6}
 
-	actual, calculated, deviation := Deviation(data, [][]Point{}, triangles)
-	if deviation > 0 {
+	actual, calculated, deviationResult := deviation(data, [][]Point{}, triangles)
+	if deviationResult > 0 {
 		t.Errorf("real: %f, actual: %f", actual, calculated)
 	}
 }
@@ -155,8 +155,8 @@ func TestJoinHoles(t *testing.T) {
 
 			t.Log(triangles)
 
-			actual, calculated, deviation := Deviation(test.Points[0], test.Points[1:], triangles)
-			if deviation > 0 {
+			actual, calculated, deviationResult := deviation(test.Points[0], test.Points[1:], triangles)
+			if deviationResult > 0 {
 				t.Errorf("real: %f, actual: %f", actual, calculated)
 			}
 		})
@@ -208,7 +208,7 @@ func TestPolygon(t *testing.T) {
 				t.Error(err)
 			}
 
-			actual, calculated, dif := Deviation(s.Shape, [][]Point{}, res)
+			actual, calculated, dif := deviation(s.Shape, [][]Point{}, res)
 
 			if dif != 0 {
 				t.Errorf("#%s: real area: %f; result: %f", s.Name, actual, calculated)
@@ -247,10 +247,10 @@ func TestSingleTriangleTriangulation(t *testing.T) {
 }
 
 func TestAghA0(t *testing.T) {
-	agh, _ := LoadPointsFromFile("assets/agh_a0")
+	agh, _ := loadPointsFromFile("assets/agh_a0")
 	for i := range agh {
 		for j := range agh[i] {
-			p := DegreesToMeters(agh[i][j])
+			p := degreesToMeters(agh[i][j])
 			agh[i][j] = Point{3 * (p.X - 2217750), 3 * (p.Y - 6457350)}
 		}
 	}
@@ -261,8 +261,8 @@ func TestAghA0(t *testing.T) {
 		t.Errorf("AghA0: %s", err)
 	}
 
-	actual, calculated, deviation := Deviation(agh[0], [][]Point{}, result)
-	if deviation > 1e-10 {
+	actual, calculated, deviationResult := deviation(agh[0], [][]Point{}, result)
+	if deviationResult > 1e-10 {
 		t.Errorf("real area: %f; result: %f", actual, calculated)
 	}
 }
@@ -273,7 +273,7 @@ func TestAghA0(t *testing.T) {
 //
 // 	for i := range lakeSuperior {
 // 		for j := range lakeSuperior[i] {
-// 			p := DegreesToMeters(lakeSuperior[i][j])
+// 			p := degreesToMeters(lakeSuperior[i][j])
 // 			lakeSuperior[i][j] = Point{math.Abs(p.X), math.Abs(p.Y)}
 // 		}
 // 	}
@@ -296,7 +296,7 @@ func TestAghA0(t *testing.T) {
 //
 // 	for i := range points {
 // 		for j := range points[i] {
-// 			p := DegreesToMeters(points[i][j])
+// 			p := degreesToMeters(points[i][j])
 // 			points[i][j] = p
 // 		}
 // 	}
@@ -307,8 +307,8 @@ func TestAghA0(t *testing.T) {
 // 		t.Errorf("FromFile: %s", err)
 // 	}
 //
-// 	actual, calculated, deviation := Deviation(points[0], [][]Point{}, res)
-// 	if deviation > 1e-10 {
+// 	actual, calculated, deviationResult := deviation(points[0], [][]Point{}, res)
+// 	if deviationResult > 1e-10 {
 // 		t.Errorf("real area: %f; result: %f", actual, calculated)
 // 	}
 //
