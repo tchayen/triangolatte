@@ -15,7 +15,7 @@ const (
 
 // Line takes array of points and triangulates them to resemble a line of given
 // width. Returns array of two-coordinate CCW triangles one after another.
-func Line(joint Joint, points []Point, width int) ([]float64, error) {
+func Line(joint Joint, points []Point, width float64) ([]float64, error) {
 	switch joint {
 	case Normal:
 		return normal(points, width), nil
@@ -26,14 +26,14 @@ func Line(joint Joint, points []Point, width int) ([]float64, error) {
 	}
 }
 
-func normal(points []Point, width int) []float64 {
+func normal(points []Point, width float64) []float64 {
 	width /= 2.0
 	triangles := make([]float64, 0, len(points)*12)
 	for i := 0; i <= len(points)-2; i++ {
 		dx := points[i+1].X - points[i].X
 		dy := points[i+1].Y - points[i].Y
-		n1 := Point{dy, -dx}.Scale(float64(width))
-		n2 := Point{-dy, dx}.Scale(float64(width))
+		n1 := Point{dy, -dx}.Scale(width)
+		n2 := Point{-dy, dx}.Scale(width)
 
 		v0, v1 := points[i+1].Add(n2).X, points[i+1].Add(n2).Y
 		v2, v3 := points[i].Add(n2).X, points[i].Add(n2).Y
@@ -55,7 +55,7 @@ func calculateNormals(x, y float64) [2]Point {
 	}
 }
 
-func miter(points []Point, width int) []float64 {
+func miter(points []Point, width float64) []float64 {
 	width /= 2.0
 	triangles := make([]float64, 0, len(points)*12)
 	var dx, dy float64
@@ -66,7 +66,7 @@ func miter(points []Point, width int) []float64 {
 	dy = points[1].Y - points[0].Y
 
 	n2 = calculateNormals(dx, dy)
-	miter2 = n2[0].Scale(float64(width))
+	miter2 = n2[0].Scale(width)
 
 	for i := 1; i < len(points)-1; i++ {
 		// Shift calculated values.
@@ -102,7 +102,7 @@ func miter(points []Point, width int) []float64 {
 
 	// Use last normal as another 'neutral element' for miter join.
 	n := len(points)
-	lastMiter := n2[0].Scale(float64(width))
+	lastMiter := n2[0].Scale(width)
 
 	v0, v1 := points[n-1].Sub(lastMiter).X, points[n-1].Sub(lastMiter).Y
 	v2, v3 := points[n-2].Sub(miter1).X, points[n-2].Sub(miter1).Y
