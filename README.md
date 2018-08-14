@@ -4,6 +4,8 @@
 [![Coverage Status](https://coveralls.io/repos/github/Tchayen/triangolatte/badge.svg?branch=master)](https://coveralls.io/github/Tchayen/triangolatte?branch=master)
 [![GoDoc](https://godoc.org/github.com/Tchayen/triangolatte?status.svg)](https://godoc.org/github.com/Tchayen/triangolatte)
 
+![logo](assets/logo.png)
+
 2D triangulation library. Allows translating lines and polygons (both based on
 points) to the language of GPUs.
 

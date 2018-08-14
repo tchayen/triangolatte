@@ -34,6 +34,7 @@ h1 {
   flex-direction: column;
   align-items: center;
   padding: 20px 0;
+  width: 70vw;
 
   .buttons {
     display: flex;
@@ -149,6 +150,7 @@ h1 {
   font-family: 'Roboto Mono', 'monospaced';
   color: #888;
   width: 100%;
+  max-width: 70vw;
   height: 200px;
   border-radius: 8px;
   padding: 24px;

@@ -27,7 +27,7 @@ module.exports = {
     new webpack.DefinePlugin({
       __SERVER__: JSON.stringify(process.env.NODE_ENV === 'production'
         ? 'http://178.62.254.13'
-        : 'http://localhost:3000'
+        : 'http://localhost:3010'
       )
     })
   ]

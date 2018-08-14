@@ -72,7 +72,7 @@ func main() {
 	http.HandleFunc("/", staticHandler)
 	http.HandleFunc("/api/", apiHandler)
 
-	port := 3000
+	port := 3010
 	log.Printf("Listening on :%d...\n", port)
 	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 
