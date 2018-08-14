@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	. "triangolatte"
+
+	. "github.com/tchayen/triangolatte"
 )
 
 // GPX is the root element in the XML file.

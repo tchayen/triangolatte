@@ -6,7 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 	"math"
-	. "triangolatte"
+
+	. "github.com/tchayen/triangolatte"
 )
 
 // Building collects meta data about building and its points.
