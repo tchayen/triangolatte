@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/tchayen/triangolatte.svg?branch=master)](https://travis-ci.org/tchayen/triangolatte)
 [![Coverage Status](https://coveralls.io/repos/github/tchayen/triangolatte/badge.svg?branch=master)](https://coveralls.io/github/tchayen/triangolatte?branch=master)
-[![GoDoc](https://godoc.org/github.com/tchayen/triangolatte?status.svg)](https://godoc.org/github.com/tchayen/triangolatte)
+[![GoDoc](https://godoc.org/github.com/tchayen/triangolatte?status.svg)](https://godoc.org/github.com/tchayen/triangolatte) [![Join the chat at https://gitter.im/triangolatte/Lobby](https://badges.gitter.im/triangolatte/Lobby.svg)](https://gitter.im/triangolatte/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ![logo](assets/logo.png)
 
