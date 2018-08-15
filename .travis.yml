@@ -1,9 +1,10 @@
 language: go
-sudo: false
+sudo: true
 go:
   - tip
 before_install:
   - go get github.com/mattn/goveralls
+  - apt-get install libgl1-mesa-dev xorg-dev
   - go get -u github.com/go-gl/glfw/v3.2/glfw
   - go get -u github.com/go-gl/gl/v4.1-core/gl
 script:
