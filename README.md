@@ -117,6 +117,13 @@ type Element struct {
 }
 ```
 
+### Helpers
+
+You can have a look at `helpers.go` file. It stores triangolatte's helper
+functions used mostly by tests and examples. They are not exported because I
+don't want to commit to supporting them in the future, but they might turn out
+useful for you.
+
 ## Tests
 
 Code is (more or less) covered in tests. You can run them like this:
