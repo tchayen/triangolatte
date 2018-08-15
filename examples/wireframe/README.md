@@ -2,7 +2,7 @@
 
 ![screenshot](../../assets/wireframe_screenshot.png)
 
-Desktop OpenGL app
+Desktop OpenGL app for previewing triangulated shapes with wireframes.
 
 ## Installation
 
@@ -18,3 +18,6 @@ go get -u github.com/go-gl/gl/v4.1-core/gl
 ```bash
 go run wireframe.go
 ```
+
+UI window should appear. Any errors will be printed to the console in which you
+have typed the command above.
