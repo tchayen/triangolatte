@@ -12,34 +12,11 @@ import (
 )
 
 const (
-	windowWidth  = 500
-	windowHeight = 500
-	previewSize  = 1.5 // Anything in (0, 2]
-
-	vertexShaderSource = `
-		#version 410
-		in vec3 position;
-		// in vec3 barycentric;
-		out vec3 vbc;
-		void main() {
-			vbc = vec3(1, 1, 1);//barycentric;
-			gl_Position = vec4(position, 1.0);
-		}
-` + "\x00"
-
-	fragmentShaderSource = `
-		#version 410
-		in vec3 vbc;
-		out vec4 color;
-		void main() {
-			// if (any(lessThan(vbc, vec3(0.02)))) {
-			// 	color = vec4(0.0, 0.0, 0.0, 1.0);
-			// } else {
-			// 	color = vec4(0.5, 0.5, 0.5, 1.0);
-			// }
-			color = vec4(0, 0, 0, 1);
-		}
-` + "\x00"
+	windowWidth  = 400
+	windowHeight = 400
+	previewSize  = 1.5 // Anything in (0, 2].
+	lineWidth    = 1.0
+	grayColor    = 0.7
 )
 
 var (
@@ -48,9 +25,35 @@ var (
 	vao         uint32
 	triangles   []float32
 	barycentric []float32
-	points      = []Point{{X: 0, Y: 0}, {X: 5, Y: 0}, {X: 2, Y: 2}, {X: 3, Y: 4}, {X: 0, Y: 4}}
+	points      = []Point{{X: 50, Y: 110}, {X: 150, Y: 30}, {X: 240, Y: 115}, {X: 320, Y: 65}, {X: 395, Y: 170}, {X: 305, Y: 160}, {X: 265, Y: 240}, {X: 190, Y: 100}, {X: 95, Y: 125}, {X: 100, Y: 215}}
+
+	vertexShaderSource = `
+		#version 410
+		layout (location = 0) in vec2 position;
+		layout (location = 1) in vec3 barycentric;
+		out vec3 vbc;
+		void main() {
+			vbc = barycentric;
+			gl_Position = vec4(position, 0.0, 1.0);
+		}
+	` + "\x00"
+
+	fragmentShaderSource = fmt.Sprintf(`
+		#version 410
+		#extension GL_OES_standard_derivatives : enable
+		in vec3 vbc;
+		out vec4 color;
+		float edgeFactor() {
+			vec3 d = fwidth(vbc);
+			vec3 a3 = smoothstep(vec3(0.0), d * %f, vbc);
+			return min(min(a3.x, a3.y), a3.z);
+		}
+		void main() {
+			color = vec4(mix(vec3(0.0), vec3(%f), edgeFactor()), 1.0);
+		}`+"\x00", lineWidth, grayColor)
 )
 
+// check does simple error check and panics with the error message (if any).
 func check(err error) {
 	if err != nil {
 		panic(err)
@@ -211,19 +214,22 @@ func makeVao() {
 		)
 	}
 
-	getAttribute := func(vbo uint32, index uint32) {
+	getAttribute := func(vbo uint32, index uint32, size int32) {
 		gl.EnableVertexAttribArray(index)
 		gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
-		gl.VertexAttribPointer(index, 2, gl.FLOAT, false, 0, nil)
+		gl.VertexAttribPointer(index, size, gl.FLOAT, false, 0, nil)
 	}
 
-	var trianglesVbo uint32
-	getBuffer(&trianglesVbo, triangles)
+	var trianglesVbo, barycentricVbo uint32
 
 	gl.GenVertexArrays(1, &vao)
 	gl.BindVertexArray(vao)
 
-	getAttribute(trianglesVbo, 0)
+	getBuffer(&trianglesVbo, triangles)
+	getBuffer(&barycentricVbo, barycentric)
+
+	getAttribute(trianglesVbo, 0, 2)
+	getAttribute(barycentricVbo, 1, 3)
 }
 
 // draw takes vao, count of vertices to draw and program to use.
