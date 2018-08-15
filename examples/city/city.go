@@ -152,7 +152,7 @@ func findMinMax(points []Point) (xMin, yMin, xMax, yMax float64) {
 }
 
 // normalizeCoordinates takes building coordinates and changes them to fit in
-// range [0.0, 1.0].
+// range [0.0, 1.0] (stretching them to square).
 func normalizeCoordinates(buildings []Building) {
 	for _, b := range buildings {
 		if len(b.Points) == 0 {

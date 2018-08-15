@@ -4,18 +4,11 @@
 </h1>
 
 <p align="center">
-  <a href="https://travis-ci.org/tchayen/triangolatte">
-    <img src="https://travis-ci.org/tchayen/triangolatte.svg?branch=master" alt="Travis status">
-  </a>
-  <a href="https://coveralls.io/github/tchayen/triangolatte?branch=master">
-    <img src="https://coveralls.io/repos/github/tchayen/triangolatte/badge.svg?branch=master" alt="Coveralls status">
-  </a>
-  <a href="https://godoc.org/github.com/tchayen/triangolatte">
-    <img src="https://godoc.org/github.com/tchayen/triangolatte?status.svg" alt="Godoc reference">
-  </a>
-  <a href="https://gitter.im/triangolatte/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge">
-    <img src="https://badges.gitter.im/triangolatte/Lobby.svg" alt="Join the chat at https://gitter.im/triangolatte/Lobby">
-  </a>
+  <a href="https://travis-ci.org/tchayen/triangolatte"><img src="https://travis-ci.org/tchayen/triangolatte.svg?branch=master"></a>
+  <a href="https://coveralls.io/github/tchayen/triangolatte?branch=master"><img src="https://coveralls.io/repos/github/tchayen/triangolatte/badge.svg?branch=master"></a>
+  <a href="https://godoc.org/github.com/tchayen/triangolatte"><img src="https://godoc.org/github.com/tchayen/triangolatte?status.svg"></a>
+  <a href="https://gitter.im/triangolatte/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img src="https://badges.gitter.im/triangolatte/Lobby.svg"></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
 </p>
 
 2D triangulation library. Allows translating lines and polygons (both based on
@@ -24,8 +17,8 @@ points) to the language of GPUs.
 Features normal and miter joint line triangulation. Handles polygons using ear
 clipping algorithm with hole elimination included.
 
-> **For reference:** _triangulates 99.76% of buildings in Cracow under 3.43s on
-average MacBook._
+> **For reference:** _triangulates 99.76% of 75 thousand buildings in Cracow under 3.43s on
+average programmer notebook (single threaded)._
 
 ## Table of contents
 
@@ -36,8 +29,8 @@ average MacBook._
   - [API](#api)
   - [Types](#types)
 - [Tests](#tests)
-  - [Flame Graphs](#flame-graphs)
 - [Benchmarks](#benchmarks)
+  - [Flame Graphs](#flame-graphs)
 - [Future plans](#future-plans)
 - [Contributing](#contributing)
 - [License](#license)
@@ -60,11 +53,14 @@ t, err = triangolatte.Polygon(vertices)
 ## Examples
 
 In `/examples` you can find:
-- **city** – triangulation of whole city downloaded from Open Street Map
 - **buildings** – full-blown WebGL previewer of buildings triangulated in _city_ example
+- **city** – triangulation of whole city downloaded from Open Street Map
 - **gpx** – GPX format parsing and triangulation of its data
+- **wireframe** – desktop OpenGL wireframe previewer for triangulated shapes
 
 You will find instructions for running the code there.
+
+![screenshot](assets/wireframe_screenshot.png)
 
 ## Features
 
@@ -116,6 +112,13 @@ type Element struct {
 }
 ```
 
+### Helpers
+
+You can have a look at `helpers.go` file. It stores triangolatte's helper
+functions used mostly by tests and examples. They are not exported because I
+don't want to commit to supporting them in the future, but they might turn out
+useful for you.
+
 ## Tests
 
 Code is (more or less) covered in tests. You can run them like this:
@@ -130,62 +133,23 @@ You can also run benchmarks for selected functions (refer to the `*_test.go` fil
 go test -run NONE -bench IsInsideTriangle
 ```
 
+## Benchmarks
+
+> **NOTE:** _This section contains work in progress. Numbers below are better reference point than nothing, but still far from perfect._
+
+`Polygon()` on shape with 10 vertices takes `754ns` on average.
+
+Triangulation of 75 thousand buildings runs for around `3.43s`.
+
+_Using average programmer's notebook. Expect speed up on faster CPUs or while splitting execution into separate threads._
+
 ### Flame Graphs
 
-What is a _flame graph_? Simply speaking, a human-readable insight into what
-kept CPU busy (and it resembles fire 🔥).
-
-It has intelligent zoom that lets you narrow down the range to a particular
-function from the flame and go back quickly at will.
-
-It also supports hovering while still being a regular, valid `*.svg` file.
+CPU time % usage snaphost using Flame Graphs:
 
 ![assets/torch.svg](assets/torch.svg)
 
-You can view an example of `Polygon` benchmark flame graph in [assets/torch.svg](assets/torch.svg).
-
-> **NOTE:** _you must display the image file directly to use cool features
-described above._
-
-#### Generating flame graph
-
-Install [go-torch](https://github.com/uber/go-torch) and [FlameGraph](https://github.com/brendangregg/FlameGraph)
-if you haven't done it before.
-
-```bash
-go get github.com/uber/go-torch
-
-# In any directory, $HOME for example.
-git clone https://github.com/brendangregg/FlameGraph
-
-# You might want to add this to your .bashrc or other equivalent.
-# NOTE: replace the path with the one you chose for your FlameGraph installation.
-export PATH=$PATH:$HOME/FlameGraph
-```
-
-From now on, every time you want to generate a flame graph, simply run the
-commands below:
-
-> You can replace `Polygon` with any function name from `*_test.go` file, with
-> name starting with `Benchmark*`, stripping the prefix.
->
-> For example, `func BenchmarkPolygon(...)` became `Polygon`.
-
-```bash
-go test -run NONE -bench Polygon -cpuprofile prof.cpu
-go tool pprof triangolatte.test prof.cpu
-go-torch triangolatte.test prof.cpu
-```
-
-Now you can open newly generated `torch.svg` in your web browser.
-
-## Benchmarks
-
-> **NOTE:** _This section contains work in progress._
-
-`Polygon()` on shape with 10 vertices takes `754ns`.
-
-Triangulation of 74 thousand buildings runs in `3.43s`.
+Want to learn what is it or maybe you are willing to generate one yourself? Check [FlameGraphs](flame_graphs.md) document in this repository.
 
 ## Future plans
 
@@ -194,13 +158,14 @@ Triangulation of 74 thousand buildings runs in `3.43s`.
 > **NOTE**: _this library is developed mostly with map data triangulation in
 mind and it will be its main performance target._
 
-- allow reusing point array for massive allocation reduction
-- test z-ordering for early returning in ear detection
+- explore possibilities for optimizations in `JoinHoles(...)`
+- maybe allow reusing point array for massive allocation reduction
 
-### Making the library more professional
+### Content
 
-By providing more examples, real benchmarks with comparison to libraries in
-other languages.
+- provide more examples (e.g. desktop OpenGL usage, mobile app, live rendering pipeline, other unusual use cases...)
+- add benchmarks with comparison to libraries in
+other languages
 
 ### WebAssembly
 
@@ -210,9 +175,11 @@ for use in JS.
 
 ## Contributing
 
-You are welcome to create an issue or pull request if you've got an idea what to do.
+You are welcome to create an issue or pull request if you've got an idea what to
+do. It is usually a good idea to visit [Gitter](https://gitter.im/triangolatte/Lobby)
+and discuss your thoughts.
 
-Don't have one, but still want to contribute? Get in touch with me and we can
+Don't have one, but still want to contribute? Get in touch with us and we can
 brainstorm some ideas.
 
 ## License

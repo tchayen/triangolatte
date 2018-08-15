@@ -73,6 +73,7 @@ class App extends Component {
             // More complicated than rectangle.
             b.triangles.length > 12
           )
+          // .filter(b => b.properties['@id'] === 'relation/214263')
 
         this.setState({
           triangleData: {
