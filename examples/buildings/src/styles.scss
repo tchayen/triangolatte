@@ -26,7 +26,9 @@ h1 {
   font-size: 24px;
   font-weight: 400;
   margin: 0;
-  color: #345;
+  color: #111;
+  line-height: 36px;
+  text-align: center;
 }
 
 .panel {
@@ -52,20 +54,19 @@ h1 {
       font-size: 13px;
       font-weight: 700;
       transition: 0.15s all;
-      margin-right: 20px;
       display: flex;
       justify-content: center;
       align-items: center;
-      color: #345;
-      background-color: rgb(136, 153, 170);
+      color: #fff;
+      background-color: #111;
       @include no-select();
 
       .spinner div {
-        border-color: #345 transparent transparent transparent;
+        border-color: #777 transparent transparent transparent;
       }
 
       &:hover {
-        box-shadow: 0 4px 16px rgba(136, 153, 170, 0.6);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
       }
 
       &:last-child {
@@ -134,13 +135,13 @@ h1 {
   .dot {
     line-height: 32px;
     padding-bottom: 80px;
-    color: rgba(136, 153, 170, 0.15);
+    color: #ccc;
     font-size: 128px;
     transition: 0.15s color;
   }
 
   .selected {
-    color: rgb(136, 153, 170);
+    color: #000;
     transition: 0.15s color;
   }
 }
@@ -156,7 +157,7 @@ h1 {
   padding: 24px;
   overflow: scroll;
   margin: 0 0 30px;
-  background-color: rgba(136, 153, 170, 0.15);
+  background-color: rgba(150, 150, 150, 0.15);
 }
 
 .spinner {

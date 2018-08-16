@@ -60,7 +60,7 @@ In `/examples` you can find:
 
 You will find instructions for running the code there.
 
-![screenshot](assets/wireframe_screenshot.png)
+![screenshot](assets/examples_screenshot.png)
 
 ## Features
 
