@@ -5,11 +5,13 @@
 
 <p align="center">
   <a href="https://travis-ci.org/tchayen/triangolatte"><img src="https://travis-ci.org/tchayen/triangolatte.svg?branch=master"></a>
+  <a href="https://goreportcard.com/report/github.com/tchayen/triangolatte"><img src="https://goreportcard.com/badge/github.com/tchayen/triangolatte"></a>
   <a href="https://coveralls.io/github/tchayen/triangolatte?branch=master"><img src="https://coveralls.io/repos/github/tchayen/triangolatte/badge.svg?branch=master"></a>
   <a href="https://godoc.org/github.com/tchayen/triangolatte"><img src="https://godoc.org/github.com/tchayen/triangolatte?status.svg"></a>
-  <a href="https://gitter.im/triangolatte/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img src="https://badges.gitter.im/triangolatte/Lobby.svg"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
+  <a href="https://gitter.im/triangolatte/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge"><img src="https://badges.gitter.im/triangolatte/Lobby.svg"></a>
 </p>
+
 
 2D triangulation library. Allows translating lines and polygons (both based on
 points) to the language of GPUs.
