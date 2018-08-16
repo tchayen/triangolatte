@@ -17,6 +17,8 @@ points) to the language of GPUs.
 Features normal and miter joint line triangulation. Handles polygons using ear
 clipping algorithm with hole elimination included.
 
+![screenshot](assets/examples_screenshot.png)
+
 > **For reference:** _triangulates 99.76% of 75 thousand buildings in Cracow under 3.43s on
 average programmer notebook (single threaded)._
 
@@ -59,8 +61,6 @@ In `/examples` you can find:
 - **wireframe** – desktop OpenGL wireframe previewer for triangulated shapes
 
 You will find instructions for running the code there.
-
-![screenshot](assets/examples_screenshot.png)
 
 ## Features
 
