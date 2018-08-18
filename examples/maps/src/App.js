@@ -3,8 +3,9 @@ import React, { Component } from 'react'
 import './styles.scss'
 
 const workerTask = () => {
-  fetch(`${SERVER}/data.geojson`)
-    .then(value => value.json())
+  fetch(`${SERVER}/data`)
+    .then(value => value.arrayBuffer())
+    .then(value => new Float32Array(value))
     .then(value => postMessage(value))
     .catch(error => postMessage({ error: 'data download failed' }))
 }

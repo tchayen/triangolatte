@@ -73,8 +73,8 @@ func deviation(data []Point, holes [][]Point, t []float64) (
 	return
 }
 
-// parseData takes JSON naively to map[string]interface{} and returns more
-// organized []Building array.
+// parseData takes JSON naively converted to map[string]interface{} and returns
+// more organized []Building array.
 func parseData(m map[string]interface{}) (buildings []Building) {
 	// This part is really ugly, but gets the job done with converting
 	// unstructured JSON to GO.
