@@ -1,28 +1,18 @@
 package main
 
 import (
+	"bufio"
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"math"
 	"net/http"
+	"os"
 
 	. "github.com/tchayen/triangolatte"
 )
-
-// TODO
-//
-// backend:
-// - read *.geojson file
-// - triangulate its content
-// - join the arrays
-// - save as one huge binary blob array buffer whatever
-// - serve it as a file
-//
-// frontend:
-// - read array buffer file
-// - display it
 
 // Shape joins type info about geometry feature and its points.
 type Shape struct {
@@ -37,9 +27,9 @@ func check(err error) {
 	}
 }
 
-// loadFileToJSON
+// loadFileToJSON takes file name and returns JSON as a map[string]interface{}.
 func loadFileToJSON(fileName string) map[string]interface{} {
-	file, err := ioutil.ReadFile("./data.geojson")
+	file, err := ioutil.ReadFile(fileName)
 	check(err)
 
 	var m map[string]interface{}
@@ -63,7 +53,7 @@ func degreesToMeters(point Point) Point {
 	}
 }
 
-// parseData
+// parseData takes map created from JSON file and returns array of shapes.
 func parseData(m map[string]interface{}) []Shape {
 	shapes := make([]Shape, 0)
 	for i, f := range m["features"].([]interface{}) {
@@ -101,27 +91,112 @@ func parseData(m map[string]interface{}) []Shape {
 	return shapes
 }
 
-// normalize
+// findGlobalBounds takes array of shapes and finds min and max coordinates.
+func findGlobalBounds(shapes []Shape) (xMin, yMin, xMax, yMax float64) {
+	xMin, yMin, xMax, yMax = math.MaxFloat64, math.MaxFloat64, 0.0, 0.0
+	for _, s := range shapes {
+		for i := range s.Points {
+			for _, p := range s.Points[i] {
+				if p.X < xMin {
+					xMin = p.X
+				}
+
+				if p.X > xMax {
+					xMax = p.X
+				}
+
+				if p.Y < yMin {
+					yMin = p.Y
+				}
+
+				if p.Y > yMax {
+					yMax = p.Y
+				}
+			}
+		}
+	}
+	return
+}
+
+// normalize puts all points in range [-1, 1], where the longer axis (either X
+// or Y) is stretched to the whole range and the other is translated in a way
+// that keeps proportions.
 func normalize(shapes []Shape) []Shape {
+	for k := range shapes {
+		xMin, yMin, xMax, yMax := findGlobalBounds(shapes)
+		min, max := math.Min(xMin, yMin), math.Max(xMax, yMax)
+		for i := range shapes[k].Points {
+			for j := range shapes[k].Points[i] {
+				p := shapes[k].Points[i][j]
+				shapes[k].Points[i][j] = Point{
+					X: (p.X - min) / (max - min),
+					Y: (p.Y - min) / (max - min),
+				}
+			}
+		}
+	}
 	return shapes
 }
 
-// triangulate
+// triangulate takes array of shapes and returns them triangulated based on
+// their type.
 func triangulate(shapes []Shape) [][]float64 {
-	return [][]float64{}
+	triangles := make([][]float64, len(shapes))
+	var err error
+
+	for i, s := range shapes {
+		switch s.Type {
+		case "Polygon":
+			joined, err := JoinHoles(s.Points)
+			check(err)
+			triangles[i], err = Polygon(joined)
+		case "LineString":
+			triangles[i], err = Line(Miter, s.Points[0], 2)
+		}
+		check(err)
+	}
+	return triangles
 }
 
-// flatten
+// flatten joins array of []float64 into one array.
 func flatten(triangles [][]float64) []float64 {
-	return []float64{}
+	size := 0
+	for i := range triangles {
+		size += len(triangles[i])
+	}
+
+	flattened := make([]float64, size)
+	offset := 0
+	for i := range triangles {
+		for j := range triangles[i] {
+			flattened[offset+j] = triangles[i][j]
+		}
+		offset += len(triangles[i])
+	}
+
+	return flattened
 }
 
-// saveToFile
-func saveToFile(vertices []float64) {
-
+// toFloat32 takes array of float64 elements and changes them to float32.
+func toFloat32(array []float64) []float32 {
+	converted := make([]float32, len(array))
+	for i, v := range array {
+		converted[i] = float32(v)
+	}
+	return converted
 }
 
-// startServer
+// saveToFile takes simple []float64 array and saves it to a binary file.
+func saveToFile(vertices []float32) {
+	f, err := os.Create("data_tmp")
+	check(err)
+	w := bufio.NewWriter(f)
+	err = binary.Write(w, binary.LittleEndian, vertices)
+	w.Flush()
+	f.Close()
+}
+
+// startServer starts HTTP server responding to API calls.
 func startServer() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fileName := r.RequestURI[1:]
@@ -131,16 +206,7 @@ func startServer() {
 		}
 
 		log.Printf("opening %s", fileName)
-
-		file, err := ioutil.ReadFile(fileName)
-
-		if err != nil {
-			log.Print(err)
-			http.Error(w, "Not found", 404)
-			return
-		}
-
-		w.Write(file)
+		http.ServeFile(w, r, fileName)
 	})
 
 	port := 3010
@@ -150,11 +216,18 @@ func startServer() {
 }
 
 func main() {
-	jsonMap := loadFileToJSON("./data.geojson")
-	shapes := parseData(jsonMap)
+	// jsonMap := loadFileToJSON("data.geojson")
+	// shapes := parseData(jsonMap)
+	shapes := []Shape{{
+		Type: "Polygon",
+		Points: [][]Point{
+			{{X: 50, Y: 110}, {X: 150, Y: 30}, {X: 240, Y: 115}, {X: 320, Y: 65}, {X: 395, Y: 170}, {X: 305, Y: 160}, {X: 265, Y: 240}, {X: 190, Y: 100}, {X: 95, Y: 125}, {X: 100, Y: 215}},
+		},
+	}}
 	normalized := normalize(shapes)
 	triangulated := triangulate(normalized)
 	vertices := flatten(triangulated)
-	saveToFile(vertices)
+	converted := toFloat32(vertices)
+	saveToFile(converted)
 	startServer()
 }

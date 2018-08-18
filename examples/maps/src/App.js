@@ -1,13 +1,24 @@
 import React, { Component } from 'react'
+import Preview from './Preview'
 
 import './styles.scss'
 
 const workerTask = () => {
-  fetch(`${SERVER}/data`)
-    .then(value => value.arrayBuffer())
-    .then(value => new Float32Array(value))
-    .then(value => postMessage(value))
-    .catch(error => postMessage({ error: 'data download failed' }))
+  const request = new XMLHttpRequest()
+  request.open('GET', `${SERVER}/data_tmp`, true)
+  request.responseType = 'arraybuffer'
+
+  request.onload = event => {
+    const arrayBuffer = request.response
+
+    if (!arrayBuffer) {
+      postMessage({ error: 'Array buffer conversion failed' })
+      return
+    }
+
+    postMessage({ value: new Float32Array(arrayBuffer) })
+  }
+  request.send()
 }
 
 class App extends Component {
@@ -26,7 +37,7 @@ class App extends Component {
     if (data.error) {
       this.setState({ data: null, error: data.error })
     } else {
-      this.setState({ data, error: null })
+      this.setState({ data: data.value, error: null })
     }
   }
 
@@ -43,12 +54,16 @@ class App extends Component {
   render() {
     const { data, error } = this.state
 
+    console.log(data)
+
     return (
       <div className="container">
         <div className="navigation">
           <img src="logo.png" className="logo" />
         </div>
-        {data && <div>{JSON.stringify(data)}</div>}
+        {data
+          ? <Preview vertices={data} />
+          : <div>loading...</div>}
         {error && <div>{JSON.stringify(error)}</div>}
       </div>
     )
