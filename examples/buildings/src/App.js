@@ -26,7 +26,7 @@ class App extends Component {
 
     // Create function for background task.
     const task = () => {
-      fetch(`${__SERVER__}/api/data`)
+      fetch(`${SERVER}/api/data`)
         .then(response => response.json())
         .then(data => {
           const shuffle = a => {
@@ -91,7 +91,7 @@ class App extends Component {
 
   respond = async status => {
     const { currentId } = this.state.triangleData
-    await fetch(`${__SERVER__}/api/report`, {
+    await fetch(`${SERVER}/api/report`, {
       method: 'POST',
       body: JSON.stringify({
         id: currentId,

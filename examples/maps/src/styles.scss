@@ -1,0 +1,37 @@
+@mixin font-stack() {
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantrell, "Helvetica Neue", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+@mixin no-select() {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+body {
+  font-size: 15px;
+  margin: 0;
+  padding: 0;
+  background-color: #eee;
+  @include font-stack();
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.navigation {
+  padding: 10px 50px;
+}
+
+.logo {
+  height: 80px;
+}
+
+* {
+  box-sizing: border-box;
+}

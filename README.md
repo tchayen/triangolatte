@@ -165,7 +165,7 @@ mind and it will be its main performance target._
 
 ### Content
 
-- provide more examples (e.g. desktop OpenGL usage, mobile app, live rendering pipeline, other unusual use cases...)
+- provide more examples (e.g. mobile app, live rendering pipeline, other unusual use cases...)
 - add benchmarks with comparison to libraries in
 other languages
 

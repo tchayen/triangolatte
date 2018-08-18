@@ -25,7 +25,7 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      __SERVER__: JSON.stringify('http://localhost:3010'),
+      SERVER: JSON.stringify('http://localhost:3010'),
     })
   ]
 }
