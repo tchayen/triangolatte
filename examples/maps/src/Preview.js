@@ -55,9 +55,9 @@ class Preview extends Component {
     // Normalize data.
     const { data } = this.props
     Object.keys(data).forEach(type => {
-      for (let i = 0; i < data[type].length; i += 2) {
-        data[type][i] *= this.width
-        data[type][i + 1] *= this.width
+      for (let i = 0; i < data[type].value.length; i += 2) {
+        data[type].value[i] *= this.width
+        data[type].value[i + 1] *= this.width
       }
     })
 
@@ -71,11 +71,9 @@ class Preview extends Component {
 
   render() {
     const { data } = this.props
-    const triangleArrays = Object
-      .values(data)
-      .map(object => new Float32Array(object))
+    const values = Object.values(data)
 
-    const objects = scene.setBuffers(gl, triangleArrays)
+    const objects = scene.setBuffers(gl, values)
     scene.draw(gl, this.program, objects, this.constants)
 
     return null

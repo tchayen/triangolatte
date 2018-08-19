@@ -6,13 +6,14 @@ import * as matrix from './matrix'
  * @param {Object} program linked shaders
  */
 
-let positionLocation, resolutionLocation, matrixLocation
+let positionLocation, resolutionLocation, colorLocation, matrixLocation
 
 const setup = (gl, program) => {
   positionLocation = gl.getAttribLocation(program, 'a_position')
 
   // Set uniforms.
   resolutionLocation = gl.getUniformLocation(program, "u_resolution")
+  colorLocation      = gl.getUniformLocation(program, "u_color")
   matrixLocation     = gl.getUniformLocation(program, "u_matrix")
 
   // Set up data in buffers.
@@ -30,10 +31,11 @@ const setBuffers = (gl, objects) => {
   objects.forEach(object => {
     const buffer = gl.createBuffer()
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-    gl.bufferData(gl.ARRAY_BUFFER, object, gl.STATIC_DRAW)
+    gl.bufferData(gl.ARRAY_BUFFER, object.value, gl.STATIC_DRAW)
     resultObjects.push({
       buffer,
-      triangles: object,
+      color: object.color.map(c => c / 255.0),
+      triangles: object.value,
     })
   })
 
@@ -54,10 +56,10 @@ const draw = (gl, program, objects, constants) => {
   gl.useProgram(program)
 
   objects.forEach(object => {
-    const { buffer, triangles } = object
+    const { buffer, triangles, color } = object
 
     gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height)
-
+    gl.uniform3f(colorLocation, ...color)
     const m = matrix.calculateSRTP([gl.canvas.clientWidth, gl.canvas.clientHeight], [0, 0], [1, 1], 0)
 
     gl.uniformMatrix3fv(matrixLocation, false, m)

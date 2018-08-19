@@ -5,8 +5,16 @@ import './styles.scss'
 
 const workerTask = () => {
   Promise
-    .all(['buildings', 'parks', 'roads']
-    .map(type => new Promise((resolve, reject) => {
+    .all([{
+      type: 'buildings',
+      color: [150, 150, 150],
+    }, {
+      type: 'parks',
+      color: [210, 210, 210],
+    }, {
+      type: 'roads',
+      color: [240, 240, 240],
+    }].map(({ type, color }) => new Promise((resolve, reject) => {
     const request = new XMLHttpRequest()
       request.open('GET', `${SERVER}/${type}_tmp`, true)
       request.responseType = 'arraybuffer'
@@ -17,7 +25,11 @@ const workerTask = () => {
           reject('Array buffer conversion failed')
         }
 
-        resolve({ type, value: new Float32Array(arrayBuffer) })
+        resolve({
+          type,
+          color,
+          value: new Float32Array(arrayBuffer),
+        })
       }
       request.send()
     })))
@@ -43,7 +55,8 @@ class App extends Component {
     } else {
       const renderingData = {}
       data.forEach(object => {
-        renderingData[object.type] = object.value
+        const { color, value } = object
+        renderingData[object.type] = { color, value }
       })
       this.setState({ data: renderingData, error: null })
     }

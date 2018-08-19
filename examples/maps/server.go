@@ -75,7 +75,7 @@ func parseData(m map[string]interface{}) [][]Shape {
 			var s *Shape
 			properties := feature["properties"].(map[string]interface{})
 
-			if properties["building"] == "yes" {
+			if properties["building"] != nil {
 				shapes[BUILDINGS] = append(shapes[BUILDINGS], Shape{})
 				s = &shapes[BUILDINGS][len(shapes[BUILDINGS])-1]
 			} else if properties["leisure"] == "park" {
