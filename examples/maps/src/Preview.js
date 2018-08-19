@@ -53,26 +53,29 @@ class Preview extends Component {
     this.program = webgl.createProgram(gl, vertexShader, fragmentShader)
 
     // Normalize data.
-    const { vertices } = this.props
-    for (let i = 0; i < vertices.length; i += 2) {
-      vertices[i] *= this.width
-      vertices[i + 1] *= this.width
-    }
+    const { data } = this.props
+    Object.keys(data).forEach(type => {
+      for (let i = 0; i < data[type].length; i += 2) {
+        data[type][i] *= this.width
+        data[type][i + 1] *= this.width
+      }
+    })
 
     // Setup scene.
     scene.setup(gl, this.program)
   }
 
   shouldComponentUpdate(nextProps) {
-    return false
+    return true
   }
 
   render() {
-    const { vertices } = this.props
-    // const vertices = [0.15068493783473969, -0.534246563911438, 0.5890411138534546, -0.8082191944122314, 1, -0.232876718044281, 0.15068493783473969, -0.534246563911438, 1, -0.232876718044281, 0.5068492889404297, -0.2876712381839752, 0.15068493783473969, -0.534246563911438, 0.5068492889404297, -0.2876712381839752, 0.2876712381839752, 0.15068493783473969, 0.15068493783473969, -0.534246563911438, 0.2876712381839752, 0.15068493783473969, -0.12328767031431198, -0.6164383292198181, -0.6438356041908264, -0.4794520437717438, -0.6164383292198181, 0.013698630034923553, -0.8904109597206116, -0.5616438388824463, -0.6438356041908264, -0.4794520437717438, -0.8904109597206116, -0.5616438388824463, -0.34246575832366943, -1, -0.34246575832366943, -1, 0.15068493783473969, -0.534246563911438, -0.12328767031431198, -0.6164383292198181, -0.34246575832366943, -1, -0.12328767031431198, -0.6164383292198181, -0.6438356041908264, -0.4794520437717438]
-    const triangles = new Float32Array(vertices)
-    const objects = scene.setBuffers(gl, [triangles])
+    const { data } = this.props
+    const triangleArrays = Object
+      .values(data)
+      .map(object => new Float32Array(object))
 
+    const objects = scene.setBuffers(gl, triangleArrays)
     scene.draw(gl, this.program, objects, this.constants)
 
     return null

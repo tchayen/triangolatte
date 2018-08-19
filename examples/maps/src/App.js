@@ -4,21 +4,25 @@ import Preview from './Preview'
 import './styles.scss'
 
 const workerTask = () => {
-  const request = new XMLHttpRequest()
-  request.open('GET', `${SERVER}/data_tmp`, true)
-  request.responseType = 'arraybuffer'
+  Promise
+    .all(['buildings', 'parks', 'roads']
+    .map(type => new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest()
+      request.open('GET', `${SERVER}/${type}_tmp`, true)
+      request.responseType = 'arraybuffer'
+      request.onload = event => {
+        const arrayBuffer = request.response
 
-  request.onload = event => {
-    const arrayBuffer = request.response
+        if (!arrayBuffer) {
+          reject('Array buffer conversion failed')
+        }
 
-    if (!arrayBuffer) {
-      postMessage({ error: 'Array buffer conversion failed' })
-      return
-    }
-
-    postMessage({ value: new Float32Array(arrayBuffer) })
-  }
-  request.send()
+        resolve({ type, value: new Float32Array(arrayBuffer) })
+      }
+      request.send()
+    })))
+    .then(values => postMessage(values))
+    .catch(error => postMessage({ error }))
 }
 
 class App extends Component {
@@ -37,7 +41,11 @@ class App extends Component {
     if (data.error) {
       this.setState({ data: null, error: data.error })
     } else {
-      this.setState({ data: data.value, error: null })
+      const renderingData = {}
+      data.forEach(object => {
+        renderingData[object.type] = object.value
+      })
+      this.setState({ data: renderingData, error: null })
     }
   }
 
@@ -62,8 +70,8 @@ class App extends Component {
           <img src="logo.png" className="logo" />
         </div>
         {data
-          ? <Preview vertices={data} />
-          : <div>loading...</div>}
+          ? <Preview data={data} />
+          : <div className="loading">loading...</div>}
         {error && <div>{JSON.stringify(error)}</div>}
       </div>
     )
