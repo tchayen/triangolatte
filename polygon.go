@@ -48,23 +48,9 @@ func isEar(p *Element) bool {
 	return true
 }
 
-func combinePolygons(outer, inner []Point) ([]Point, error) {
-	xMax := 0.0
-	mIndex := 0
-	for i := 0; i < len(inner); i++ {
-		if inner[i].X > xMax {
-			xMax = inner[i].X
-			mIndex = i
-		}
-	}
-
-	m := inner[mIndex]
-
-	// Find the edges that intersect with ray `M + t * (1, 0)`. Let `K` be the
-	// closest visible point to `M` on this ray.
-	var k Point
-	foundK := false
-	var k1, k2 int
+// findK finds the edges that intersect with ray `M + t * (1, 0)`. Let `K` be
+// the closest visible point to `M` on this ray.
+func findK(m Point, outer []Point) (k Point, k1, k2 int, err error) {
 	for i, j := len(outer)-1, 0; j < len(outer); i, j = j, j+1 {
 		// Skip edges that does not have their first point below `M` and the second
 		// one above.
@@ -81,18 +67,82 @@ func combinePolygons(outer, inner []Point) ([]Point, error) {
 
 		if t1 >= 0.0 && t2 >= 0.0 && t2 <= 1.0 {
 			// If there is no current `k` candidate or this one is closer.
-			if !foundK || t1-m.X < k.X {
+			if t1-m.X < k.X {
 				k = Point{X: t1 + m.X, Y: m.Y}
 				k1, k2 = i, j
-				foundK = true
+				return
 			}
 		} else {
-			return nil, errors.New("cannot calculate intersection, problematic data")
+			err = errors.New("cannot calculate intersection, problematic data")
+			return
+		}
+	}
+	return
+}
+
+func areAllOutside(m, k Point, pIndex int, outer []Point) bool {
+	allOutside := true
+	for i := range outer {
+		// We have to skip M, K and P vertices. Since M is from the inner
+		// polygon and K was proved to not match any vertex, the only one to
+		// check is pIndex
+		if i == pIndex {
+			continue
+		}
+
+		if isInsideTriangle(m, k, outer[pIndex], outer[i]) {
+			allOutside = false
+		}
+	}
+	return allOutside
+}
+
+func findClosest(m, k Point, pIndex int, outer []Point) int {
+	reflex := list.New()
+	n := len(outer)
+	for i := 0; i < n; i++ {
+		notInside := !isInsideTriangle(m, k, outer[pIndex], outer[i])
+		prev, next := cyclic(i-1, n), cyclic(i+1, n)
+		notReflex := !isReflex(outer[prev], outer[i], outer[next])
+		if notInside || notReflex {
+			continue
+		}
+		reflex.PushBack(i)
+	}
+	var closest int
+	var maxDist float64
+
+	for r := reflex.Front(); r != nil; r = r.Next() {
+		i := r.Value.(int)
+		dist := outer[i].Distance2(outer[closest])
+		if dist > maxDist {
+			closest = i
+			maxDist = dist
+		}
+	}
+	return closest
+}
+
+func combinePolygons(outer, inner []Point) ([]Point, error) {
+	xMax := 0.0
+	mIndex := 0
+	for i := 0; i < len(inner); i++ {
+		if inner[i].X > xMax {
+			xMax = inner[i].X
+			mIndex = i
 		}
 	}
 
+	m := inner[mIndex]
+
 	var pIndex int
 	visibleIndex := -1
+
+	k, k1, k2, err := findK(m, outer)
+
+	if err != nil {
+		return nil, err
+	}
 
 	// If `K` is vertex of the outer polygon, `M` and `K` are mutually visible.
 	for i := 0; i < len(outer); i++ {
@@ -111,19 +161,7 @@ func combinePolygons(outer, inner []Point) ([]Point, error) {
 
 	// Check with all vertices of the outer polygon to be outside of the
 	// triangle `[M, K, P]`. If it is true, `M` and `P` are mutually visible.
-	allOutside := true
-	for i := range outer {
-		// We have to skip M, K and P vertices. Since M is from the inner
-		// polygon and K was proved to not match any vertex, the only one to
-		// check is pIndex
-		if i == pIndex {
-			continue
-		}
-
-		if isInsideTriangle(m, k, outer[pIndex], outer[i]) {
-			allOutside = false
-		}
-	}
+	allOutside := areAllOutside(m, k, pIndex, outer)
 
 	if visibleIndex < 0 && allOutside {
 		visibleIndex = pIndex
@@ -135,29 +173,7 @@ func combinePolygons(outer, inner []Point) ([]Point, error) {
 	// mutually visible. If there are multiple such vertices, pick the one closest
 	// to `M`.
 	if visibleIndex < 0 {
-		reflex := list.New()
-		n := len(outer)
-		for i := 0; i < n; i++ {
-			notInside := !isInsideTriangle(m, k, outer[pIndex], outer[i])
-			prev, next := cyclic(i-1, n), cyclic(i+1, n)
-			notReflex := !isReflex(outer[prev], outer[i], outer[next])
-			if notInside || notReflex {
-				continue
-			}
-			reflex.PushBack(i)
-		}
-		var closest int
-		var maxDist float64
-
-		for r := reflex.Front(); r != nil; r = r.Next() {
-			i := r.Value.(int)
-			dist := outer[i].Distance2(outer[closest])
-			if dist > maxDist {
-				closest = i
-				maxDist = dist
-			}
-		}
-		visibleIndex = closest
+		visibleIndex = findClosest(m, k, pIndex, outer)
 	}
 
 	if visibleIndex < 0 {
