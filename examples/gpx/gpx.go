@@ -7,7 +7,7 @@ import (
 	"log"
 	"math"
 
-	. "github.com/tchayen/triangolatte"
+	"github.com/tchayen/triangolatte"
 )
 
 // GPX is the root element in the XML file.
@@ -46,8 +46,8 @@ const originShift = 2.0 * math.Pi * 6378137 / 2.0
 // codename.
 //
 // X is longitude, Y is latitude.
-func degreesToMeters(point Point) Point {
-	return Point{
+func degreesToMeters(point triangolatte.Point) triangolatte.Point {
+	return triangolatte.Point{
 		X: point.X * originShift / 180.0,
 		Y: math.Log(math.Tan((90.0+point.Y)*math.Pi/360.0)) / (math.Pi / 180.0) * originShift / 180.0,
 	}
@@ -61,15 +61,15 @@ func XMLToGPX(data []byte) (gpx GPX, err error) {
 
 // GPXToPoints takes parsed GPX data and returns array of arrays of points
 // (divided into segments as in GPX source).
-func GPXToPoints(gpx GPX) [][]Point {
-	segmentPoints := make([][]Point, len(gpx.Trk.Trkseg))
+func GPXToPoints(gpx GPX) [][]triangolatte.Point {
+	segmentPoints := make([][]triangolatte.Point, len(gpx.Trk.Trkseg))
 	for i := range gpx.Trk.Trkseg {
-		segmentPoints[i] = make([]Point, len(gpx.Trk.Trkseg[i].Trkpt))
+		segmentPoints[i] = make([]triangolatte.Point, len(gpx.Trk.Trkseg[i].Trkpt))
 
 		for j := range gpx.Trk.Trkseg[i].Trkpt {
 			trackPoint := gpx.Trk.Trkseg[i].Trkpt[j]
 			lon, lat := trackPoint.Longitude, trackPoint.Latitude
-			point := Point{X: lon, Y: lat}
+			point := triangolatte.Point{X: lon, Y: lat}
 
 			segmentPoints[i][j] = degreesToMeters(point)
 		}
@@ -78,10 +78,10 @@ func GPXToPoints(gpx GPX) [][]Point {
 }
 
 // triangulatePoints takes array of arrays of points and triangulates them.
-func triangulatePoints(points [][]Point) [][]float64 {
+func triangulatePoints(points [][]triangolatte.Point) [][]float64 {
 	triangles := make([][]float64, len(points))
 	for i := range points {
-		triangles[i], _ = Line(Miter, points[i], 2)
+		triangles[i], _ = triangolatte.Line(triangolatte.Miter, points[i], 2)
 	}
 	return triangles
 }

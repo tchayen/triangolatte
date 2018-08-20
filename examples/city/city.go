@@ -7,13 +7,13 @@ import (
 	"log"
 	"math"
 
-	. "github.com/tchayen/triangolatte"
+	"github.com/tchayen/triangolatte"
 )
 
 // Building collects meta data about building and its points.
 type Building struct {
 	Properties map[string]string
-	Points     [][]Point
+	Points     [][]triangolatte.Point
 }
 
 // Triangulated is a variation of building containing triangulated points.
@@ -30,15 +30,15 @@ const originShift = 2.0 * math.Pi * 6378137 / 2.0
 // codename.
 //
 // X is longitude, Y is latitude.
-func degreesToMeters(point Point) Point {
-	return Point{
+func degreesToMeters(point triangolatte.Point) triangolatte.Point {
+	return triangolatte.Point{
 		X: point.X * originShift / 180.0,
 		Y: math.Log(math.Tan((90.0+point.Y)*math.Pi/360.0)) / (math.Pi / 180.0) * originShift / 180.0,
 	}
 }
 
 // polygonArea calculates real area of the polygon.
-func polygonArea(data []Point) float64 {
+func polygonArea(data []triangolatte.Point) float64 {
 	area := 0.0
 	for i, j := 0, len(data)-1; i < len(data); i++ {
 		area += data[i].X*data[j].Y - data[i].Y*data[j].X
@@ -58,7 +58,7 @@ func trianglesArea(t []float64) float64 {
 
 // deviation calculates difference between real area and the one from
 // triangulation. Used as a helper function.
-func deviation(data []Point, holes [][]Point, t []float64) (
+func deviation(data []triangolatte.Point, holes [][]triangolatte.Point, t []float64) (
 	actual,
 	calculated,
 	deviation float64,
@@ -105,13 +105,13 @@ func parseData(m map[string]interface{}) (buildings []Building) {
 		case "Polygon":
 			for j, polygon := range geometry["coordinates"].([]interface{}) {
 				// Initialize points array in the building.
-				buildings[i].Points = append(buildings[i].Points, []Point{})
+				buildings[i].Points = append(buildings[i].Points, []triangolatte.Point{})
 
 				for _, p := range polygon.([]interface{}) {
 					// Cast from interface{} to []interface{}.
 					pointArray := p.([]interface{})
 
-					point := Point{
+					point := triangolatte.Point{
 						X: pointArray[0].(float64),
 						Y: pointArray[1].(float64),
 					}
@@ -129,7 +129,7 @@ func parseData(m map[string]interface{}) (buildings []Building) {
 }
 
 // findMinMax takes array of points and finds min and max coordinates.
-func findMinMax(points []Point) (xMin, yMin, xMax, yMax float64) {
+func findMinMax(points []triangolatte.Point) (xMin, yMin, xMax, yMax float64) {
 	xMin, yMin, xMax, yMax = math.MaxFloat64, math.MaxFloat64, 0.0, 0.0
 	for _, p := range points {
 		if p.X < xMin {
@@ -163,7 +163,7 @@ func normalizeCoordinates(buildings []Building) {
 		for i := range b.Points {
 			for j := range b.Points[i] {
 				v := b.Points[i][j]
-				b.Points[i][j] = Point{
+				b.Points[i][j] = triangolatte.Point{
 					X: (v.X - xMin) / (xMax - xMin),
 					Y: (v.Y - yMin) / (yMax - yMin),
 				}
@@ -187,23 +187,23 @@ func triangulate(buildings []Building) (
 		}
 
 		errorHappened := false
-		cleaned, err := JoinHoles(b.Points)
+		cleaned, err := triangolatte.JoinHoles(b.Points)
 
 		if err != nil {
 			errorHappened = true
 		}
 
-		t, err := Polygon(cleaned)
+		t, err := triangolatte.Polygon(cleaned)
 
 		if err != nil {
 			errorHappened = true
 		}
 
-		var h [][]Point
+		var h [][]triangolatte.Point
 		if len(b.Points) > 1 {
 			h = b.Points[1:]
 		} else {
-			h = [][]Point{}
+			h = [][]triangolatte.Point{}
 		}
 		_, _, deviation := deviation(b.Points[0], h, t)
 

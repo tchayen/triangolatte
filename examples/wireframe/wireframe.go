@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
-	. "github.com/tchayen/triangolatte"
+	"github.com/tchayen/triangolatte"
 )
 
 const (
@@ -25,7 +25,7 @@ var (
 	vao         uint32
 	triangles   []float32
 	barycentric []float32
-	points      = []Point{{X: 50, Y: 110}, {X: 150, Y: 30}, {X: 240, Y: 115}, {X: 320, Y: 65}, {X: 395, Y: 170}, {X: 305, Y: 160}, {X: 265, Y: 240}, {X: 190, Y: 100}, {X: 95, Y: 125}, {X: 100, Y: 215}}
+	points      = []triangolatte.Point{{X: 50, Y: 110}, {X: 150, Y: 30}, {X: 240, Y: 115}, {X: 320, Y: 65}, {X: 395, Y: 170}, {X: 305, Y: 160}, {X: 265, Y: 240}, {X: 190, Y: 100}, {X: 95, Y: 125}, {X: 100, Y: 215}}
 
 	vertexShaderSource = `
 		#version 410
@@ -61,7 +61,7 @@ func check(err error) {
 }
 
 // findMinMax takes array of points and finds min and max coordinates.
-func findMinMax(points []Point) (xMin, yMin, xMax, yMax float64) {
+func findMinMax(points []triangolatte.Point) (xMin, yMin, xMax, yMax float64) {
 	xMin, yMin, xMax, yMax = math.MaxFloat64, math.MaxFloat64, 0.0, 0.0
 	for _, p := range points {
 		if p.X < xMin {
@@ -93,10 +93,10 @@ func toFloat32(array []float64) []float32 {
 }
 
 // normalize puts array of vertices in range [-1, 1] (stretching to rectangle).
-func normalize(points []Point) []Point {
+func normalize(points []triangolatte.Point) []triangolatte.Point {
 	xMin, yMin, xMax, yMax := findMinMax(points)
 	for i := range points {
-		points[i] = Point{
+		points[i] = triangolatte.Point{
 			X: ((points[i].X-xMin)/(xMax-xMin))*previewSize - previewSize/2,
 			Y: ((points[i].Y-yMin)/(yMax-yMin))*previewSize - previewSize/2,
 		}
@@ -106,7 +106,7 @@ func normalize(points []Point) []Point {
 
 // triangulate triangules array of points returning array of triangles.
 func triangulate() {
-	triangulated, err := Polygon(normalize(points))
+	triangulated, err := triangolatte.Polygon(normalize(points))
 	check(err)
 
 	triangles = toFloat32(triangulated)

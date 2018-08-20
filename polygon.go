@@ -91,7 +91,8 @@ func combinePolygons(outer, inner []Point) ([]Point, error) {
 		}
 	}
 
-	var visibleIndex, pIndex int = -1, -1
+	var pIndex int
+	visibleIndex := -1
 
 	// If `K` is vertex of the outer polygon, `M` and `K` are mutually visible.
 	for i := 0; i < len(outer); i++ {
